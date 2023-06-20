@@ -1,0 +1,51 @@
+System coldstorageservice
+
+//Messaggi
+//serviceaccessgui <-> appl
+Request storerequest: 	storerequest(FW)
+Reply storeaccepted:	storeaccepted(TICKETTIME)
+Reply storerejected:	storerejected(_)
+
+
+
+
+Context ctxcoldstorage ip [host="localhost" port=8021]
+
+// ACTORS
+ExternalQActor basicrobot context ctxcoldstorage
+
+QActor transporttrolley context ctxcoldstorage {
+	State s0 initial {
+		
+	}
+}
+
+QActor servicestatusgui context ctxcoldstorage {
+	State s0 initial {
+		
+	}
+}
+
+QActor serviceaccessgui context ctxcoldstorage {
+	State s0 initial {
+		
+	}
+}
+
+QActor appl context ctxcoldstorage {
+	State s0 initial {
+		
+	}
+}
+
+QActor sonar context ctxcoldstorage {
+	State s0 initial {
+		
+	}
+}
+
+QActor led context ctxcoldstorage {
+	State s0 initial {
+		
+	}
+}

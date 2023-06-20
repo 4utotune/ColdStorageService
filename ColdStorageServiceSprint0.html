@@ -236,7 +236,7 @@
         <h2>Introduction</h2>
         Lo Sprint0 si concentra sull'analisi dei requisiti forniti dal cliente in modo tale da delineare in modo generale la struttura del sistema richiesto. Per fare ciò in seguito vengono riportate le considerazioni e chiarimenti avute durante l'analisi del Temafinale23.<br>
 Una volta definita senza ambiguità la richiesta del committente si è delineata tramite dei macro-componenti la struttura complessiva. Questa visione torna utile per intuire la complessità e distribuire il lavoro in modo incrementale sotto forma di Sprint.
-        DA RIGUARDARE:
+        <!--DA RIGUARDARE:
         Il nostro team deve progettare e sviluppare un sistema software per , come descritto nel tema finale del 2022.
 
         Lo Sprint0 si concentra sull'analisi dei requisiti forniti dal cliente. Il nostro compito è comprenderli
@@ -254,7 +254,7 @@ Una volta definita senza ambiguità la richiesta del committente si è delineata
 
         Alla fine dello Sprint0, redigeremo alcune conclusioni e forniremo un piano di lavoro che programmerà gli Sprint
         successivi. In particolare, delineeremo il core-business del progetto.
-
+    -->
         <h2>Requirements</h2>
 
         <div class="remark">
@@ -617,8 +617,20 @@ Una volta definita senza ambiguità la richiesta del committente si è delineata
 
 
 
-
-
+        <h2>Analisi del Problema</h2>
+        Dati i requisiti del progetto, si è deciso di modellare l'interazione dei componenti specificato tramite il modello ad attori QAK, gli attori identificati
+        <ul>
+            <li>ServiceAccessGui</li>
+            <li>ServiceStatusGui</li>
+            <li>TransportTrolley</li>
+            <li>ColdStorageService</li>
+            <li>BasicRobot</li>
+            <li>Sonar</li>
+            <li>Led</li>
+        </ul>
+        Data l'assenza di requisiti riguardanti il comportamento della ColdRoom si è deciso di non modellarla come attore. Per quanto una estensione delle sua
+        funzionalità richiederà sicuramente una diversa modellazione, per questo Sprint0 scegliamo di inserire la poca logica nell'attore ServiceAccessGui in quanto non è
+        comunque violato il principio di singola responsabilità.
 
 
 
