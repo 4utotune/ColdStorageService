@@ -171,6 +171,10 @@
         border-radius: 25px;
     }
 
+    table {
+        width: 90%;
+    }
+
     table,
     th,
     td {
@@ -216,6 +220,19 @@
         width: 85%;
         margin: auto;
     }
+
+    .piccolo {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 40%;
+    }
+
+    .piccolo img {
+        border-radius: 20px;
+        max-width: 100%;
+        max-height: 100%;
+    }
 </style>
 
 <head>
@@ -234,32 +251,22 @@
     <div class="body">
 
         <h2>Introduction</h2>
-        Lo Sprint0 si concentra sull'analisi dei requisiti forniti dal cliente in modo tale da delineare in modo generale la struttura del sistema richiesto. Per fare ciò in seguito vengono riportate le considerazioni e chiarimenti avute durante l'analisi del Temafinale23.<br>
-Una volta definita senza ambiguità la richiesta del committente si è delineata tramite dei macro-componenti la struttura complessiva. Questa visione torna utile per intuire la complessità e distribuire il lavoro in modo incrementale sotto forma di Sprint.
-        <!--DA RIGUARDARE:
-        Il nostro team deve progettare e sviluppare un sistema software per , come descritto nel tema finale del 2022.
+        Lo Sprint0 si concentra sull'analisi dei requisiti forniti dal cliente in modo tale da delineare in modo
+        generale
+        la struttura del sistema richiesto. Per fare ciò in seguito vengono riportate le considerazioni e chiarimenti
+        avute
+        durante l'analisi del <a href="http://calendar.altervista.org/TemaFinale23.pdf" target="_blank">TemaFinale23</a><br>
+        Una volta definita senza ambiguità la richiesta del committente, si è delineata tramite dei macro-componenti la
+        struttura
+        complessiva. Alla fine dello Sprint0 si fornisce dunque un piano di lavoro che programmerà gli Sprint
+        successivi, delineando così
+        il core-business del progetto.<br>
 
-        Lo Sprint0 si concentra sull'analisi dei requisiti forniti dal cliente. Il nostro compito è comprenderli
-        appieno, chiarire dubbi e incertezze, in modo che tutti (i membri del team e il cliente/proprietario del
-        prodotto) concordino sul loro significato.
-
-        In particolare, lo Sprint0 ha i seguenti obiettivi<ul>
-            <li>Formalizzare i requisiti per renderli comprensibili dalla macchina;</li>
-            <li>Realizzare un modello di panoramica generale del sistema, suddiviso per nodi computazionali;</li>
-            <li>Stilare uno schema di interazione primitivo iniziale;</li>
-            <li>Fornire alcuni piani di test eseguibili, che serviranno per mostrare al cliente il comportamento
-                principale del sistema, al fine di discutere la correttezza e eventuali problemi/differenze.</li>
-        </ul>
-        Lo Sprint0 non discute ancora alcun problema, pertanto non ci sarà una sezione di analisi dei problemi.
-
-        Alla fine dello Sprint0, redigeremo alcune conclusioni e forniremo un piano di lavoro che programmerà gli Sprint
-        successivi. In particolare, delineeremo il core-business del progetto.
-    -->
         <h2>Requirements</h2>
 
         <div class="remark">
-            <a target="_blank" href="https://iss.riccardohost.space/TemaFinale23.html">Descrizione requirements a questa
-                pagina</a><br>
+            <a target="_blank" href="http://calendar.altervista.org/TemaFinale23.pdf">Descrizione del
+                TemaFinale23</a><br>
 
             <bc>Goals dello sprint 0</bc>:
             <ol>
@@ -271,7 +278,7 @@ Una volta definita senza ambiguità la richiesta del committente si è delineata
         </div>
 
         <h2>Requirement analysis</h2>
-        Lo scopo del progetto finale è quello di gestire un Cold Storage Service.
+        Lo scopo del progetto finale è quello di creare e gestire un ColdStorageService.
         <h5>Chiarimenti del committente</h5>
         L'interazione con il committente ha permesso di chiarire alcuni aspetti del progetto:
         <ul>
@@ -288,18 +295,37 @@ Una volta definita senza ambiguità la richiesta del committente si è delineata
                 eccessivamente lunghi;</li>
             <li>Le posizioni del robot possono essere rappresentate con un sistema di cordinate oppure con indicazioni
                 qualitative, come "at INDOOR", "at HOME" e "at Cold Room";</li>
-            <li>La stanza presa in considerazione presenta ostacoli statici, le cui coordinate sono conosciute;</li>
+            <li>La stanza presa in considerazione presenta due ostacoli statici, le cui coordinate sono conosciute;</li>
             <li>Le posizioni degli elementi: INDOOR, HOME e Cold Room, sono conosciute a priori;</li>
             <li>Il service manager è un operatore umano esterno al sistema;</li>
             <li>I messaggi inviati allo smart device del service manager che consentono la supervisione del sistema sono
                 invece parte del sistema;</li>
+            <li>La ServiceAccessGUI è accessibile solo al service-manager;</li>
             <li>Il sonar e il Led NON sono sul trolley, bensì su un Rasberry Pi separato;</li>
             <li>Il trolley si deve fermare "il prima possibile", quando il sonar trasmette un alarm;</li>
             <li>La ServiceAccessGui è unica e condivisa da tutti i conducenti del camion;</li>
             <li>Il DDR Robot e il Transport Trolley non sono la stessa cosa;</li>
         </ul>
+        <h5>Da chiarire con il committente</h5>
+        <ol>
+            <li>Va presupposto che il Ticket sia inserito, in maniera onesta, dal conducente solo davanti all'INDOOR? E
+                dunque in quanto analisti e progettisti non ci dobbiamo preoccuparci che un conducente inserisca il
+                Ticket prima di essere davanti all'INDOOR?</li>
+            <li>In caso ci sia una coda di Fridge Truck in attesa, il committente desidera che la coda possa essere
+                infinita oppure è necessario rifiutare a priori dei Fridge Truck se la coda supera un numero N di Fridge
+                Truck in coda?</li>
+            <li>Chi si occupa di accorgesi di far fare più giri al trolley nel caso il carico superi la capacità massima
+                del robottino?</li>
+            <li>Se ci sono più giri, quando viene mandato il "charge taken"? Al primo pick-up o all'ultimo?</li>
+            <li>La ServiceAccessGUI deve essere pensata principalmente per dispositivi mobile?</li>
+            <li>Come vengono identificate le posizioni speciali, in coordinate?Come HOME, INDOOR e PORT, che
+                implicitamente sappiamo già. Ma la HOME e INDOOR quanto sono ampie?</li>
+            <li>Siccome due camion non facciano la richiesta in contemporanea e dunque non ci possono essere due "insert
+                ticket" accavallati? Quindi un truck può fare insert ticket solo quando quello precedente ha ricevuto
+                "charge taken"?</li>
+        </ol>
         <h5>Dizionario</h5>
-        <h7>Nomi:</h7>
+        <h7>NOMI:</h7>
         <table>
             <thead>
                 <tr>
@@ -310,117 +336,139 @@ Una volta definita senza ambiguità la richiesta del committente si è delineata
             <tbody>
                 <tr>
                     <td>ColdStorageService</td>
-                    <td>Il ColdStorageService è un Sistema Distribuito e corrisponde all'entità del sistema che coordina il comportamento degli altri componenti implementando la business-logic dell'applicazione. Definisce il prodotto finale che soddisfa tutti i requisiti forniti dal committente.</td>
-                </tr>
-
-                <tr>
-                    <td>INDOOR</td>
-                    <td>Posizione identificata su una parete della Service Area adibita allo scambio di alimenti dal Fridge Truck al
-                        Transport Trolley.</td>
-                </tr>
-                <tr>
-                    <td>PORT</td>
-                    <td>Posizione identificata su una faccia della ColdRoom utilizzata per scaricare gli alimenti dal
-                        Transport Trolley.</td>
-                </tr>
-                <tr>
-                    <td>Alimenti</td>
-                    <td>Contenuto del carico che il Transport Trolley gestisce.</td>
-                </tr>
-                <tr>
-                    <td>ColdRoom</td>
-                    <td>Una stanza o un ambiente appositamente progettato e controllato termicamente per conservare e
-                        mantenere la temperatura dei prodotti alimentari a bassa temperatura. Costituisce la destinazione del materiale ritirato dal transport trolley al punto di INDOOR.</td>
-                </tr>
-                <tr>
-                    <td>MAXW</td>
-                    <td>Quantità massima di alimenti espressa in Kg che la ColdRoom è in grado di immagazzinare.</td>
+                    <td>Il ColdStorageService è un Sistema Distribuito e corrisponde all'entità del sistema che coordina
+                        il comportamento degli altri componenti implementando la business-logic dell'applicazione.
+                        Definisce il prodotto finale che soddisfa tutti i requisiti forniti dal committente.</td>
                 </tr>
                 <tr>
                     <td>Service area</td>
                     <td>Superficie piatta, rettangolare, con ostacoli fissi e circoscritta da 4 pareti. Definisce la
-                        zona di manovra del transport trolley ed è inoltre composta da:<ol>
-                            <li>una ColdRoom</li>
-                            <li>una INDOOR</li>
-                            <li>una HOME</li>
+                        zona di manovra del <u>Transport Trolley</u> ed è inoltre composta da:<ol>
+                            <li>una <u>Cold Room</u></li>
+                            <li>una <u>INDOOR</u></li>
+                            <li>una <u>HOME</u></li>
                         </ol>
-                        Per ostacoli si intendono oggetti che limitano l'area percorribile dal Transport trolley.</td>
-                </tr>
-                <tr>
-                    <td>DDR robot</td>
-                    <td>Differential Drive Robot (DDR), robot fisico fornito dal committente. È in grado di muoversi all'interno della Service Area
-                        grazie al software BasicRobot, anch'esso fornito dal committente.</td>
-                </tr>
-                <tr>
-                    <td>Transport Trolley</td>
-                    <td>Un robot virtuale a forma di quadrato, con lato di lunghezza RD, che è inizialmente posizionato nella sua posizione HOME e svolge un'azione di deposito. Può muoversi in avanti, indietro, fermarsi e ruotare di 90°.
-                        Il Transport Trolley è un <u>attuatore di comando</u>: può utilizzare il robot DDR per eseguire azioni in un ambiente reale.</td>
-                </tr>
-                <tr>
-                    <td>RD</td>
-                    <td>Lunghezza di ogni lato del Transport Trolley.</td>
-                </tr>
-                <tr>
-                    <td>HOME</td>
-                    <td>Posizione identificata sul pavimento della Service Area che identifica la zona dove il robot
-                        risiede alla partenza.</td>
-                </tr>
-                <tr>
-                    <td>Azione di deposito</td>
-                    <td>Sequenza di azioni del Transport Trolley che vengono eseguite ogni volta che un Fridge truck è
-                        pronto per scaricare il carico:
-                        <ol>
-                            <li>Raccogliere il carico dal Fridge truck situato nella INDOOR</li>
-                            <li>Andare dalla INDOOR alla PORT della ColdRoom</li>
-                            <li>Depositate il carico nella ColdRoom</li>
-                        </ol>
+                        Per ostacoli si intendono oggetti che limitano l'area percorribile dal <u>Transport Trolley</u>.
                     </td>
                 </tr>
                 <tr>
-                    <td>Fridge Truck</td>
-                    <td>Entità generica esterna al sistema che consente di scaricare una
-                        quantità pari a FW Kg di alimenti.</td>
+                    <td>INDOOR</td>
+                    <td>Posizione identificata su una parete della Service Area adibita allo scambio di alimenti dal
+                        <u>Fridge Truck</u> al
+                        <u>Transport Trolley</u>.
+                    </td>
                 </tr>
                 <tr>
-                    <td>Conducente del Fridge Truck</td>
-                    <td>Entità esterna al sistema definita come essere umano alla guida del Fridge truck.</td>
+                    <td>PORT</td>
+                    <td>Posizione della <u>Service Area</u> identificata su una faccia della ColdRoom utilizzata per
+                        scaricare gli alimenti dal
+                        <u>Transport Trolley</u>.
+                    </td>
                 </tr>
                 <tr>
-                    <td>Carico</td>
-                    <td>Qunatità in kg di alimenti che viene depositato dal Fridge Truck presso l'INDOOR.</td>
+                    <td>HOME</td>
+                    <td>Posizione identificata sul pavimento della <u>Service Area</u> che identifica la zona dove il
+                        robot
+                        risiede alla partenza.</td>
                 </tr>
                 <tr>
-                    <td> ServiceAcessGUI </td>
-                    <td>Interfaccia grafica utilizzata dai conducenti del Fridge Truck per interagire con il ColdStorageService al fine
-                        di scaricare il carico.</td>
+                    <td>Transport Trolley</td>
+                    <td>Un robot virtuale a forma di quadrato, con lato di lunghezza <u>RD</u>, che è inizialmente
+                        posizionato nella sua posizione <u>HOME</u> e svolge un'<u>azione di deposito</u>. Può muoversi
+                        in avanti, indietro, fermarsi e ruotare di 90°.
+                        Il <u>Transport Trolley</u> è un <b>attuatore di comando</b>: può utilizzare il <u>robot DDR</u>
+                        per eseguire azioni in un ambiente reale.</td>
+                </tr>
+                <tr>
+                    <td>RD</td>
+                    <td>Lunghezza di ogni lato del <u>Transport Trolley</u>.</td>
+                </tr>
+                <tr>
+                    <td>Alimenti</td>
+                    <td>Contenuto del carico che il <u>Transport Trolley</u> gestisce.</td>
+                </tr>
+                <tr>
+                    <td>ColdRoom</td>
+                    <td>Una stanza o un ambiente appositamente progettato e controllato termicamente per conservare e
+                        mantenere la temperatura dei prodotti alimentari a bassa temperatura. Costituisce la
+                        destinazione del materiale ritirato dal <u>Transport Trolley</u> al punto di <u>INDOOR</u>.</td>
+                </tr>
+                <tr>
+                    <td>MAXW</td>
+                    <td>Quantità massima di alimenti espressa in Kg che la <u>Cold Room</u> è in grado di immagazzinare.
+                    </td>
+                </tr>
+                <tr>
+                    <td>DDR robot</td>
+                    <td>Differential Drive Robot (DDR), robot fisico fornito dal committente. È in grado di muoversi
+                        all'interno della <u>Service Area</u>
+                        grazie al software BasicRobot, anch'esso fornito dal committente.</td>
+                </tr>
+                <tr>
+                    <td>Azione di deposito</td>
+                    <td>Sequenza di azioni del <u>Transport Trolley</u> che vengono eseguite ogni volta che un <u>Fridge
+                            Truck</u> è
+                        pronto per scaricare il carico:
+                        <ol>
+                            <li>Raccogliere il carico dal <u>Fridge Truck</u> situato nella <u>INDOOR</u></li>
+                            <li>Andare dalla INDOOR alla <u>PORT</u> della <u>Cold Room</u></li>
+                            <li>Depositate il carico nella <u>Cold Room</u></li>
+                        </ol>
+                    </td>
                 </tr>
                 <tr>
                     <td>FW</td>
                     <td>Peso del carico espresso in Kg.</td>
                 </tr>
                 <tr>
+                    <td>Fridge Truck</td>
+                    <td>Entità generica esterna al sistema che consente di scaricare una
+                        quantità pari a <u>FW</u> Kg di <u>alimenti</u>.</td>
+                </tr>
+                <tr>
+                    <td>Conducente del Fridge Truck</td>
+                    <td>Entità esterna al sistema definita come essere umano alla guida del <u>Fridge Truck</u>.</td>
+                </tr>
+                <tr>
+                    <td>Carico</td>
+                    <td>Qunatità in kg di <u>alimenti</u> che viene depositato dal <u>Fridge Truck</u> presso
+                        l'<u>INDOOR</u>.</td>
+                </tr>
+                <tr>
+                    <td> ServiceAcessGUI </td>
+                    <td>Interfaccia grafica utilizzata dai conducenti del <u>Fridge Truck</u> per interagire con il
+                        <u>ColdStorageService</u> al fine
+                        di scaricare il carico.
+                    </td>
+                </tr>
+                <tr>
                     <td>Ticket</td>
-                    <td>Identificatore univoco della richiesta del conducente del Fridge Truck al ColdStorageService per consentire lo scarico del
-                        carico.</td>
+                    <td>Identificatore univoco della richiesta del conducente del <u>Fridge Truck</u> al
+                        <u>ColdStorageService</u> per consentire lo scarico del
+                        carico.
+                    </td>
                 </tr>
                 <tr>
                     <td>TICKETTIME</td>
-                    <td>Tempo di validità del ticket, espresso in secondi.</td>
+                    <td>Tempo di validità del <u>TICKETTIME</u>, espresso in secondi.</td>
                 </tr>
                 <tr>
                     <td>ServiceStatusGUI</td>
-                    <td>Interfaccia grafica utilizzata dal Service-manager per supervisionare lo Stato della Service Area.</td>
+                    <td>Interfaccia grafica utilizzata dal <u>Service-manager</u> per supervisionare lo <u>Stato della
+                            Service Area</u>.</td>
                 </tr>
                 <tr>
                     <td> Service-manager </td>
-                    <td>Entità esterna al sistema, definita come essere umano che svolge il compito di monitorare lo Stato della Service Area attraverso la ServiceStatusGUI.</td>
+                    <td>Entità esterna al sistema, definita come essere umano che svolge il compito di monitorare lo
+                        <u>Stato della Service Area</u> attraverso la <u>ServiceStatusGUI</u>.
+                    </td>
                 </tr>
                 <tr>
                     <td>Stato della Service Area</td>
                     <td>Informazioni sul sistema ad un preciso istante di tempo, che includono:
                         <ul>
-                            <li>La posizione corrente del Transport Trolley ed il suo stato</li>
-                            <li>Il peso corrente immagazzinato dalla Cold Room</li>
+                            <li>La posizione corrente del <u>Transport Trolley</u> ed il suo <u>Stato</u></li>
+                            <li>Il peso corrente immagazzinato dalla <u>Cold Room</u></li>
                             <li>Il numero di richieste respinte dall'avvio del servizio</li>
                         </ul>
                     </td>
@@ -438,159 +486,185 @@ Una volta definita senza ambiguità la richiesta del committente si è delineata
                 <tr>
                     <td> RaspberryPi </td>
                     <td>Single-board computer in particolare un Rasberry Pi 2 Model B. (Link: <a
-                            href="https://www.raspberrypi.org/">https://www.raspberrypi.org/</a>).</td>
+                            href="https://www.raspberrypi.org/" target="_blank">https://www.raspberrypi.org/</a>).</td>
                 </tr>
                 <tr>
                     <td>Stato del Transport Trolley</td>
-                    <td>Informazione riguardante l'azione svolta dal Transport Trolley, visibile anche grazie al Led. Può essere:
+                    <td>Informazione riguardante l'azione svolta dal <u>Transport Trolley</u>, visibile anche grazie al
+                        <u>Led</u>. Può essere:
                         <ul>
-                            <li>OFF: quando il Transport Trolley è in HOME.</li>
-                            <li>Blinking: quando il Transport Trolley si sta muovendo.</li>
-                            <li>ON: quando il Transport Trolley è fermo.</li>
+                            <li>OFF: quando il <u>Transport Trolley</u> è in <u>HOME</u>.</li>
+                            <li>Blinking: quando il <u>Transport Trolley</u> si sta muovendo.</li>
+                            <li>ON: quando il <u>Transport Trolley</u> è fermo.</li>
                         </ul>
                     </td>
                 </tr>
                 <tr>
                     <td>DLIMT</td>
-                    <td>Distanza limite misurata dal Sonar. È usata per fermare il Transport Trolley.</td>
+                    <td>Distanza limite misurata dal <u>Sonar</u>. È usata per fermare il <u>Transport Trolley</u>.</td>
                 </tr>
                 <tr>
                     <td>Warining Device</td>
-                    <td>Componente astratto che utilizza il LED (attraverso il software fornito dal cliente) e sarà installato su un Raspberry Pi. Fornirà informazioni sullo stato attuale del Transport Trolley.</td>
+                    <td>Componente astratto che utilizza il <u>Led</u> (attraverso il software fornito dal cliente) e
+                        sarà installato su un <u>Raspberry Pi</u>. Fornirà informazioni sullo attuale <u>Stato del
+                            Transport Trolley</u>.</td>
                 </tr>
                 <tr>
                     <td>Alarm Device</td>
-                    <td>Componente astratto che utilizza il Sonar (attraverso il software fornito dal cliente) e sarà installato su un Raspberry Pi. Quando misura una distanza inferiore a un valore prefissato DLIMT, il carrello di trasporto deve essere fermato.
-                        Verrà ripreso quando il Sonar rileva nuovamente una distanza superiore a DLIMT.</td>
+                    <td>Componente astratto che utilizza il <u>Sonar</u> (attraverso il software fornito dal cliente) e
+                        sarà installato su un <u>Raspberry Pi</u>. Quando misura una distanza inferiore a un valore
+                        prefissato <u>DLIMIT</u>, <u>Transport Trolley</u> il deve essere fermato.
+                        Verrà ripreso quando il <u>Sonar</u> rileva nuovamente una distanza superiore a <u>DLIMIT</u>.
+                    </td>
                 </tr>
                 <tr>
                     <td>MINT</td>
                     <td>Tempo espresso in millisecondi che identifica l'intervallo minimo che può intercorrere tra due
-                        stop consecutivi del Transport Trolley</td>
+                        stop consecutivi del <u>Transport Trolley</u>.</td>
                 </tr>
             </tbody>
         </table>
-
-        <h7>Verbi:</h7>
+        <br>
+        <h7>VERBI:</h7>
         <table>
             <tbody>
                 <tr>
-                    <th>Termine</th>
                     <th>Soggetto</th>
+                    <th>Termine</th>
                     <th>Descrizione</th>
                 </tr>
                 <tr>
+                    <td rowspan="3">Led</td>
                     <td>Accendere</td>
-                    <td>Led</td>
                     <td>Accensione del <b>Led</b> che emette luce.</td>
                 </tr>
                 <tr>
                     <td>Spegnere</td>
-                    <td>Led</td>
                     <td>Spegnimento del <b>Led</b> che non emette luce.</td>
                 </tr>
                 <tr>
                     <td>Lampeggiare</td>
-                    <td>Led</td>
                     <td>Il <b>Led</b> si accende e spegne rapidamente in sequenza.</td>
                 </tr>
                 <tr>
+                    <td rowspan="3">Sonar</td>
                     <td>Misurare la distanza</td>
-                    <td>Sonar</td>
                     <td>Il <b>Sonar</b> tramite ultrasuoni rileva la distanza che intercorre tra il sonar stesso ed un
                         ostacolo.</td>
                 </tr>
                 <tr>
-                    <td>Essere pronto</td>
-                    <td>Transport Trolley</td>
-                    <td>Il <b>Transport Trolley</b> è in condizioni di servire una nuova operazione di scarico.</td>
-                </tr>
-                <tr>
-                    <td>Essere in movimento</td>
-                    <td>Transport Trolley</td>
-                    <td>Il <b>Transport Trolley</b> si sta muovendo all'interno della Service Area, si considera in
-                        movimento anche quando è fermo ma sta svolgendo una azione. Durante questa fase devono essere soddisfatti gli <b>Alarm requirements.</b></td>
-                </tr>
-                <tr>
-                    <td>Terminare l'azione di scarico</td>
-                    <td>Transport Trolley</td>
-                    <td>Il <b>Transport Trolley</b> ha completato una azione di scarico ed è pronto per gestire una
-                        nuova richiesta se presente, altrimenti ritorna in HOME.</td>
-                </tr>
-                <tr>
-                    <td>Avviare il sistema</td>
-                    <td>ColdStorageService</td>
-                    <td>Viene avviato il software del sistema ed il <b>Transport Trolley</b> risulta posizionato in HOME.</td>
-                </tr>
-                <tr>
                     <td>Fermare l'attività</td>
-                    <td>Sonar</td>
                     <td>Il <b>Transport Trolley</b>, durante lo spostamento in avanti o all'indietro, può essere fermato
                         a causa del dispositivo di allarme. Mentre il <b>Transport Trolley</b> è fermo, non può muoversi
                         fino a quando non si verifica un messaggio di ripresa.</td>
                 </tr>
                 <tr>
                     <td>Riattivare l'attività</td>
-                    <td>Sonar</td>
                     <td>Il <b>Transport Trolley</b> riprende l'azione di scarico, riprendendo dal momento esatto in cui
                         si era fermato.</td>
                 </tr>
                 <tr>
+                    <td rowspan="6">Transport Trolley</td>
+                    <td>Essere pronto</td>
+                    <td>Il <b>Transport Trolley</b> è in condizioni di servire una nuova operazione di scarico.</td>
+                </tr>
+                <tr>
+                    <td>Essere in movimento</td>
+                    <td>Il <b>Transport Trolley</b> si sta muovendo all'interno della Service Area, si considera in
+                        movimento anche quando è fermo ma sta svolgendo una azione. Durante questa fase devono essere
+                        soddisfatti gli <b>Alarm requirements.</b></td>
+                </tr>
+                <tr>
+                    <td>Terminare l'azione di scarico</td>
+                    <td>Il <b>Transport Trolley</b> ha completato una azione di scarico ed è pronto per gestire una
+                        nuova richiesta se presente, altrimenti ritorna in HOME.</td>
+                </tr>
+                <tr>
                     <td>Raccogliere il carico</td>
-                    <td>Transport Trolley</td>
-                    <td>Il <b>Transport Trolley</b> si trova in <b>INDOOR</b> e prende il <b>carico</b> impiegandoci il tempo necessario ed avendo cura di non superare la sua capacità massima di trasporto.</td>
+                    <td>Il <b>Transport Trolley</b> si trova in <b>INDOOR</b> e prende il <b>carico</b> impiegandoci il
+                        tempo necessario ed avendo cura di non superare la sua capacità massima di trasporto.</td>
                 </tr>
                 <tr>
                     <td>Depositare il carico</td>
-                    <td>Transport Trolley</td>
-                    <td>Il <b>Transport Trolley</b> si trova in <b>PORT</b> della <b>ColdRoom</b> e scarica il <b>carico</b> impiegandoci il tempo necessario.</td>
+                    <td>Il <b>Transport Trolley</b> si trova in <b>PORT</b> della <b>Cold Room</b> e scarica il
+                        <b>carico</b> impiegandoci il tempo necessario.
+                    </td>
                 </tr>
                 <tr>
                     <td>Fare un'azione di carico-scarico</td>
-                    <td>Transport Trolley</td>
                     <td>Il task effettuato dal <b>Transport Trolley</b> consiste di 3 azioni:
-                    <ol>
-                        <li><b>Raccogliere il carico</b> dall'INDOOR</li>
-                        <li>Recarsi alla Cold Room</li>
-                        <li>Depositare il carico</li>
-                    </ol></td>
+                        <ol>
+                            <li><b>Raccogliere il carico</b> dall'INDOOR</li>
+                            <li>Recarsi alla <b>Cold Room</b></li>
+                            <li>Depositare il <b>carico</b></li>
+                        </ol>
+                    </td>
                 </tr>
                 <tr>
-                    <td>Inviare una richiesta di storage</td>
-                    <td>ServiceAccessGui</td>
-                    <td>Il conducente del Fridge Truck si avvicina all'area INDOOR del servizio e chiede al sistema ColdStorageService (tramite un dispositivo intelligente) se può depositare un carico di FW kg./td>
+                    <td rowspan="3">ColdStorageService</td>
+                    <td>Avviare il sistema</td>
+                    <td>Viene avviato il software del sistema ed il <b>Transport Trolley</b> risulta posizionato in
+                        <b>HOME</b>.
+                    </td>
                 </tr>
                 <tr>
                     <td>Inviare una risposta di storage</td>
-                    <td>ColdStorageService</td>
-                    <td>Azione che si verifica quando il sistema riceve una richiesta di storage. Il ColdStorageService risponde con una risposta che può essere:
+                    <td>Azione che si verifica quando il sistema riceve una richiesta di storage. Il
+                        <b>ColdStorageService</b>
+                        risponde con una risposta che può essere:
                         <ul>
-                            <li>Positiva: se la Cold Room ha abbastanza spazio per immagazzinare il carico del Fridge Truck, in questo caso viene emesso un Ticket</li>
-                            <li>Negativa: se la Cold Room non ha abbastanza spazio per immagazzinare il carico del Fridge Truck, in questo caso non viene emesso alcun Ticket</li>
+                            <li>Positiva: se la <b>Cold Room</b> ha abbastanza spazio per immagazzinare il carico del
+                                <b>Fridge Truck</b>
+                                , in questo caso viene emesso un <b>Ticket</b>
+                            </li>
+                            <li>Negativa: se la <b>Cold Room</b> non ha abbastanza spazio per immagazzinare il carico
+                                del
+                                <b>Fridge Truck</b>, in questo caso non viene emesso alcun Ticket
+                            </li>
                         </ul>
                     </td>
                 </tr>
                 <tr>
-                    <td>Inviare il Ticket</td>
-                    <td>ServiceAccessGui</td>
-                    <td>Il conducente del Fridge Truck invia il proprio Ticket al sistema.</td>
+                    <td>Invio charge taken</td>
+                    <td>Il sistema comunica al conducente del <b>Fridge Truck</b> che il carico è stato correttamente
+                        ritirato.
+                    </td>
                 </tr>
                 <tr>
-                    <td>Invio charge taken</td>
-                    <td>ColdStorageService</td>
-                    <td>Il sistema comunica al conducente del Fridge Truck che il carico è stato correttamente ritirato.</td>
+                    <td rowspan="2">ServiceAccessGUI</td>
+                    <td>Inviare una richiesta di storage</td>
+                    <td>Il conducente del Fridge Truck si avvicina all'area <b>INDOOR</b> del servizio e chiede al
+                        sistema
+                        <b>ColdStorageService</b> (tramite un dispositivo intelligente) se può depositare un carico di
+                        <b>FW</b>
+                        kg.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Inviare il Ticket</td>
+                    <td>Il conducente del <b>Fridge Truck</b> invia il proprio <b>Ticket</b> al sistema.</td>
+                </tr>
+                <tr>
+                    <td rowspan="1">ServiceStatusGUI</td>
+                    <td>Ricevere un messaggio di stato</td>
+                    <td>La ServiceStatusGUI riceve un messaggio con lo <b>Stato del Transport Trolley</b>, il peso della <b>Cold Room</b> e il numero di richieste di store rifiutato.</td>
                 </tr>
             </tbody>
         </table>
-
         <h5>Service Area</h5>
-        Data la descrizione della stanza e l'immagine fornita dal committente, si è deciso di modellare la Service Area come un rettangolo, circoscrtitto da 4 mura,
+        Data la descrizione della stanza e l'immagine fornita dal committente, si è deciso di modellare la Service Area
+        come un rettangolo, circoscritto da 4 mura,
         contentente due ostacoli fissi di cui uno è la Cold Room. <br>
-        <img src="./ServiceArea23.jpg" alt="service area"><br>
-        All'avvio il Transport Trolley si trova in posizione Home, ovvero sopra l'area Home. Il Transport Trolley è da considerarsi
+        <center>
+            <img src="./ServiceArea23.jpg" alt="service area"><br>
+        </center>
+        All'avvio il Transport Trolley si trova in posizione Home, ovvero sopra l'area Home. Il Transport Trolley è da
+        considerarsi
         "at INDOOR" o "at Cold Room" quando si trova rispettivamente vicino al muro INDOOR o alla porta della Cold Room.
         <h5>Sistema</h5>
-        Dall'analisi del <u>TemaFinale23</u> fornita dal committente, è possibile effettuare una bozza della struttura del sistema, il quale presenterà 5 nodi computazionali:
+        Dall'analisi del <a href="http://calendar.altervista.org/TemaFinale23.pdf" target="_blank">TemaFinale23</a> fornita dal
+        committente, è possibile effettuare una bozza della struttura
+        del sistema, il quale presenterà 5 nodi computazionali:
         <ul>
             <li>Rasberry Pi</li>
             <li>ServiceAccessGui</li>
@@ -598,77 +672,135 @@ Una volta definita senza ambiguità la richiesta del committente si è delineata
             <li>DDR Robot</li>
             <li>ColdStorageService</li>
         </ul> <br>
-        <img src="./system.jpg" alt="system"> <br>
-        Si evince dunque che tutti i componenti evidenziati comunicano tra loro in maniera bidirezionale, all'infuori della ServiceStatusGui che si limita a ricevere informazioni dal sistema.
+        <center>
+            <div class="piccolo">
+                <img src="./system.jpg" alt="system"> 
+            </div>
+        </center>
+        Si evince dunque che tutti i componenti evidenziati comunicano tra loro in maniera bidirezionale, all'infuori
+        della ServiceStatusGUI che si limita a ricevere informazioni dal sistema.
         <div class="remark">
-            Considerando la struttura appena effettuata è possibile raggruppare i requisiti del progetto in 3 macro-componenti, ordinati per priorità:
+            TODO <br>
+            Considerando la struttura appena effettuata è possibile raggruppare i requisiti del progetto in 3
+            macro-componenti, ordinati per priorità:
             <ol>
                 <li>Il componente <b>ColdStorageService</b> (requisiti )</li>
             </ol>
         </div>
-
-
-
-        Dall'analisi del <u>TemaFinale23</u> fornita dal committente, si evince che il sistema presenterà 5 macro-componenti:
-        <ul>
-            <li>Rasberry Pi</li>
-
-        </ul>
-
-
-
+        <h5>Interazioni</h5>
+        Dall'analisi dei requisiti espressi nel <a
+            href="http://calendar.altervista.org/TemaFinale23.pdf" target="_blank">TemaFinale23</a> è stato possibile identificare 4
+        momenti di interazione tra i componenti del sistema: <br>
+        <ol>
+            <li>Il sistema già avviato riceve la prima richiesta dal conducente Fridge Truck e viene comunicato lo stato
+                della Cold Room. <br>
+                <center>
+                    <div class="piccolo">
+                        <img src="./momento1.png" alt="momento1">
+                    </div>
+                </center>
+            </li>
+            <li>Viene effettuato dal conducente del Fridge Truck una richiesta di store utilizzando la
+                ServiceAccessGUI.<br>
+                <center>
+                    <div class="piccolo">
+                        <img src="./momento2.png" alt="momento2">
+                    </div>
+                </center>
+            </li>
+            <li>Quando il conducente del Fridge Truck arriva all'INDOOR, inserisce il Ticket ed innesca le azioni di
+                carico e scarico della merce presente nel Fridge Truck.<br>
+                <center>
+                    <div class="piccolo">
+                        <img src="./momento3.png" alt="momento3">
+                    </div>
+                </center>
+            </li>
+            <li>Il Service-manager utilizza la ServiceStatusGUI per monitorare il sistema.<br>
+                <center>
+                    <div class="piccolo">
+                        <img src="./momento4.png" alt="momento4">
+                    </div>
+                </center>
+            </li>
+        </ol>
         <h2>Analisi del Problema</h2>
-        Dati i requisiti del progetto, si è deciso di modellare l'interazione dei componenti specificato tramite il modello ad attori QAK, gli attori identificati
+        Dati i requisiti del <a href="http://calendar.altervista.org/TemaFinale23.pdf" target="_blank">TemaFinale23</a> e le interazioni
+        appena definite, si è deciso di modellare il sistema tramite il
+        modello ad attori QAK, gli attori identificati sono:
+        <table>
+            <tbody>
+                <tr>
+                    <th>Attore</th>
+                    <th>Type</th>
+                </tr>
+                <tr>
+                    <td>ServiceAccessGUI</td>
+                    <td>Proattiva e Reattiva</td>
+                </tr>
+                <tr>
+                    <td>ServiceStatusGUI</td>
+                    <td>Reattiva</td>
+                </tr>
+                <tr>
+                    <td>Transport Trolley</td>
+                    <td>Proattivo e Reattivo</td>
+                </tr>
+                <tr>
+                    <td>ColdStorageService</td>
+                    <td>Proattivo e Reattivo</td>
+                </tr>
+                <tr>
+                    <td>BasicRobot</td>
+                    <td>Reattivo</td>
+                </tr>
+                <tr>
+                    <td>Sonar</td>
+                    <td>Proattivo</td>
+                </tr>
+                <tr>
+                    <td>Led</td>
+                    <td>Reattivo</td>
+                </tr>
+            </tbody>
+        </table>
+        <table>
+            <caption>Occorre aggiungere un attore di test Fridge Truck, che simuli il comportamento del conducente</caption>
+            <tbody>
+                <tr>
+                    <th>Attore di Test</th>
+                    <th>Type</th>
+                </tr>
+                <tr>
+                    <td>Fridge Truck</td>
+                    <td>Proattivo</td>
+                </tr>
+            </tbody>
+        </table>
+        Note:
         <ul>
-            <li>ServiceAccessGui</li>
-            <li>ServiceStatusGui</li>
-            <li>TransportTrolley</li>
-            <li>ColdStorageService</li>
-            <li>BasicRobot</li>
-            <li>Sonar</li>
-            <li>Led</li>
+            <li>Reattivo: entità che agisce in risposta ad una situazioni piuttosto che controllarla.</li>
+            <li>Proattivo: entità che crea o controlla una situazione piuttosto che rispondere passivamente dopo che si
+                è verificata.</li>
         </ul>
-        Data l'assenza di requisiti riguardanti il comportamento della ColdRoom si è deciso di non modellarla come attore. Per quanto una estensione delle sua
-        funzionalità richiederà sicuramente una diversa modellazione, per questo Sprint0 scegliamo di inserire la poca logica nell'attore ServiceAccessGui in quanto non è
-        comunque violato il principio di singola responsabilità.
-
-
-
-
-
-
-
-
-
-
-
-
-
         <div class="remark">
-
-            In questa analisi dei requisiti si concentrer&agrave; l'attenzione su i seguenti <b>componenti</b>,
-            individuati dai requisiti forniti dal committente:
-            <ol>
-                <li><b>ColdStorageService</b></li>
-                <li>Service area</li>
-                <li>ColdRoom</li>
-                <li>Transport trolley</li>
-                <li>DDR Robot</li>
-                <li>Camion refrigerato</li>
-            </ol><br>
-
+            Codice QAK per la modellazione del sistema: <a
+                href="http://calendar.altervista.org/ColdStorageService.qak" target="_blank">ColdStorageService.qak</a>
         </div>
-
-        <h2>Problem analysis</h2>
-
-        <div class="remark">
-            Si &egrave; deciso di modellare l'interazione dei componenti specificato tramite il modello ad attori QAK,
-            gli attori identificati
-        </div>
+        <h3>Architettura logica</h3>
+        Il sistema da noi modellato, presenta la seguente architettura logica:
 
         <h2>Test plans</h2>
+        I test prevedono che il sistema riceva diverse richieste dal conducente del Fridge Truck tramite la ServiceAccessGUI.
+        I tests mirano a mostrare e verificare come il sistema reagisce quando riceve le richieste di store in diverse situazioni:
+        <ul>
+            <li>Store request con Cold Room piena -> StoreRejected</li>
+            <li>Store request con Cold Room non piena -> StoreAccepted</li>
+            <li>Invio Ticket con TICKETTIME scaduto -> TicketNotOK</li>
+            <li>Invio Ticket con TICKETTIME non scaduto -> TicketOK</li>
+        </ul>
 
-
+        <!-- 
         <h2>Project</h2>
 
 
@@ -679,13 +811,13 @@ Una volta definita senza ambiguità la richiesta del committente si è delineata
 
 
         <h2>Maintenance</h2>
-
+-->
         <br /><br />
 
         <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
-            By Riccardo Barbieri email: riccardo.barbieri11@studio.unibo.it,
-            <img src="../../_images/fototessera.jpg" alt="mbot" width="15%" height="15%">
-            GIT repo: https://github.com/RiccardBarbieri/BarbieriRiccardoIss23
+            By Tassinari Gabriele email: gabriele.tassinari2@studio.unibo.it,
+            <img src="./gabriele.jpeg" alt="mbot" width="15%" height="15%">
+            GIT repo: https://github.com/4utotune/ColdStorageService/
         </div>
 </body>
 
