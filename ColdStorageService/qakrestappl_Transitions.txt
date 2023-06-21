@@ -1,0 +1,7 @@
+{"actor":"serviceaccessgui", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}
+{"actor":"transporttrolley", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_load_request", "msgId":"gotoindoor"}
+{"actor":"led", "msgType":"dispatch", "curstate":"led_off", "nextstate":"handle_update", "msgId":"updateled"}
+{"actor":"led", "msgType":"dispatch", "curstate":"led_on", "nextstate":"handle_update", "msgId":"updateled"}
+{"actor":"led", "msgType":"dispatch", "curstate":"led_blink", "nextstate":"handle_update", "msgId":"updateled"}
+{"actor":"servicestatusgui", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_trolley_update", "msgId":"updatetrolleystatus"}
+{"actor":"servicestatusgui", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_coldstorage_update", "msgId":"updatecoldstoragestatus"}

@@ -14,13 +14,53 @@ import kotlinx.coroutines.runBlocking
 class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
 
 	override fun getInitialState() : String{
-		return "s0"
+		return "init"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
 		return { //this:ActionBasciFsm
-				state("s0") { //this:State
+				state("init") { //this:State
 					action { //it:State
+						CommUtils.outblack("[Led] Init")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="led_off", cond=doswitch() )
+				}	 
+				state("led_off") { //this:State
+					action { //it:State
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t013",targetState="handle_update",cond=whenDispatch("updateled"))
+				}	 
+				state("led_on") { //this:State
+					action { //it:State
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t114",targetState="handle_update",cond=whenDispatch("updateled"))
+				}	 
+				state("led_blink") { //this:State
+					action { //it:State
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t215",targetState="handle_update",cond=whenDispatch("updateled"))
+				}	 
+				state("handle_update") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("updateled(ledStatus)"), Term.createTerm("updateled(ledStatus)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

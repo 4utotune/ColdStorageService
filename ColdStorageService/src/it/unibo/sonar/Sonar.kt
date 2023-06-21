@@ -14,13 +14,24 @@ import kotlinx.coroutines.runBlocking
 class Sonar ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
 
 	override fun getInitialState() : String{
-		return "s0"
+		return "init"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
 		return { //this:ActionBasciFsm
-				state("s0") { //this:State
+				state("init") { //this:State
 					action { //it:State
+						CommUtils.outblack("[Sonar] Init")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="alarm", cond=doswitch() )
+				}	 
+				state("alarm") { //this:State
+					action { //it:State
+						forward("alarm", "alarm(_)" ,"transporttrolley" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

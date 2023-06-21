@@ -7,7 +7,7 @@ Reply coldroomdata: coldroomdata(weight)
 
 Request storerequest: 	storerequest(FW)
 Reply storeaccepted:	storeaccepted(TICKET)
-Reply storerejected:	storerejected(_)
+Reply storerejected: 	storerejected(_)
 
 Request insertticket: insertticket(TICKET)
 Reply ticketaccepted: ticketaccepted(_)
@@ -31,38 +31,80 @@ Dispatch alarm: alarm(STATUS)
 Dispatch updateled: updateled(ledStatus) 
 
 // transporttrolley -> servicestatusgui
-Dispatch trolleystatus: trolleystatus(trolleyState, trolleyPosition)
+Dispatch updatetrolleystatus: updatetrolleystatus(trolleyState, trolleyPosition)
 
 // coldstorageservice -> servicestatusgui
-Dispatch coldstoragestatus: coldstoragestatus(currentWeight, rejectedRequest)
-
+Dispatch updatecoldstoragestatus: updatecoldstoragestatus(currentWeight, rejectedRequest)
 
 // CONTEXTS
-Context ctxcoldstorage ip [host="localhost" port=8021]
-
+Context ctx_coldstorage ip [host="localhost" port=8020]
+Context ctx_accessgui 	ip [host="localhost" port=8021]
+Context ctx_basicrobot 	ip [host="localhost" port=8022]
+Context ctx_statusgui 	ip [host="localhost" port=8023]
+Context ctx_raspberry 	ip [host="localhost" port=8024]
 
 // ACTORS
-ExternalQActor basicrobot context ctxcoldstorage
+ExternalQActor basicrobot context ctx_basicrobot
 
-QActor transporttrolley context ctxcoldstorage {
+QActor serviceaccessgui context ctx_accessgui {
+	[#
+		var currentWeight: Float	
+	#]
 	State init initial {
-		
+		printCurrentMessage
+		[# currentWeight = 0.0f #]
+		request coldstorageservice -m coldroomdatarequest: coldroomdatarequest(_)
 	}
+	Transition t0	whenReply coldroomdata -> handle_update_data
+	
+	State handle_update_data {
+		onMsg(coldroomdata: coldroomdata(weight)) {
+			[# 
+				currentWeight = payloadArg(0).toFloat()	
+			#]
+		}
+	}
+	Goto idle
+	
+	State idle {
+		println("[ServiceAccessGui] Idle...")
+	}
+	Transition t1	whenReply 	storeaccepted 	-> handle_store_accepted
+					whenReply 	storerejected 	-> handle_store_rejected
+					whenReply 	ticketaccepted 	-> handle_ticket_accepted
+					whenReply 	ticketrejected 	-> handle_ticket_rejected
+					whenMsg		chargetaken 	-> handle_charge_taken		
+
+	
+	State handle_store_accepted {
+		onMsg(storeaccepted: storeaccepted(TICKET)) {
+			// TODO show ticket
+		}
+	}
+	Goto idle
+	
+	State handle_store_rejected {
+		// TODO show error message
+	}
+	Goto idle
+		
+	State handle_ticket_accepted {
+		// TODO show success message
+	}
+	Goto idle
+	
+	State handle_ticket_rejected {
+		// TODO show error message
+	}
+	Goto idle
+	
+	State handle_charge_taken {
+		// TODO show charge taken message
+	}
+	Goto idle
 }
 
-QActor servicestatusgui context ctxcoldstorage {
-	State s0 initial {
-		
-	}
-}
-
-QActor serviceaccessgui context ctxcoldstorage {
-	State s0 initial {
-		
-	}
-}
-
-QActor coldstorageservice context ctxcoldstorage {
+QActor coldstorageservice context ctx_coldstorage {
 	[#
 		var CurrentWeight: Float
 		var MaxWeightcoldroom: Float
@@ -89,6 +131,7 @@ QActor coldstorageservice context ctxcoldstorage {
 	Transition t0 	whenRequest coldroomdatarequest -> handle_data
 					whenRequest storerequest		-> handle_store
 					whenRequest insertticket		-> handle_ticket
+					whenRequest chargedeposited		-> handle_ticketloop
 					
 	State handle_data {
 		printCurrentMessage
@@ -101,16 +144,18 @@ QActor coldstorageservice context ctxcoldstorage {
 	State handle_store {
 		printCurrentMessage
 		onMsg(storerequest: storerequest(FW)) {
-			[#val FW = payloadArg(0).toFloat()#]
-			if [#(CurrentWeight+ReservedWeight+FW>MaxWeightcoldroom)#]{
+			[# val FW = payloadArg(0).toFloat() #]
+			if [# (CurrentWeight+ReservedWeight+FW>MaxWeightcoldroom) #] {
 				[# RejectedRequests++ #]
 				replyTo storerequest with storerejected: storerejected(_)
-			}else{
-				[#val TICKET = new Ticket(FW)
-				  Tickets.add(TICKET)
-				  ReservedWeight+=FW
+			} else {
+				[#
+					val TICKET = new Ticket(FW)
+				  	Tickets.add(TICKET)
+				  	ReservedWeight += FW
+				  	val Timestamp = TICKET.getTimestamp()
 				#]
-				replyTo storerequest with storeaccepted: storeaccepted($TICKET)
+				replyTo storerequest with storeaccepted: storeaccepted($Timestamp)
 			}
 		}
 	}
@@ -119,30 +164,142 @@ QActor coldstorageservice context ctxcoldstorage {
 	State handle_ticket {
 		printCurrentMessage
 		onMsg(insertticket: insertticket(TICKET)) {
-			[#val TICKET = Tickets.find { it.timestamp == payloadArg(0).toString() }#]
-			if [#(TICKET!=null && TICKET.isValid())#]{
-				replyTo insertticket with ticketaccepted: ticketaccepted(_)
+			[# val TICKET = Tickets.find { it.timestamp == payloadArg(0).toString() } #]
+			if [# (TICKET != null && TICKET.isValid()) #]{
 				[# CurrentTicket = TICKET #]
+				replyTo insertticket with ticketaccepted: ticketaccepted(_)
 				forward transporttrolley -m gotoindoor: gotoindoor(_)
-			}else{
-				[# Tickets.remove(TICKET) 
-				   ReservedWeight-=TICKET.getWeight()
+			} else {
+				[# 
+					Tickets.remove(TICKET) 
+				   	ReservedWeight -= TICKET.getWeight()
 				#]
 				replyTo insertticket with ticketrejected: ticketrejected(_)
 			}
 		}
 	}
 	Goto idle
+	
+	State handle_ticketloop {
+		printCurrentMessage
+		onMsg(chargedeposited: chargedeposited(_)) {
+			if [# (currentTicket != null) #] {
+				replyTo chargedeposited with more: more(_)
+			} else {
+				replyTo chargedeposited with gohome: gohome(_)
+			}
+		}
+	}
+	Goto idle
 }
 
-QActor sonar context ctxcoldstorage {
-	State s0 initial {
-		
+QActor transporttrolley context ctx_coldstorage {
+	State init initial {
+		forward led -m updateled: updateled(_)
+		forward servicestatusgui -m updatetrolleystatus: updatetrolleystatus(_) 
+	}
+	Goto idle
+	
+	State idle {
+		println("[transporttrolley] Idle...")
+	}
+	Transition t0	whenMsg gotoindoor	-> handle_load_request
+	
+	State handle_load_request {
+		onMsg(gotoindoor: gotoindoor(_)) {
+			// TODO
+			// go to indoor
+			// pick up
+			forward coldstorageservice -m chargetaken: chargetaken(_)
+			// TODO
+			// go to coldroom
+			request coldstorageservice -m chargedeposited: chargedeposited(_)
+		}
+	}
+	Transition t1	whenReply more -> handle_load_request
+				 	whenReply gohome -> handle_gohome
+				 	
+	State handle_gohome {
+		onMsg(gohome: gohome(_)) {
+			// TODO 
+			// go to home
+		}
+	}
+	Goto idle
+}
+
+QActor sonar context ctx_raspberry {
+	State init initial {
+		println("[Sonar] Init")
+	}
+	Goto alarm
+	
+	State alarm {
+		forward transporttrolley -m alarm: alarm(_)
 	}
 }
 
-QActor led context ctxcoldstorage {
-	State s0 initial {
+QActor led context ctx_raspberry {
+	State init initial {
+		println("[Led] Init")
+	}
+	Goto led_off
+	
+	State led_off {
 		
 	}
+	Transition t0	whenMsg updateled	-> handle_update
+	
+	State led_on {
+		
+	}
+	Transition t1	whenMsg updateled	-> handle_update
+	
+	State led_blink {
+		
+	}
+	Transition t2	whenMsg updateled	-> handle_update
+	
+	State handle_update {
+		onMsg(updateled: updateled(ledStatus)) {
+			// TODO
+			// update led
+			// transition		
+		}
+	}
+}
+
+QActor servicestatusgui context ctx_statusgui {
+	[# 
+		var TrolleyState: String
+		var TrolleyPosition: (Int,Int)
+		var CurrentWeight: Float
+		var RejectedRequest: Int
+	#]
+	State init initial {
+		println("[ServiceStatusGui] Init")
+		[# 
+			TrolleyState = "HOME"
+			TrolleyPosition = (0,0)
+			CurrentWeight = 0.0f
+			RejectedRequest = 0
+		#]	
+	}
+	Goto idle
+	
+	State idle {
+		println("[ServiceStatusGui] Wait for updates...")
+	}
+	Transition t0	whenMsg updatetrolleystatus 	-> handle_trolley_update
+					whenMsg updatecoldstoragestatus -> handle_coldstorage_update
+					
+	State handle_trolley_update {
+		// TODO update values
+	}
+	Goto idle
+	
+	State handle_coldstorage_update {
+		// TODO update values
+	}
+	Goto idle
 }

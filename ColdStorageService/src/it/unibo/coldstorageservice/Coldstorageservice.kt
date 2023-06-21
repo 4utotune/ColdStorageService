@@ -20,6 +20,8 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 		val interruptedStateTransitions = mutableListOf<Transition>()
 		
 				var CurrentWeight: Float
+				var MaxWeightcoldroom: Float
+				var ReservedWeight: Float
 				var RejectedRequest: Int
 				var CurrentTicket: String
 				val Tickets: MutableSet<Ticket>
@@ -28,6 +30,8 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					action { //it:State
 						 
 									CurrentWeight = 0.0f 
+									ReservedWeight = 0.0f
+									MaxWeightcoldroom = 100f
 									RejectedRequests = 0
 									Tickets = new MutableSet()
 						CommUtils.outblack("[ColdStorageService] Initialized")
@@ -46,9 +50,10 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="handle_data",cond=whenRequest("coldroomdatarequest"))
-					transition(edgeName="t01",targetState="handle_store",cond=whenRequest("storerequest"))
-					transition(edgeName="t02",targetState="handle_ticket",cond=whenRequest("insertticket"))
+					 transition(edgeName="t06",targetState="handle_data",cond=whenRequest("coldroomdatarequest"))
+					transition(edgeName="t07",targetState="handle_store",cond=whenRequest("storerequest"))
+					transition(edgeName="t08",targetState="handle_ticket",cond=whenRequest("insertticket"))
+					transition(edgeName="t09",targetState="handle_ticketloop",cond=whenRequest("chargedeposited"))
 				}	 
 				state("handle_data") { //this:State
 					action { //it:State
@@ -63,22 +68,80 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 				state("handle_store") { //this:State
 					action { //it:State
+						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
+						 	   
+						if( checkMsgContent( Term.createTerm("storerequest(FW)"), Term.createTerm("storerequest(FW)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								 val FW = payloadArg(0).toFloat()  
+								if(  (CurrentWeight+ReservedWeight+FW>MaxWeightcoldroom)  
+								 ){ RejectedRequests++  
+								answer("storerequest", "storerejected", "storerejected(_)"   )  
+								}
+								else
+								 {
+								 					val TICKET = new Ticket(FW)
+								 				  	Tickets.add(TICKET)
+								 				  	ReservedWeight += FW
+								 				  	val Timestamp = TICKET.getTimestamp()
+								 answer("storerequest", "storeaccepted", "storeaccepted($Timestamp)"   )  
+								 }
+						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 				state("handle_ticket") { //this:State
 					action { //it:State
+						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
+						 	   
+						if( checkMsgContent( Term.createTerm("insertticket(TICKET)"), Term.createTerm("insertticket(TICKET)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								 val TICKET = Tickets.find { it.timestamp == payloadArg(0).toString() }  
+								if(  (TICKET != null && TICKET.isValid())  
+								 ){ CurrentTicket = TICKET  
+								answer("insertticket", "ticketaccepted", "ticketaccepted(_)"   )  
+								forward("gotoindoor", "gotoindoor(_)" ,"transporttrolley" ) 
+								}
+								else
+								 { 
+								 					Tickets.remove(TICKET) 
+								 				   	ReservedWeight -= TICKET.getWeight()
+								 answer("insertticket", "ticketrejected", "ticketrejected(_)"   )  
+								 }
+						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
+				}	 
+				state("handle_ticketloop") { //this:State
+					action { //it:State
+						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
+						 	   
+						if( checkMsgContent( Term.createTerm("chargedeposited(_)"), Term.createTerm("chargedeposited(_)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								if(  (currentTicket != null)  
+								 ){answer("chargedeposited", "more", "more(_)"   )  
+								}
+								else
+								 {answer("chargedeposited", "gohome", "gohome(_)"   )  
+								 }
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 			}
 		}

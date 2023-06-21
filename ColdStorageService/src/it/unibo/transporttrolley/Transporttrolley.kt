@@ -21,11 +21,51 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 		return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
+						forward("updateled", "updateled(_)" ,"led" ) 
+						forward("updatetrolleystatus", "updatetrolleystatus(_)" ,"servicestatusgui" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
+				}	 
+				state("idle") { //this:State
+					action { //it:State
+						CommUtils.outblack("[transporttrolley] Idle...")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t010",targetState="handle_load_request",cond=whenDispatch("gotoindoor"))
+				}	 
+				state("handle_load_request") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("gotoindoor(_)"), Term.createTerm("gotoindoor(_)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								forward("chargetaken", "chargetaken(_)" ,"coldstorageservice" ) 
+								request("chargedeposited", "chargedeposited(_)" ,"coldstorageservice" )  
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t111",targetState="handle_load_request",cond=whenReply("more"))
+					transition(edgeName="t112",targetState="handle_gohome",cond=whenReply("gohome"))
+				}	 
+				state("handle_gohome") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("gohome(_)"), Term.createTerm("gohome(_)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 			}
 		}
