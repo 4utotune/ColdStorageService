@@ -3,4 +3,9 @@
 2. Va presupposto che il Ticket sia inserito, in maniera onesta, dal conducente solo davanti all'INDOOR? E dunque in quanto analisti e progettisti non ci dobbiamo preoccuparci che un conducente inserisca il Ticket prima di essere davanti all'INDOOR?
 3. Come desiderava che funzionasse il sistema riguardo a questo esempio in particolare? Ponendo di avere una coda di 5 Fridge Truck, all'arrivo del sesto dovrebbe giustamente essere erogato un nuovo Ticket, tuttavia a causa di spazio insufficiente, il ticket non viene emesso. Ponendo ora che ad esempio il quarto Fridge Truck non riesca a scaricare il proprio carico a causa del TicketTime (liberando così spazio che porterebbe all'emissione del Ticket per il sesto Fridge Truck), come dovrebbe comportarsi il sistema? Dovrebbe rifiutare subito il sesto Fridge Truck oppure "rischiare un overbooking" oppure anche tenere in attesa l'ultimo Fridge Truck per poi magari accettarlo/rifiutarlo all'ultimo? 
 4. In caso ci sia una coda di Fridge Truck in attesa, il committente desidera che la coda possa essere infinita oppure è necessario rifiutare a priori dei Fridge Truck se la coda supera un numero N di Fridge Truck in coda?
+5. (La domanda 1 chiede se non ci possono essere du "insert ticket" accavallati? Quindi un truck può fare insert ticket solo quando quello precedente ha ricevuto "charge taken"?)
+6. Chi si occupa di accorgesi di far fare più giri al trolley nel caso il carico superi la capacità massima del robottino?
+6.1 Se ci sono più giri, quando viene mandato il "charge taken"? Al primo pick-up o all'ultimo?
+7. La ServiceAccessGUI deve essere pensata principalmente per dispositivi mobile?
+8. Come vengono identificate le posizioni speciali, in coordinate?Come HOME e INDOOR?(PORT implicitamente lo sappiamo già. Ma la HOME e INDOOR quanto sono ampie?
 
