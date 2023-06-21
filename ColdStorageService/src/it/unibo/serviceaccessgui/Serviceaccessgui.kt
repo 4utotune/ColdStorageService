@@ -50,7 +50,7 @@ class Serviceaccessgui ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("idle") { //this:State
 					action { //it:State
-						CommUtils.outblack("[ServiceAccessGui] Idle...")
+						CommUtils.outblack("[ServiceAccessGui] Idle...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

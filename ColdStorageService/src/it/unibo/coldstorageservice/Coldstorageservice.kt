@@ -19,12 +19,12 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
 		
-				var CurrentWeight: Float
-				var MaxWeightcoldroom: Float
-				var ReservedWeight: Float
-				var RejectedRequest: Int
-				var CurrentTicket: String
-				val Tickets: MutableSet<Ticket>
+				var MaxWeightcoldroom: Float = 100.0f
+				var CurrentWeight: Float = 0.0f
+				var ReservedWeight: Float = 0.0f
+				var RejectedRequests: Int = 0
+				var CurrentTicket: String = ""
+				var Tickets: MutableSet<coldstorageservice.Ticket> = mutableSetOf()
 		return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
@@ -33,7 +33,8 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 									ReservedWeight = 0.0f
 									MaxWeightcoldroom = 100f
 									RejectedRequests = 0
-									Tickets = new MutableSet()
+									CurrentTicket = ""
+									Tickets = mutableSetOf()
 						CommUtils.outblack("[ColdStorageService] Initialized")
 						//genTimer( actor, state )
 					}
@@ -77,13 +78,13 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 						if( checkMsgContent( Term.createTerm("storerequest(FW)"), Term.createTerm("storerequest(FW)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 val FW = payloadArg(0).toFloat()  
-								if(  (CurrentWeight+ReservedWeight+FW>MaxWeightcoldroom)  
+								if(  ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom)  
 								 ){ RejectedRequests++  
 								answer("storerequest", "storerejected", "storerejected(_)"   )  
 								}
 								else
 								 {
-								 					val TICKET = new Ticket(FW)
+								 					val TICKET = coldstorageservice.Ticket(FW)
 								 				  	Tickets.add(TICKET)
 								 				  	ReservedWeight += FW
 								 				  	val Timestamp = TICKET.getTimestamp()
@@ -103,16 +104,18 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 						 	   
 						if( checkMsgContent( Term.createTerm("insertticket(TICKET)"), Term.createTerm("insertticket(TICKET)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 val TICKET = Tickets.find { it.timestamp == payloadArg(0).toString() }  
+								 val TICKET = Tickets.find { it.getTimestamp() == payloadArg(0).toString() }  
 								if(  (TICKET != null && TICKET.isValid())  
-								 ){ CurrentTicket = TICKET  
+								 ){ CurrentTicket = TICKET.getTimestamp()  
 								answer("insertticket", "ticketaccepted", "ticketaccepted(_)"   )  
 								forward("gotoindoor", "gotoindoor(_)" ,"transporttrolley" ) 
 								}
 								else
 								 { 
-								 					Tickets.remove(TICKET) 
-								 				   	ReservedWeight -= TICKET.getWeight()
+								 					if (TICKET != null) {
+								 						Tickets.remove(TICKET) 
+								 				   		ReservedWeight -= TICKET.getWeight()
+								 				   	}
 								 answer("insertticket", "ticketrejected", "ticketrejected(_)"   )  
 								 }
 						}
@@ -129,7 +132,7 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 						 	   
 						if( checkMsgContent( Term.createTerm("chargedeposited(_)"), Term.createTerm("chargedeposited(_)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								if(  (currentTicket != null)  
+								if(  (CurrentTicket != "")  
 								 ){answer("chargedeposited", "more", "more(_)"   )  
 								}
 								else

@@ -67,7 +67,7 @@ QActor serviceaccessgui context ctx_accessgui {
 	Goto idle
 	
 	State idle {
-		println("[ServiceAccessGui] Idle...")
+		println("[ServiceAccessGui] Idle...")
 	}
 	Transition t1	whenReply 	storeaccepted 	-> handle_store_accepted
 					whenReply 	storerejected 	-> handle_store_rejected
@@ -106,12 +106,12 @@ QActor serviceaccessgui context ctx_accessgui {
 
 QActor coldstorageservice context ctx_coldstorage {
 	[#
-		var CurrentWeight: Float
-		var MaxWeightcoldroom: Float
-		var ReservedWeight: Float
-		var RejectedRequest: Int
-		var CurrentTicket: String
-		val Tickets: MutableSet<Ticket>
+		var MaxWeightcoldroom: Float = 100.0f
+		var CurrentWeight: Float = 0.0f
+		var ReservedWeight: Float = 0.0f
+		var RejectedRequests: Int = 0
+		var CurrentTicket: String = ""
+		var Tickets: MutableSet<coldstorageservice.Ticket> = mutableSetOf()
 	#]
 	State init initial {
 		[# 
@@ -119,7 +119,8 @@ QActor coldstorageservice context ctx_coldstorage {
 			ReservedWeight = 0.0f
 			MaxWeightcoldroom = 100f
 			RejectedRequests = 0
-			Tickets = new MutableSet()
+			CurrentTicket = ""
+			Tickets = mutableSetOf()
 		#]
 		println("[ColdStorageService] Initialized")
 	}
@@ -145,12 +146,12 @@ QActor coldstorageservice context ctx_coldstorage {
 		printCurrentMessage
 		onMsg(storerequest: storerequest(FW)) {
 			[# val FW = payloadArg(0).toFloat() #]
-			if [# (CurrentWeight+ReservedWeight+FW>MaxWeightcoldroom) #] {
+			if [# ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom) #] {
 				[# RejectedRequests++ #]
 				replyTo storerequest with storerejected: storerejected(_)
 			} else {
 				[#
-					val TICKET = new Ticket(FW)
+					val TICKET = coldstorageservice.Ticket(FW)
 				  	Tickets.add(TICKET)
 				  	ReservedWeight += FW
 				  	val Timestamp = TICKET.getTimestamp()
@@ -164,15 +165,17 @@ QActor coldstorageservice context ctx_coldstorage {
 	State handle_ticket {
 		printCurrentMessage
 		onMsg(insertticket: insertticket(TICKET)) {
-			[# val TICKET = Tickets.find { it.timestamp == payloadArg(0).toString() } #]
+			[# val TICKET = Tickets.find { it.getTimestamp() == payloadArg(0).toString() } #]
 			if [# (TICKET != null && TICKET.isValid()) #]{
-				[# CurrentTicket = TICKET #]
+				[# CurrentTicket = TICKET.getTimestamp() #]
 				replyTo insertticket with ticketaccepted: ticketaccepted(_)
 				forward transporttrolley -m gotoindoor: gotoindoor(_)
 			} else {
 				[# 
-					Tickets.remove(TICKET) 
-				   	ReservedWeight -= TICKET.getWeight()
+					if (TICKET != null) {
+						Tickets.remove(TICKET) 
+				   		ReservedWeight -= TICKET.getWeight()
+				   	}
 				#]
 				replyTo insertticket with ticketrejected: ticketrejected(_)
 			}
@@ -183,7 +186,7 @@ QActor coldstorageservice context ctx_coldstorage {
 	State handle_ticketloop {
 		printCurrentMessage
 		onMsg(chargedeposited: chargedeposited(_)) {
-			if [# (currentTicket != null) #] {
+			if [# (CurrentTicket != "") #] {
 				replyTo chargedeposited with more: more(_)
 			} else {
 				replyTo chargedeposited with gohome: gohome(_)
@@ -201,7 +204,7 @@ QActor transporttrolley context ctx_coldstorage {
 	Goto idle
 	
 	State idle {
-		println("[transporttrolley] Idle...")
+		println("[transporttrolley] Idle...")
 	}
 	Transition t0	whenMsg gotoindoor	-> handle_load_request
 	
@@ -271,16 +274,16 @@ QActor led context ctx_raspberry {
 
 QActor servicestatusgui context ctx_statusgui {
 	[# 
-		var TrolleyState: String
-		var TrolleyPosition: (Int,Int)
-		var CurrentWeight: Float
-		var RejectedRequest: Int
+		var TrolleyState: String = "IDLE"
+		var TrolleyPosition: String = "HOME"
+		var CurrentWeight: Float = 0.0f
+		var RejectedRequest: Int = 0
 	#]
 	State init initial {
 		println("[ServiceStatusGui] Init")
 		[# 
-			TrolleyState = "HOME"
-			TrolleyPosition = (0,0)
+			TrolleyState = "IDLE"
+			TrolleyPosition = "HOME"
 			CurrentWeight = 0.0f
 			RejectedRequest = 0
 		#]	

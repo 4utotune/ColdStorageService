@@ -32,7 +32,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("idle") { //this:State
 					action { //it:State
-						CommUtils.outblack("[transporttrolley] Idle...")
+						CommUtils.outblack("[transporttrolley] Idle...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

@@ -19,17 +19,17 @@ class Servicestatusgui ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
 		 
-				var TrolleyState: String
-				var TrolleyPosition: (Int,Int)
-				var CurrentWeight: Float
-				var RejectedRequest: Int
+				var TrolleyState: String = "IDLE"
+				var TrolleyPosition: String = "HOME"
+				var CurrentWeight: Float = 0.0f
+				var RejectedRequest: Int = 0
 		return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
 						CommUtils.outblack("[ServiceStatusGui] Init")
 						 
-									TrolleyState = "HOME"
-									TrolleyPosition = (0,0)
+									TrolleyState = "IDLE"
+									TrolleyPosition = "HOME"
 									CurrentWeight = 0.0f
 									RejectedRequest = 0
 						//genTimer( actor, state )
