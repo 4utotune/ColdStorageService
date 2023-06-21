@@ -14,12 +14,12 @@ import kotlinx.coroutines.runBlocking
 class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
 
 	override fun getInitialState() : String{
-		return "s0"
+		return "init"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
 		return { //this:ActionBasciFsm
-				state("s0") { //this:State
+				state("init") { //this:State
 					action { //it:State
 						//genTimer( actor, state )
 					}

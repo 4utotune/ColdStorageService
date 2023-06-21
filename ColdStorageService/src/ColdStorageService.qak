@@ -1,21 +1,51 @@
-System coldstorageservice
+System coldstorageservice_sprint0
 
-//Messaggi
-//serviceaccessgui <-> appl
+// MESSAGGI
+// serviceAccessGUI -> coldstorageservice
+Request coldroomdatarequest: coldroomdatarequest(_)
+Reply coldroomdata: coldroomdata(weight)
+
 Request storerequest: 	storerequest(FW)
-Reply storeaccepted:	storeaccepted(TICKETTIME)
+Reply storeaccepted:	storeaccepted(TICKET)
 Reply storerejected:	storerejected(_)
 
+Request insertticket: insertticket(TICKET)
+Reply ticketaccepted: ticketaccepted(_)
+Reply ticketrejected: ticketrejected(_)
+
+// transporttrolley -> coldstorageservice  
+Dispatch chargetaken: chargetaken(_)
+
+Request chargedeposited: chargedeposited(_)
+
+// coldstorageservice -> transporttrolley
+Dispatch gotoindoor: gotoindoor(_)
+
+Reply more: more(_)
+Reply gohome: gohome(_)
+
+// sonar -> transporttrolley
+Dispatch alarm: alarm(STATUS)
+
+// transporttrolley -> led
+Dispatch updateled: updateled(ledStatus) 
+
+// transporttrolley -> servicestatusgui
+Dispatch trolleystatus: trolleystatus(trolleyState, trolleyPosition)
+
+// coldstorageservice -> servicestatusgui
+Dispatch coldstoragestatus: coldstoragestatus(currentWeight, rejectedRequest)
 
 
-
+// CONTEXTS
 Context ctxcoldstorage ip [host="localhost" port=8021]
+
 
 // ACTORS
 ExternalQActor basicrobot context ctxcoldstorage
 
 QActor transporttrolley context ctxcoldstorage {
-	State s0 initial {
+	State init initial {
 		
 	}
 }
@@ -32,8 +62,42 @@ QActor serviceaccessgui context ctxcoldstorage {
 	}
 }
 
-QActor appl context ctxcoldstorage {
-	State s0 initial {
+QActor coldstorageservice context ctxcoldstorage {
+	[#
+		var CurrentWeight: Float
+		var RejectedRequest: Int
+		var CurrentTicket: String
+		val Tickets: MutableSet<Ticket>
+	#]
+	State init initial {
+		[# 
+			CurrentWeight = 0.0f 
+			RejectedRequests = 0
+			Tickets = new MutableSet()
+		#]
+		println("[ColdStorageService] Initialized")
+	}
+	Goto idle
+	
+	State idle {
+		println("[ColdStorageService] Idle...")
+	}
+	Transition t0 	whenRequest coldroomdatarequest -> handle_data
+					whenRequest storerequest		-> handle_store
+					whenRequest insertticket		-> handle_ticket
+					
+	State handle_data {
+		printCurrentMessage
+		onMsg(coldroomdatarequest: coldroomdatarequest(_)) {
+			replyTo coldroomdatarequest with coldroomdata: coldroomdata($CurrentWeight)
+		}
+	}
+	
+	State handle_store {
+		
+	}
+	
+	State handle_ticket {
 		
 	}
 }
