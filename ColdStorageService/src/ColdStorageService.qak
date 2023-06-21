@@ -65,6 +65,8 @@ QActor serviceaccessgui context ctxcoldstorage {
 QActor coldstorageservice context ctxcoldstorage {
 	[#
 		var CurrentWeight: Float
+		var MaxWeightcoldroom: Float
+		var ReservedWeight: Float
 		var RejectedRequest: Int
 		var CurrentTicket: String
 		val Tickets: MutableSet<Ticket>
@@ -72,6 +74,8 @@ QActor coldstorageservice context ctxcoldstorage {
 	State init initial {
 		[# 
 			CurrentWeight = 0.0f 
+			ReservedWeight = 0.0f
+			MaxWeightcoldroom = 100f
 			RejectedRequests = 0
 			Tickets = new MutableSet()
 		#]
@@ -92,14 +96,43 @@ QActor coldstorageservice context ctxcoldstorage {
 			replyTo coldroomdatarequest with coldroomdata: coldroomdata($CurrentWeight)
 		}
 	}
+	Goto idle
 	
 	State handle_store {
-		
+		printCurrentMessage
+		onMsg(storerequest: storerequest(FW)) {
+			[#val FW = payloadArg(0).toFloat()#]
+			if [#(CurrentWeight+ReservedWeight+FW>MaxWeightcoldroom)#]{
+				[# RejectedRequests++ #]
+				replyTo storerequest with storerejected: storerejected(_)
+			}else{
+				[#val TICKET = new Ticket(FW)
+				  Tickets.add(TICKET)
+				  ReservedWeight+=FW
+				#]
+				replyTo storerequest with storeaccepted: storeaccepted($TICKET)
+			}
+		}
 	}
+	Goto idle
 	
 	State handle_ticket {
-		
+		printCurrentMessage
+		onMsg(insertticket: insertticket(TICKET)) {
+			[#val TICKET = Tickets.find { it.timestamp == payloadArg(0).toString() }#]
+			if [#(TICKET!=null && TICKET.isValid())#]{
+				replyTo insertticket with ticketaccepted: ticketaccepted(_)
+				[# CurrentTicket = TICKET #]
+				forward transporttrolley -m gotoindoor: gotoindoor(_)
+			}else{
+				[# Tickets.remove(TICKET) 
+				   ReservedWeight-=TICKET.getWeight()
+				#]
+				replyTo insertticket with ticketrejected: ticketrejected(_)
+			}
+		}
 	}
+	Goto idle
 }
 
 QActor sonar context ctxcoldstorage {
