@@ -1,7 +1,0 @@
-{"actor":"coldstorageservice", "msgType":"request", "sender":"serviceaccessgui", "msgId":"coldroomdatarequest"}
-{"actor":"transporttrolley", "msgType":"dispatch", "sender":"coldstorageservice", "msgId":"gotoindoor"}
-{"actor":"led", "msgType":"dispatch", "sender":"transporttrolley", "msgId":"updateled"}
-{"actor":"servicestatusgui", "msgType":"dispatch", "sender":"transporttrolley", "msgId":"updatetrolleystatus"}
-{"actor":"coldstorageservice", "msgType":"dispatch", "sender":"transporttrolley", "msgId":"chargetaken"}
-{"actor":"coldstorageservice", "msgType":"request", "sender":"transporttrolley", "msgId":"chargedeposited"}
-{"actor":"transporttrolley", "msgType":"dispatch", "sender":"sonar", "msgId":"alarm"}
