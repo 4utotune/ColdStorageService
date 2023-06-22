@@ -228,6 +228,20 @@
         width: 40%;
     }
 
+    .piccola {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 50%;
+        height: auto;
+    }
+
+    .piccola img {
+        border-radius: 20px;
+        max-width: 100%;
+        max-height: 100%;
+    }
+
     .piccolo img {
         border-radius: 20px;
         max-width: 100%;
@@ -255,8 +269,8 @@
         generale
         la struttura del sistema richiesto. Per fare ciò in seguito vengono riportate le considerazioni e chiarimenti
         avute
-        durante l'analisi del <a href="http://calendar.altervista.org/TemaFinale23.pdf" target="_blank">TemaFinale23</a><br>
-        Una volta definita senza ambiguità la richiesta del committente, si è delineata tramite dei macro-componenti la
+        durante l'analisi del <a href="http://calendar.altervista.org/TemaFinale23.pdf" target="_blank">TemaFinale23</a>.<br>
+        Una volta definita senza ambiguità la richiesta del committente, si può delineare tramite dei macro-componenti la
         struttura
         complessiva. Alla fine dello Sprint0 si fornisce dunque un piano di lavoro che programmerà gli Sprint
         successivi, delineando così
@@ -360,7 +374,7 @@
                 </tr>
                 <tr>
                     <td>INDOOR</td>
-                    <td>Posizione identificata su una parete della Service Area adibita allo scambio di alimenti dal
+                    <td>Posizione identificata su una parete della <u>Service Area</u> adibita allo scambio di alimenti dal
                         <u>Fridge Truck</u> al
                         <u>Transport Trolley</u>.
                     </td>
@@ -438,7 +452,7 @@
                 </tr>
                 <tr>
                     <td>Carico</td>
-                    <td>Qunatità in kg di <u>alimenti</u> che viene depositato dal <u>Fridge Truck</u> presso
+                    <td>Quantità in kg di <u>alimenti</u> che viene depositato dal <u>Fridge Truck</u> presso
                         l'<u>INDOOR</u>.</td>
                 </tr>
                 <tr>
@@ -465,7 +479,7 @@
                             Service Area</u>.</td>
                 </tr>
                 <tr>
-                    <td> Service-manager </td>
+                    <td>Service-manager</td>
                     <td>Entità esterna al sistema, definita come essere umano che svolge il compito di monitorare lo
                         <u>Stato della Service Area</u> attraverso la <u>ServiceStatusGUI</u>.
                     </td>
@@ -491,7 +505,7 @@
                         grado di emettere luce.</td>
                 </tr>
                 <tr>
-                    <td> RaspberryPi </td>
+                    <td>RaspberryPi</td>
                     <td>Single-board computer in particolare un Rasberry Pi 2 Model B. (Link: <a
                             href="https://www.raspberrypi.org/" target="_blank">https://www.raspberrypi.org/</a>).</td>
                 </tr>
@@ -626,7 +640,7 @@
                             </li>
                             <li>Negativa: se la <b>Cold Room</b> non ha abbastanza spazio per immagazzinare il carico
                                 del
-                                <b>Fridge Truck</b>, in questo caso non viene emesso alcun Ticket
+                                <b>Fridge Truck</b>, in questo caso non viene emesso alcun <b>Ticket</b>
                             </li>
                         </ul>
                     </td>
@@ -687,13 +701,12 @@
         Si evince dunque che tutti i componenti evidenziati comunicano tra loro in maniera bidirezionale, all'infuori
         della ServiceStatusGUI che si limita a ricevere informazioni dal sistema.
         <div class="remark">
-            TODO <br>
             Considerando la struttura appena effettuata è possibile raggruppare i requisiti del progetto in 3
             Sprint, ordinati per priorità:
             <ol>
-                <li><b>Sprint 1: </b>Il componente <b>ColdStorageService</b> (requisiti <b>1,2</b> e <b>3</b>)</li>
-                <li><b>Sprint 2: </b>Il <b>Sonar</b> ed il <b>Led</b> connessi ad un <b>Raspberry</b> (requisito <b>Alarm requirements</b>)</li>
-                <li><b>Sprint 3: </b>Il componente ServiceStatusGui (requisito <b>4</b>)</li>
+                <li><b>Sprint 1: </b>(requisiti <b>1, 2</b> e <b>3</b>) si genera un sistema che include la ServiceArea, il Transport Trolley, la ServiceAccessGUI e la ColdStorageService.</li>
+                <li><b>Sprint 2: </b>(<b>Alarm Requirements</b>) si gestiscono il Led e il Sonar connessi al Rasberry Pi.</li>
+                <li><b>Sprint 3: </b>(requisito <b>4</b>) si inserisce nel sistema la ServiceStatusGUI.</li>
             </ol>
         </div>
         <h5>Interazioni</h5>
@@ -794,11 +807,15 @@
         </ul>
         <div class="remark">
             Codice QAK per la modellazione del sistema: <a
-                href="http://calendar.altervista.org/ColdStorageService.qak" target="_blank">ColdStorageService.qak</a>
+                href="./sprint0.coldstorageservice/src/ColdStorageService.qak" target="_blank">ColdStorageService.qak</a>
         </div>
         <h3>Architettura logica</h3>
         Il sistema da noi modellato, presenta la seguente architettura logica:
-
+        <center>
+            <div class="piccola">
+                <img src="./sprint0.coldstorageservice/coldstorageservice_sprint0arch.png" alt="architettura logica">
+            </div>
+        </center>
         <h2>Test plans</h2>
         I test prevedono che il sistema riceva diverse richieste dal conducente del Fridge Truck tramite la ServiceAccessGUI.
         I tests mirano a mostrare e verificare come il sistema reagisce quando riceve le richieste di store in diverse situazioni:
