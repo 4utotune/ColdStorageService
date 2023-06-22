@@ -1,5 +1,7 @@
 package coldstorageservice;
 
+import unibo.basicomm23.utils.CommUtils;
+
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,6 +34,6 @@ public class Ticket {
         // Calcola la differenza in millisecondi tra i due timestamp
         long difference = currentTimestamp.getTime() - new SimpleDateFormat(FORMAT).parse(timestamp).getTime();
 
-        return  (difference <= 5000);
+        return  (difference <= 15000);
     }
 }

@@ -36,7 +36,7 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t015",targetState="handle_update",cond=whenDispatch("updateled"))
+					 transition(edgeName="t018",targetState="handle_update",cond=whenDispatch("updateled"))
 				}	 
 				state("led_on") { //this:State
 					action { //it:State
@@ -45,7 +45,7 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t116",targetState="handle_update",cond=whenDispatch("updateled"))
+					 transition(edgeName="t119",targetState="handle_update",cond=whenDispatch("updateled"))
 				}	 
 				state("led_blink") { //this:State
 					action { //it:State
@@ -54,18 +54,20 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t217",targetState="handle_update",cond=whenDispatch("updateled"))
+					 transition(edgeName="t220",targetState="handle_update",cond=whenDispatch("updateled"))
 				}	 
 				state("handle_update") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("updateled(STATUS)"), Term.createTerm("updateled(STATUS)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
+								CommUtils.outblack("[Led] Updating led")
 						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition( edgeName="goto",targetState="led_off", cond=doswitch() )
 				}	 
 			}
 		}

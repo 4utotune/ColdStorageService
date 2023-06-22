@@ -1,4 +1,5 @@
-{"actor":"serviceaccessgui", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}
+{"actor":"testtruck", "msgType":"dispatch", "curstate":"request_store", "nextstate":"handle_ticket", "msgId":"test_gotticket"}
+{"actor":"serviceaccessgui", "msgType":"dispatch", "curstate":"waitevents", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}
 {"actor":"coldstorageservice", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}
 {"actor":"transporttrolley", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_load_request", "msgId":"gotoindoor"}
 {"actor":"sonar", "msgType":"dispatch", "curstate":"idle", "nextstate":"alarm", "msgId":"updateled"}
@@ -6,4 +7,4 @@
 {"actor":"led", "msgType":"dispatch", "curstate":"led_on", "nextstate":"handle_update", "msgId":"updateled"}
 {"actor":"led", "msgType":"dispatch", "curstate":"led_blink", "nextstate":"handle_update", "msgId":"updateled"}
 {"actor":"servicestatusgui", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_trolley_update", "msgId":"updatetrolleystatus"}
-{"actor":"servicestatusgui", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_coldstorage_update", "msgId":"updatecoldstoragestatus"}
+{"actor":"servicestatusgui", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_coldstorage_update", "msgId":"updatestoragestatus"}

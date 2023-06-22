@@ -38,15 +38,17 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t011",targetState="handle_load_request",cond=whenDispatch("gotoindoor"))
+					 transition(edgeName="t014",targetState="handle_load_request",cond=whenDispatch("gotoindoor"))
 				}	 
 				state("handle_load_request") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("gotoindoor(_)"), Term.createTerm("gotoindoor(_)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								CommUtils.outmagenta("[transporttrolley] Going indoor")
+								forward("updateled", "updateled(_)" ,"led" ) 
 								forward("cmd", "cmd(_)" ,"basicrobot" ) 
 								request("step", "step(_)" ,"basicrobot" )  
+								delay(500) 
 								CommUtils.outmagenta("[transporttrolley] Charge taken")
 								forward("chargetaken", "chargetaken(_)" ,"coldstorageservice" ) 
 								delay(500) 
@@ -58,8 +60,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t112",targetState="handle_load_request",cond=whenReply("more"))
-					transition(edgeName="t113",targetState="handle_gohome",cond=whenReply("gohome"))
+					 transition(edgeName="t115",targetState="handle_load_request",cond=whenReply("more"))
+					transition(edgeName="t116",targetState="handle_gohome",cond=whenReply("gohome"))
 				}	 
 				state("handle_gohome") { //this:State
 					action { //it:State

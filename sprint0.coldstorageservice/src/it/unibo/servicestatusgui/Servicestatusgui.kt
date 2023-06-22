@@ -22,7 +22,7 @@ class Servicestatusgui ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				var TrolleyState: String = "IDLE"
 				var TrolleyPosition: String = "HOME"
 				var CurrentWeight: Float = 0.0f
-				var RejectedRequest: Int = 0
+				var RejectedRequests: Int = 0
 		return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
@@ -31,7 +31,7 @@ class Servicestatusgui ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 									TrolleyState = "IDLE"
 									TrolleyPosition = "HOME"
 									CurrentWeight = 0.0f
-									RejectedRequest = 0
+									RejectedRequests = 0
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -47,12 +47,18 @@ class Servicestatusgui ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t018",targetState="handle_trolley_update",cond=whenDispatch("updatetrolleystatus"))
-					transition(edgeName="t019",targetState="handle_coldstorage_update",cond=whenDispatch("updatecoldstoragestatus"))
+					 transition(edgeName="t021",targetState="handle_trolley_update",cond=whenDispatch("updatetrolleystatus"))
+					transition(edgeName="t022",targetState="handle_coldstorage_update",cond=whenDispatch("updatestoragestatus"))
 				}	 
 				state("handle_trolley_update") { //this:State
 					action { //it:State
-						CommUtils.outred("[ServiceStatusGui] Updating trolley")
+						if( checkMsgContent( Term.createTerm("updatetrolleystatus(STATE,POS)"), Term.createTerm("updatetrolleystatus(STATE,POS)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+												TrolleyState = payloadArg(0)
+												TrolleyPosition = payloadArg(1)
+						}
+						CommUtils.outred("[ServiceStatusGui] Updated trolley -> State: $TrolleyState, Pos: $TrolleyPosition")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -62,7 +68,13 @@ class Servicestatusgui ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("handle_coldstorage_update") { //this:State
 					action { //it:State
-						CommUtils.outred("[ServiceStatusGui] Updating coldroom")
+						if( checkMsgContent( Term.createTerm("updatestoragestatus(CURWEIGHT,REJREQUESTS)"), Term.createTerm("updatestoragestatus(CURWEIGHT,REJREQUESTS)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+												CurrentWeight = payloadArg(0).toFloat()
+												RejectedRequests = payloadArg(1).toInt()
+						}
+						CommUtils.outred("[ServiceStatusGui] Updated coldroom -> CurWeight: $CurrentWeight, RejRequests: $RejectedRequests")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

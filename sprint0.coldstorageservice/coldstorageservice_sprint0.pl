@@ -4,6 +4,7 @@
 context(ctx_basicrobot, "localhost",  "TCP", "8020").
 context(ctx_coldstorage, "localhost",  "TCP", "11800").
  qactor( basicrobot, ctx_basicrobot, "external").
+  qactor( testtruck, ctx_coldstorage, "it.unibo.testtruck.Testtruck").
   qactor( serviceaccessgui, ctx_coldstorage, "it.unibo.serviceaccessgui.Serviceaccessgui").
   qactor( coldstorageservice, ctx_coldstorage, "it.unibo.coldstorageservice.Coldstorageservice").
   qactor( transporttrolley, ctx_coldstorage, "it.unibo.transporttrolley.Transporttrolley").
