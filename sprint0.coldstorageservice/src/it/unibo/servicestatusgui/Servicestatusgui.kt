@@ -47,8 +47,8 @@ class Servicestatusgui ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t021",targetState="handle_trolley_update",cond=whenDispatch("updatetrolleystatus"))
-					transition(edgeName="t022",targetState="handle_coldstorage_update",cond=whenDispatch("updatestoragestatus"))
+					 transition(edgeName="t023",targetState="handle_trolley_update",cond=whenDispatch("updatetrolleystatus"))
+					transition(edgeName="t024",targetState="handle_coldstorage_update",cond=whenDispatch("updatestoragestatus"))
 				}	 
 				state("handle_trolley_update") { //this:State
 					action { //it:State

@@ -1,4 +1,5 @@
 {"actor":"testtruck", "msgType":"dispatch", "curstate":"request_store", "nextstate":"handle_ticket", "msgId":"test_gotticket"}
+{"actor":"testtruck", "msgType":"dispatch", "curstate":"second_request_store", "nextstate":"handle_ticket_for_fail", "msgId":"test_gotticket"}
 {"actor":"serviceaccessgui", "msgType":"dispatch", "curstate":"waitevents", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}
 {"actor":"coldstorageservice", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}
 {"actor":"transporttrolley", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_load_request", "msgId":"gotoindoor"}

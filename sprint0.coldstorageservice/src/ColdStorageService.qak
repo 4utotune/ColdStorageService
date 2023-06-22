@@ -72,18 +72,40 @@ QActor testtruck context ctx_coldstorage {
 		emit accessguicmd: accessguicmd(store, 30) 
 		delay 2000
 	}
-	Transition t0 	whenTime 	6000 			-> handle_fail 	
+	Transition t0 	whenTime 	6000 			-> handle_timeout	
 					whenMsg 	test_gotticket 	-> handle_ticket
 					
-	State handle_fail {
+	State handle_timeout {
 		println("[TestTruck] Storage request got (probably) rejected") color yellow
 	}
+	Goto loop
 	
 	State handle_ticket {
 		onMsg(test_gotticket: test_gotticket(TICKET)) {
 			[# val Ticket = payloadArg(0) #]
 			println("[TestTruck] Inputing ticket $Ticket") color yellow
 			emit accessguicmd: accessguicmd(ticket, $Ticket) 
+			delay 2000
+		}
+	}
+	Goto second_request_store
+	
+	State second_request_store {
+		println("[TestTruck] Requesting second store") color yellow
+		emit accessguicmd: accessguicmd(store, 30) 
+	}
+	Transition t1 	whenTime 	6000 			-> handle_timeout 	
+					whenMsg 	test_gotticket 	-> handle_ticket_for_fail
+	
+	State handle_ticket_for_fail {
+		onMsg(test_gotticket: test_gotticket(TICKET)) {
+			delay 5000
+			[# val Ticket = payloadArg(0) #]
+			println("[TestTruck] Inputing ticket $Ticket too late -> will fail") color yellow
+			emit accessguicmd: accessguicmd(ticket, $Ticket) 
+			delay 2000
+			println("[TestTruck] Inputing non-existent ticket -> will fail") color yellow
+			emit accessguicmd: accessguicmd(ticket, failfail) 
 			delay 2000
 		}
 	}
@@ -240,7 +262,7 @@ QActor coldstorageservice context ctx_coldstorage {
 				val Received = payloadArg(0).toString()
 				val TICKET = Tickets.find { it.getTimestamp() == Received }
 			#]
-			println("[ColdStorageService] Handling ticket ${TICKET!!.getTimestamp()}") color green
+			println("[ColdStorageService] Handling ticket $Received") color green
 			if [# (TICKET != null && TICKET.isValid) #]{
 				[# 
 					WaitingTicket = TICKET 				

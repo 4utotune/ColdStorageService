@@ -36,7 +36,7 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t018",targetState="handle_update",cond=whenDispatch("updateled"))
+					 transition(edgeName="t020",targetState="handle_update",cond=whenDispatch("updateled"))
 				}	 
 				state("led_on") { //this:State
 					action { //it:State
@@ -45,7 +45,7 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t119",targetState="handle_update",cond=whenDispatch("updateled"))
+					 transition(edgeName="t121",targetState="handle_update",cond=whenDispatch("updateled"))
 				}	 
 				state("led_blink") { //this:State
 					action { //it:State
@@ -54,7 +54,7 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t220",targetState="handle_update",cond=whenDispatch("updateled"))
+					 transition(edgeName="t222",targetState="handle_update",cond=whenDispatch("updateled"))
 				}	 
 				state("handle_update") { //this:State
 					action { //it:State

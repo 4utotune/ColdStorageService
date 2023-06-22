@@ -34,6 +34,6 @@ public class Ticket {
         // Calcola la differenza in millisecondi tra i due timestamp
         long difference = currentTimestamp.getTime() - new SimpleDateFormat(FORMAT).parse(timestamp).getTime();
 
-        return  (difference <= 15000);
+        return  (difference <= 5000);
     }
 }
