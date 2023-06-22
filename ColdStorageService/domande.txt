@@ -8,4 +8,5 @@
 6.1 Se ci sono più giri, quando viene mandato il "charge taken"? Al primo pick-up o all'ultimo?
 7. La ServiceAccessGUI deve essere pensata principalmente per dispositivi mobile?
 8. Come vengono identificate le posizioni speciali, in coordinate?Come HOME e INDOOR?(PORT implicitamente lo sappiamo già. Ma la HOME e INDOOR quanto sono ampie?
+9. Quando il Trolley sta andando in HOME ed una richiesta di andare in INDOOR arriva: il Trolley deve aspettare di arrivare in HOME per poi andare in INDOOR oppure deve essere avvisato istantaneamente di andare in INDOOR?
 

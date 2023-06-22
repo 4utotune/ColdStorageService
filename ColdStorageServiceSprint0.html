@@ -314,15 +314,22 @@
             <li>In caso ci sia una coda di Fridge Truck in attesa, il committente desidera che la coda possa essere
                 infinita oppure è necessario rifiutare a priori dei Fridge Truck se la coda supera un numero N di Fridge
                 Truck in coda?</li>
-            <li>Chi si occupa di accorgesi di far fare più giri al trolley nel caso il carico superi la capacità massima
+            <li>Puo' capitare che un carico superi la porata massima del trolley? In questo caso come si procede? Si scarta la richiesta dal principio
+                oppure si fanno fare più giri al trolley?
+            </li>
+            <li>(Nel caso il trolley debba fare più giri per un carico che supera la sua portata massima)
+                Chi si occupa di accorgesi di far fare più giri al trolley nel caso il carico superi la capacità massima
                 del robottino?</li>
-            <li>Se ci sono più giri, quando viene mandato il "charge taken"? Al primo pick-up o all'ultimo?</li>
+            <li>(Nel caso il trolley debba fare più giri per un carico che supera la sua portata massima)
+                Se ci sono più giri, quando viene mandato il "charge taken"? Al primo pick-up o all'ultimo?</li>
             <li>La ServiceAccessGUI deve essere pensata principalmente per dispositivi mobile?</li>
             <li>Come vengono identificate le posizioni speciali, in coordinate?Come HOME, INDOOR e PORT, che
                 implicitamente sappiamo già. Ma la HOME e INDOOR quanto sono ampie?</li>
             <li>Siccome due camion non facciano la richiesta in contemporanea e dunque non ci possono essere due "insert
                 ticket" accavallati? Quindi un truck può fare insert ticket solo quando quello precedente ha ricevuto
                 "charge taken"?</li>
+            <li>Quando il Trolley sta andando in HOME ed una richiesta di andare in INDOOR arriva: il Trolley deve aspettare 
+                di arrivare in HOME per poi andare in INDOOR oppure deve essere avvisato istantaneamente di andare in INDOOR?</li>
         </ol>
         <h5>Dizionario</h5>
         <h7>NOMI:</h7>
@@ -664,9 +671,9 @@
         <h5>Sistema</h5>
         Dall'analisi del <a href="http://calendar.altervista.org/TemaFinale23.pdf" target="_blank">TemaFinale23</a> fornita dal
         committente, è possibile effettuare una bozza della struttura
-        del sistema, il quale presenterà 5 nodi computazionali:
+        del sistema, il quale presenterà 5 macro-componenti:
         <ul>
-            <li>Rasberry Pi</li>
+            <li>Raspberry Pi</li>
             <li>ServiceAccessGui</li>
             <li>ServiceStatusGui</li>
             <li>DDR Robot</li>
@@ -682,9 +689,11 @@
         <div class="remark">
             TODO <br>
             Considerando la struttura appena effettuata è possibile raggruppare i requisiti del progetto in 3
-            macro-componenti, ordinati per priorità:
+            Sprint, ordinati per priorità:
             <ol>
-                <li>Il componente <b>ColdStorageService</b> (requisiti )</li>
+                <li><b>Sprint 1: </b>Il componente <b>ColdStorageService</b> (requisiti <b>1,2</b> e <b>3</b>)</li>
+                <li><b>Sprint 2: </b>Il <b>Sonar</b> ed il <b>Led</b> connessi ad un <b>Raspberry</b> (requisito <b>Alarm requirements</b>)</li>
+                <li><b>Sprint 3: </b>Il componente ServiceStatusGui (requisito <b>4</b>)</li>
             </ol>
         </div>
         <h5>Interazioni</h5>
@@ -815,9 +824,13 @@
         <br /><br />
 
         <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
-            By Tassinari Gabriele email: gabriele.tassinari2@studio.unibo.it,
+            By <br>Tassinari Gabriele,   email: gabriele.tassinari2@studio.unibo.it ,<br>
+            Baraldi Leonardo,            email: leonardo.baraldi@studio.unibo.it ,<br>
+            Koss Krystian,               email: krystian.koss@studio.unibo.it<br>
             <img src="./gabriele.jpeg" alt="mbot" width="15%" height="15%">
-            GIT repo: https://github.com/4utotune/ColdStorageService/
+            <img src="./Baraldi.jpeg" alt="mbot" width="15%" height="15%">
+            <img src="./kriss.jpeg" alt="mbot" width="15%" height="15%">    <br>        
+            GIT repo: https://github.com/4utotune/ColdStorageService/ <br>
         </div>
 </body>
 
