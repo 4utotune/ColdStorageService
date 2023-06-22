@@ -247,6 +247,22 @@
         max-width: 100%;
         max-height: 100%;
     }
+
+    .foto {
+        margin: 0px;
+        padding: 0px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        object-fit: fill;
+    }
+
+    .foto img {
+        border-radius: 20px;
+        max-width: 100%;
+        height: 8em;
+    }
 </style>
 
 <head>
@@ -665,7 +681,8 @@
                     <td rowspan="1">ServiceStatusGUI</td>
                     <td>Ricevere un messaggio di stato</td>
                     <td>La ServiceStatusGUI riceve un messaggio con lo <b>Stato del Transport Trolley</b>, il peso della
-                        <b>Cold Room</b> e il numero di richieste di store rifiutato.</td>
+                        <b>Cold Room</b> e il numero di richieste di store rifiutato.
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -789,7 +806,8 @@
                 </tbody>
             </table>
             <table>
-                <caption>Occorre aggiungere un attore di test che simuli il comportamento del conducente di un Fridge Truck
+                <caption>Occorre aggiungere un attore di test che simuli il comportamento del conducente di un Fridge
+                    Truck
                 </caption>
                 <tbody>
                     <tr>
@@ -835,13 +853,18 @@
                     anche i carichi prenotati), il servizio ha premura di controllare eventuali Ticket scaduti, e
                     conseguentemente
                     liberare lo spazio allocato. Qualora non siano presenti Ticket scaduti, la richiesta verrà
-                    respinta. Ciò potrà portare in alcuni casi il servizio a respingere carichi che in breve tempo si sarebbero rivelati accettabili, ma grazie a questo sistema di allocazione logica del peso
-                    siamo sicuri di non mandare mai il servizio in stato di overbooking e conseguente overflow della ColdRoom.<br>
-                    Solo quando il TransportTrolley avrà comunicato di aver depositato nella ColdRoom il carico che attualmente sta gestendo
+                    respinta. Ciò potrà portare in alcuni casi il servizio a respingere carichi che in breve tempo si
+                    sarebbero rivelati accettabili, ma grazie a questo sistema di allocazione logica del peso
+                    siamo sicuri di non mandare mai il servizio in stato di overbooking e conseguente overflow della
+                    ColdRoom.<br>
+                    Solo quando il TransportTrolley avrà comunicato di aver depositato nella ColdRoom il carico che
+                    attualmente sta gestendo
                     verrà aggiornato il peso del contenuto reale del frigo e di conseguenza ridotto quello prenotato.
                 </li>
                 <li>
-                    Per questo primo Sprint segliamo di modellare i Ticket come sequenza di numeri corrispondenti al timestamp di richiesta dello stesso. In questo modo otteniamo leggibilità, univocità e semplicità.<br>
+                    Per questo primo Sprint segliamo di modellare i Ticket come sequenza di numeri corrispondenti al
+                    timestamp di richiesta dello stesso. In questo modo otteniamo leggibilità, univocità e
+                    semplicità.<br>
                     Questa scelta in ultima istanza dovrà essere confermata dal Committente.
                 </li>
             </ul>
@@ -889,9 +912,12 @@
                 By <br>Tassinari Gabriele, email: gabriele.tassinari2@studio.unibo.it ,<br>
                 Baraldi Leonardo, email: leonardo.baraldi@studio.unibo.it ,<br>
                 Koss Krystian, email: krystian.koss@studio.unibo.it<br>
-                <img src="./gabriele.jpeg" alt="mbot" width="15%" height="15%">
-                <img src="./Baraldi.jpeg" alt="mbot" width="15%" height="15%">
-                <img src="./kriss.jpeg" alt="mbot" width="15%" height="15%"> <br>
+                <div class="foto">
+                    <img src="./gabriele.jpeg" alt="mbot" width="15%" height="15%">
+                    <img src="./Baraldi.jpeg" alt="mbot" width="15%" height="15%">
+                    <img src="./kriss.jpeg" alt="mbot" width="15%" height="15%">
+                </div>
+                <br>
                 GIT repo: https://github.com/4utotune/ColdStorageService/ <br>
             </div>
 </body>
