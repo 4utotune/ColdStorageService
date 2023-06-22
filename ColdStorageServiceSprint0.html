@@ -314,7 +314,7 @@
             <li>Il service manager è un operatore umano esterno al sistema;</li>
             <li>I messaggi inviati allo smart device del service manager che consentono la supervisione del sistema sono
                 invece parte del sistema;</li>
-            <li>La ServiceAccessGUI è accessibile solo al service-manager;</li>
+            <li>La ServiceStatusGUI è accessibile solo al service-manager;</li>
             <li>Il sonar e il Led NON sono sul trolley, bensì su un Rasberry Pi separato;</li>
             <li>Il trolley si deve fermare "il prima possibile", quando il sonar trasmette un alarm;</li>
             <li>La ServiceAccessGui è unica e condivisa da tutti i conducenti del camion;</li>
@@ -323,30 +323,17 @@
         <h5>Da chiarire con il committente</h5>
         <ol>
             <li>Va presupposto che il Ticket sia inserito, in maniera onesta, dal conducente solo davanti all'INDOOR? E
-                dunque in quanto analisti e progettisti non ci dobbiamo preoccuparci che un conducente inserisca il
+                dunque in quanto analisti e progettisti non ci dobbiamo preoccupare che un conducente inserisca il
                 Ticket prima di essere davanti all'INDOOR?</li>
-            <li>In caso ci sia una coda di Fridge Truck in attesa, il committente desidera che la coda possa essere
-                infinita oppure è necessario rifiutare a priori dei Fridge Truck se la coda supera un numero N di Fridge
-                Truck in coda?</li>
-            <li>Puo' capitare che un carico superi la porata massima del trolley? In questo caso come si procede? Si scarta la richiesta dal principio
-                oppure si fanno fare più giri al trolley?
-            </li>
-            <li>(Nel caso il trolley debba fare più giri per un carico che supera la sua portata massima)
+            <li>
                 Chi si occupa di accorgesi di far fare più giri al trolley nel caso il carico superi la capacità massima
                 del robottino?</li>
-            <li>(Nel caso il trolley debba fare più giri per un carico che supera la sua portata massima)
-                Se ci sono più giri, quando viene mandato il "charge taken"? Al primo pick-up o all'ultimo?</li>
             <li>La ServiceAccessGUI deve essere pensata principalmente per dispositivi mobile?</li>
-            <li>Come vengono identificate le posizioni speciali, in coordinate?Come HOME, INDOOR e PORT, che
-                implicitamente sappiamo già. Ma la HOME e INDOOR quanto sono ampie?</li>
-            <li>Siccome due camion non facciano la richiesta in contemporanea e dunque non ci possono essere due "insert
-                ticket" accavallati? Quindi un truck può fare insert ticket solo quando quello precedente ha ricevuto
-                "charge taken"?</li>
             <li>Quando il Trolley sta andando in HOME ed una richiesta di andare in INDOOR arriva: il Trolley deve aspettare 
                 di arrivare in HOME per poi andare in INDOOR oppure deve essere avvisato istantaneamente di andare in INDOOR?</li>
         </ol>
-        <h5>Dizionario</h5>
-        <h7>NOMI:</h7>
+        <h3>Dizionario</h3>
+        <h5>NOMI:</h5>
         <table>
             <thead>
                 <tr>
@@ -373,6 +360,10 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Ostacolo</td>
+                    <td>Un ostacolo è un oggetto che limita l'area percorribile dal <u>Transport Trolley</u></td>
+                </tr>
+                <tr>
                     <td>INDOOR</td>
                     <td>Posizione identificata su una parete della <u>Service Area</u> adibita allo scambio di alimenti dal
                         <u>Fridge Truck</u> al
@@ -390,7 +381,7 @@
                     <td>HOME</td>
                     <td>Posizione identificata sul pavimento della <u>Service Area</u> che identifica la zona dove il
                         robot
-                        risiede alla partenza.</td>
+                        risiede alla partenza o in attesa di nuove richieste.</td>
                 </tr>
                 <tr>
                     <td>Transport Trolley</td>
@@ -456,7 +447,7 @@
                         l'<u>INDOOR</u>.</td>
                 </tr>
                 <tr>
-                    <td> ServiceAcessGUI </td>
+                    <td> ServiceAccessGUI </td>
                     <td>Interfaccia grafica utilizzata dai conducenti del <u>Fridge Truck</u> per interagire con il
                         <u>ColdStorageService</u> al fine
                         di scaricare il carico.
@@ -471,7 +462,7 @@
                 </tr>
                 <tr>
                     <td>TICKETTIME</td>
-                    <td>Tempo di validità del <u>TICKETTIME</u>, espresso in secondi.</td>
+                    <td>Tempo di validità del <u>Ticket</u>, espresso in secondi.</td>
                 </tr>
                 <tr>
                     <td>ServiceStatusGUI</td>
@@ -525,7 +516,7 @@
                     <td>Distanza limite misurata dal <u>Sonar</u>. È usata per fermare il <u>Transport Trolley</u>.</td>
                 </tr>
                 <tr>
-                    <td>Warining Device</td>
+                    <td>Warning Device</td>
                     <td>Componente astratto che utilizza il <u>Led</u> (attraverso il software fornito dal cliente) e
                         sarà installato su un <u>Raspberry Pi</u>. Fornirà informazioni sullo attuale <u>Stato del
                             Transport Trolley</u>.</td>
@@ -534,7 +525,7 @@
                     <td>Alarm Device</td>
                     <td>Componente astratto che utilizza il <u>Sonar</u> (attraverso il software fornito dal cliente) e
                         sarà installato su un <u>Raspberry Pi</u>. Quando misura una distanza inferiore a un valore
-                        prefissato <u>DLIMIT</u>, <u>Transport Trolley</u> il deve essere fermato.
+                        prefissato <u>DLIMIT</u>, il <u>Transport Trolley</u> deve essere fermato.
                         Verrà ripreso quando il <u>Sonar</u> rileva nuovamente una distanza superiore a <u>DLIMIT</u>.
                     </td>
                 </tr>
@@ -546,7 +537,7 @@
             </tbody>
         </table>
         <br>
-        <h7>VERBI:</h7>
+        <h5>VERBI:</h5>
         <table>
             <tbody>
                 <tr>
@@ -683,8 +674,7 @@
         considerarsi
         "at INDOOR" o "at Cold Room" quando si trova rispettivamente vicino al muro INDOOR o alla porta della Cold Room.
         <h5>Sistema</h5>
-        Dall'analisi del <a href="http://calendar.altervista.org/TemaFinale23.pdf" target="_blank">TemaFinale23</a> fornita dal
-        committente, è possibile effettuare una bozza della struttura
+        Dall'analisi del <a href="http://calendar.altervista.org/TemaFinale23.pdf" target="_blank">TemaFinale23</a>, è possibile effettuare una bozza della struttura
         del sistema, il quale presenterà 5 macro-componenti:
         <ul>
             <li>Raspberry Pi</li>
@@ -700,6 +690,7 @@
         </center>
         Si evince dunque che tutti i componenti evidenziati comunicano tra loro in maniera bidirezionale, all'infuori
         della ServiceStatusGUI che si limita a ricevere informazioni dal sistema.
+        <h3>Piano di lavoro</h5>
         <div class="remark">
             Considerando la struttura appena effettuata è possibile raggruppare i requisiti del progetto in 3
             Sprint, ordinati per priorità:
