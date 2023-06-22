@@ -269,8 +269,10 @@
         generale
         la struttura del sistema richiesto. Per fare ciò in seguito vengono riportate le considerazioni e chiarimenti
         avute
-        durante l'analisi del <a href="http://calendar.altervista.org/TemaFinale23.pdf" target="_blank">TemaFinale23</a>.<br>
-        Una volta definita senza ambiguità la richiesta del committente, si può delineare tramite dei macro-componenti la
+        durante l'analisi del <a href="http://calendar.altervista.org/TemaFinale23.pdf"
+            target="_blank">TemaFinale23</a>.<br>
+        Una volta definita senza ambiguità la richiesta del committente, si può delineare tramite dei macro-componenti
+        la
         struttura
         complessiva. Alla fine dello Sprint0 si fornisce dunque un piano di lavoro che programmerà gli Sprint
         successivi, delineando così
@@ -329,8 +331,10 @@
                 Chi si occupa di accorgesi di far fare più giri al trolley nel caso il carico superi la capacità massima
                 del robottino?</li>
             <li>La ServiceAccessGUI deve essere pensata principalmente per dispositivi mobile?</li>
-            <li>Quando il Trolley sta andando in HOME ed una richiesta di andare in INDOOR arriva: il Trolley deve aspettare 
-                di arrivare in HOME per poi andare in INDOOR oppure deve essere avvisato istantaneamente di andare in INDOOR?</li>
+            <li>Quando il Trolley sta andando in HOME ed una richiesta di andare in INDOOR arriva: il Trolley deve
+                aspettare
+                di arrivare in HOME per poi andare in INDOOR oppure deve essere avvisato istantaneamente di andare in
+                INDOOR?</li>
         </ol>
         <h3>Dizionario</h3>
         <h5>NOMI:</h5>
@@ -365,7 +369,8 @@
                 </tr>
                 <tr>
                     <td>INDOOR</td>
-                    <td>Posizione identificata su una parete della <u>Service Area</u> adibita allo scambio di alimenti dal
+                    <td>Posizione identificata su una parete della <u>Service Area</u> adibita allo scambio di alimenti
+                        dal
                         <u>Fridge Truck</u> al
                         <u>Transport Trolley</u>.
                     </td>
@@ -659,7 +664,8 @@
                 <tr>
                     <td rowspan="1">ServiceStatusGUI</td>
                     <td>Ricevere un messaggio di stato</td>
-                    <td>La ServiceStatusGUI riceve un messaggio con lo <b>Stato del Transport Trolley</b>, il peso della <b>Cold Room</b> e il numero di richieste di store rifiutato.</td>
+                    <td>La ServiceStatusGUI riceve un messaggio con lo <b>Stato del Transport Trolley</b>, il peso della
+                        <b>Cold Room</b> e il numero di richieste di store rifiutato.</td>
                 </tr>
             </tbody>
         </table>
@@ -674,7 +680,8 @@
         considerarsi
         "at INDOOR" o "at Cold Room" quando si trova rispettivamente vicino al muro INDOOR o alla porta della Cold Room.
         <h5>Sistema</h5>
-        Dall'analisi del <a href="http://calendar.altervista.org/TemaFinale23.pdf" target="_blank">TemaFinale23</a>, è possibile effettuare una bozza della struttura
+        Dall'analisi del <a href="http://calendar.altervista.org/TemaFinale23.pdf" target="_blank">TemaFinale23</a>, è
+        possibile effettuare una bozza della struttura
         del sistema, il quale presenterà 5 macro-componenti:
         <ul>
             <li>Raspberry Pi</li>
@@ -685,140 +692,186 @@
         </ul> <br>
         <center>
             <div class="piccolo">
-                <img src="./system.jpg" alt="system"> 
+                <img src="./system.jpg" alt="system">
             </div>
         </center>
         Si evince dunque che tutti i componenti evidenziati comunicano tra loro in maniera bidirezionale, all'infuori
         della ServiceStatusGUI che si limita a ricevere informazioni dal sistema.
         <h3>Piano di lavoro</h5>
-        <div class="remark">
-            Considerando la struttura appena effettuata è possibile raggruppare i requisiti del progetto in 3
-            Sprint, ordinati per priorità:
-            <ol>
-                <li><b>Sprint 1: </b>(requisiti <b>1, 2</b> e <b>3</b>) si genera un sistema che include la ServiceArea, il Transport Trolley, la ServiceAccessGUI e la ColdStorageService.</li>
-                <li><b>Sprint 2: </b>(<b>Alarm Requirements</b>) si gestiscono il Led e il Sonar connessi al Rasberry Pi.</li>
-                <li><b>Sprint 3: </b>(requisito <b>4</b>) si inserisce nel sistema la ServiceStatusGUI.</li>
-            </ol>
-        </div>
-        <h5>Interazioni</h5>
-        Dall'analisi dei requisiti espressi nel <a
-            href="http://calendar.altervista.org/TemaFinale23.pdf" target="_blank">TemaFinale23</a> è stato possibile identificare 4
-        momenti di interazione tra i componenti del sistema: <br>
-        <ol>
-            <li>Il sistema già avviato riceve la prima richiesta dal conducente Fridge Truck e viene comunicato lo stato
-                della Cold Room. <br>
-                <center>
-                    <div class="piccolo">
-                        <img src="./momento1.png" alt="momento1">
-                    </div>
-                </center>
-            </li>
-            <li>Viene effettuato dal conducente del Fridge Truck una richiesta di store utilizzando la
-                ServiceAccessGUI.<br>
-                <center>
-                    <div class="piccolo">
-                        <img src="./momento2.png" alt="momento2">
-                    </div>
-                </center>
-            </li>
-            <li>Quando il conducente del Fridge Truck arriva all'INDOOR, inserisce il Ticket ed innesca le azioni di
-                carico e scarico della merce presente nel Fridge Truck.<br>
-                <center>
-                    <div class="piccolo">
-                        <img src="./momento3.png" alt="momento3">
-                    </div>
-                </center>
-            </li>
-            <li>Il Service-manager utilizza la ServiceStatusGUI per monitorare il sistema.<br>
-                <center>
-                    <div class="piccolo">
-                        <img src="./momento4.png" alt="momento4">
-                    </div>
-                </center>
-            </li>
-        </ol>
-        <h2>Analisi del Problema</h2>
-        Dati i requisiti del <a href="http://calendar.altervista.org/TemaFinale23.pdf" target="_blank">TemaFinale23</a> e le interazioni
-        appena definite, si è deciso di modellare il sistema tramite il
-        modello ad attori QAK, gli attori identificati sono:
-        <table>
-            <tbody>
-                <tr>
-                    <th>Attore</th>
-                    <th>Type</th>
-                </tr>
-                <tr>
-                    <td>ServiceAccessGUI</td>
-                    <td>Proattiva e Reattiva</td>
-                </tr>
-                <tr>
-                    <td>ServiceStatusGUI</td>
-                    <td>Reattiva</td>
-                </tr>
-                <tr>
-                    <td>Transport Trolley</td>
-                    <td>Proattivo e Reattivo</td>
-                </tr>
-                <tr>
-                    <td>ColdStorageService</td>
-                    <td>Proattivo e Reattivo</td>
-                </tr>
-                <tr>
-                    <td>BasicRobot</td>
-                    <td>Reattivo</td>
-                </tr>
-                <tr>
-                    <td>Sonar</td>
-                    <td>Proattivo</td>
-                </tr>
-                <tr>
-                    <td>Led</td>
-                    <td>Reattivo</td>
-                </tr>
-            </tbody>
-        </table>
-        <table>
-            <caption>Occorre aggiungere un attore di test Fridge Truck, che simuli il comportamento del conducente</caption>
-            <tbody>
-                <tr>
-                    <th>Attore di Test</th>
-                    <th>Type</th>
-                </tr>
-                <tr>
-                    <td>Fridge Truck</td>
-                    <td>Proattivo</td>
-                </tr>
-            </tbody>
-        </table>
-        Note:
-        <ul>
-            <li>Reattivo: entità che agisce in risposta ad una situazioni piuttosto che controllarla.</li>
-            <li>Proattivo: entità che crea o controlla una situazione piuttosto che rispondere passivamente dopo che si
-                è verificata.</li>
-        </ul>
-        <div class="remark">
-            Codice QAK per la modellazione del sistema: <a
-                href="./sprint0.coldstorageservice/src/ColdStorageService.qak" target="_blank">ColdStorageService.qak</a>
-        </div>
-        <h3>Architettura logica</h3>
-        Il sistema da noi modellato, presenta la seguente architettura logica:
-        <center>
-            <div class="piccola">
-                <img src="./sprint0.coldstorageservice/coldstorageservice_sprint0arch.png" alt="architettura logica">
+            <div class="remark">
+                Considerando la struttura appena effettuata è possibile raggruppare i requisiti del progetto in 3
+                Sprint, ordinati per priorità:
+                <ol>
+                    <li><b>Sprint 1: </b>(requisiti <b>1, 2</b> e <b>3</b>) si genera un sistema che include la
+                        ServiceArea, il Transport Trolley, la ServiceAccessGUI e la ColdStorageService.</li>
+                    <li><b>Sprint 2: </b>(<b>Alarm Requirements</b>) si gestiscono il Led e il Sonar connessi al
+                        Rasberry Pi.</li>
+                    <li><b>Sprint 3: </b>(requisito <b>4</b>) si inserisce nel sistema la ServiceStatusGUI.</li>
+                </ol>
             </div>
-        </center>
-        <h2>Test plans</h2>
-        I test prevedono che il sistema riceva diverse richieste dal conducente del Fridge Truck tramite la ServiceAccessGUI.
-        I tests mirano a mostrare e verificare come il sistema reagisce quando riceve le richieste di store in diverse situazioni:
-        <ul>
-            <li>Store request con Cold Room piena -> StoreRejected</li>
-            <li>Store request con Cold Room non piena -> StoreAccepted</li>
-            <li>Invio Ticket con TICKETTIME scaduto -> TicketNotOK</li>
-            <li>Invio Ticket con TICKETTIME non scaduto -> TicketOK</li>
-            <li>Invio Ticket inesistente -> TicketNotOK</li>
-        </ul>
+            <h5>Interazioni</h5>
+            Dall'analisi dei requisiti espressi nel <a href="http://calendar.altervista.org/TemaFinale23.pdf"
+                target="_blank">TemaFinale23</a> è stato possibile identificare 4
+            momenti di interazione tra i componenti del sistema: <br>
+            <ol>
+                <li>Il sistema già avviato riceve la prima richiesta dal conducente Fridge Truck e viene comunicato lo
+                    stato
+                    della Cold Room. <br>
+                    <center>
+                        <div class="piccolo">
+                            <img src="./momento1.png" alt="momento1">
+                        </div>
+                    </center>
+                </li>
+                <li>Viene effettuato dal conducente del Fridge Truck una richiesta di store utilizzando la
+                    ServiceAccessGUI.<br>
+                    <center>
+                        <div class="piccolo">
+                            <img src="./momento2.png" alt="momento2">
+                        </div>
+                    </center>
+                </li>
+                <li>Quando il conducente del Fridge Truck arriva all'INDOOR, inserisce il Ticket ed innesca le azioni di
+                    carico e scarico della merce presente nel Fridge Truck.<br>
+                    <center>
+                        <div class="piccolo">
+                            <img src="./momento3.png" alt="momento3">
+                        </div>
+                    </center>
+                </li>
+                <li>Il Service-manager utilizza la ServiceStatusGUI per monitorare il sistema.<br>
+                    <center>
+                        <div class="piccolo">
+                            <img src="./momento4.png" alt="momento4">
+                        </div>
+                    </center>
+                </li>
+            </ol>
+            <h2>Analisi del Problema</h2>
+            Dati i requisiti del <a href="http://calendar.altervista.org/TemaFinale23.pdf"
+                target="_blank">TemaFinale23</a> e le interazioni
+            appena definite, si è deciso di modellare il sistema tramite il
+            modello ad attori QAK. Gli attori identificati sono:
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Attore</th>
+                        <th>Type</th>
+                    </tr>
+                    <tr>
+                        <td>ServiceAccessGUI</td>
+                        <td>Proattiva e Reattiva</td>
+                    </tr>
+                    <tr>
+                        <td>ServiceStatusGUI</td>
+                        <td>Reattiva</td>
+                    </tr>
+                    <tr>
+                        <td>Transport Trolley</td>
+                        <td>Proattivo e Reattivo</td>
+                    </tr>
+                    <tr>
+                        <td>ColdStorageService</td>
+                        <td>Proattivo e Reattivo</td>
+                    </tr>
+                    <tr>
+                        <td>BasicRobot</td>
+                        <td>Reattivo</td>
+                    </tr>
+                    <tr>
+                        <td>Sonar</td>
+                        <td>Proattivo</td>
+                    </tr>
+                    <tr>
+                        <td>Led</td>
+                        <td>Reattivo</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table>
+                <caption>Occorre aggiungere un attore di test che simuli il comportamento del conducente di un Fridge Truck
+                </caption>
+                <tbody>
+                    <tr>
+                        <th>Attore di Test</th>
+                        <th>Type</th>
+                    </tr>
+                    <tr>
+                        <td>Test Truck</td>
+                        <td>Proattivo</td>
+                    </tr>
+                </tbody>
+            </table>
+            Note:
+            <ul>
+                <li>Reattivo: entità che agisce in risposta ad una situazioni piuttosto che controllarla.</li>
+                <li>Proattivo: entità che crea o controlla una situazione piuttosto che rispondere passivamente dopo che
+                    si è verificata.</li>
+            </ul>
+            <h5>Considerazioni</h5>
+            <ul>
+                <li> In fase di analisi si è affrontata la problematica relativa alla concomitanza di richieste da parte
+                    di Fridge Truck diversi,
+                    e in particolare quale dovesse essere la policy riguardo all'inserimento di Ticket mentre il
+                    TransportTrolley sta processando una richiesta.
+                    Si è deciso di non permettere a molteplici Truck di inserire il proprio Ticket e poi mettersi "in
+                    coda" in attesa del proprio turno. Quando un Fridge Truck inserisce il proprio Ticket,
+                    nel caso il servizio dia conferma di validità, viene chiesto al TransportTrolley di recarsi presso
+                    la zona carico. In questo caso diciamo che il Ticket è in attesa (Waiting).
+                    Quando il Trolley da conferma di Charge Taken e si dirige verso la ColdRoom, il Ticket viene segnato
+                    come in lavorazione (Working) e il Fridge Truck è libero di abbandonare la zona INDOOR.
+                    In questo momento un'altra richiesta di inserimento Ticket può essere gestita dal sistema. Questo
+                    nuovo Ticket rimarrà in stato Waiting fino a che il TransportTrolley non avrà depositato il carico
+                    corrente e richiesto al servizio se è presente un nuovo Ticket.
+                </li>
+                <li>
+                    Dato il tempo materiale di spostamento del carico da INDOOR a ColdRoom dovuto al movimento del
+                    TransportTrolley, e il grado di variabilità nel tempo tra richiesta di storage e inserimento del
+                    Ticket da parte
+                    dei Fridge Truck, serve una strategia per l'aggiornamento della capacità della ColdRoom stessa.
+                    In particolare, decidiamo di considerare ogni richiesta di Storage non ancora completamente
+                    soddisfatta come una prenotazione di una certa quantità di peso (pari a FW) nel frigo.
+                    Nel caso in cui una richiesta arrivi quando la ColdRoom è teoricamente piena (ovvero considerando
+                    anche i carichi prenotati), il servizio ha premura di controllare eventuali Ticket scaduti, e
+                    conseguentemente
+                    liberare lo spazio allocato. Qualora non siano presenti Ticket scaduti, la richiesta verrà
+                    respinta. Ciò potrà portare in alcuni casi il servizio a respingere carichi che in breve tempo si sarebbero rivelati accettabili, ma grazie a questo sistema di allocazione logica del peso
+                    siamo sicuri di non mandare mai il servizio in stato di overbooking e conseguente overflow della ColdRoom.<br>
+                    Solo quando il TransportTrolley avrà comunicato di aver depositato nella ColdRoom il carico che attualmente sta gestendo
+                    verrà aggiornato il peso del contenuto reale del frigo e di conseguenza ridotto quello prenotato.
+                </li>
+                <li>
+                    Per questo primo Sprint segliamo di modellare i Ticket come sequenza di numeri corrispondenti al timestamp di richiesta dello stesso. In questo modo otteniamo leggibilità, univocità e semplicità.<br>
+                    Questa scelta in ultima istanza dovrà essere confermata dal Committente.
+                </li>
+            </ul>
+            <div class="remark">
+                Codice QAK per la modellazione del sistema: <a
+                    href="./sprint0.coldstorageservice/src/ColdStorageService.qak"
+                    target="_blank">ColdStorageService.qak</a>
+            </div>
+            <h3>Architettura logica</h3>
+            Il sistema da noi modellato, presenta la seguente architettura logica:
+            <center>
+                <div class="piccola">
+                    <img src="./sprint0.coldstorageservice/coldstorageservice_sprint0arch.png"
+                        alt="architettura logica">
+                </div>
+            </center>
+            <h2>Test plans</h2>
+            I test prevedono che il sistema riceva diverse richieste dal conducente del Fridge Truck tramite la
+            ServiceAccessGUI.
+            I tests mirano a mostrare e verificare come il sistema reagisce quando riceve le richieste di store in
+            diverse situazioni:
+            <ul>
+                <li>Store request con Cold Room piena -> StoreRejected</li>
+                <li>Store request con Cold Room non piena -> StoreAccepted</li>
+                <li>Invio Ticket inesistente -> TicketNotOK</li>
+                <li>Invio Ticket con TICKETTIME scaduto -> TicketNotOK</li>
+                <li>Invio Ticket con TICKETTIME non scaduto -> TicketOK</li>
+            </ul>
 
-        <!-- 
+            <!-- 
         <h2>Project</h2>
 
 
@@ -830,17 +883,17 @@
 
         <h2>Maintenance</h2>
 -->
-        <br /><br />
+            <br /><br />
 
-        <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
-            By <br>Tassinari Gabriele,   email: gabriele.tassinari2@studio.unibo.it ,<br>
-            Baraldi Leonardo,            email: leonardo.baraldi@studio.unibo.it ,<br>
-            Koss Krystian,               email: krystian.koss@studio.unibo.it<br>
-            <img src="./gabriele.jpeg" alt="mbot" width="15%" height="15%">
-            <img src="./Baraldi.jpeg" alt="mbot" width="15%" height="15%">
-            <img src="./kriss.jpeg" alt="mbot" width="15%" height="15%">    <br>        
-            GIT repo: https://github.com/4utotune/ColdStorageService/ <br>
-        </div>
+            <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
+                By <br>Tassinari Gabriele, email: gabriele.tassinari2@studio.unibo.it ,<br>
+                Baraldi Leonardo, email: leonardo.baraldi@studio.unibo.it ,<br>
+                Koss Krystian, email: krystian.koss@studio.unibo.it<br>
+                <img src="./gabriele.jpeg" alt="mbot" width="15%" height="15%">
+                <img src="./Baraldi.jpeg" alt="mbot" width="15%" height="15%">
+                <img src="./kriss.jpeg" alt="mbot" width="15%" height="15%"> <br>
+                GIT repo: https://github.com/4utotune/ColdStorageService/ <br>
+            </div>
 </body>
 
 </html>

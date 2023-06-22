@@ -54,11 +54,11 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t011",targetState="handle_data",cond=whenRequest("coldroomdatarequest"))
-					transition(edgeName="t012",targetState="handle_store",cond=whenRequest("storerequest"))
-					transition(edgeName="t013",targetState="handle_ticket",cond=whenRequest("insertticket"))
-					transition(edgeName="t014",targetState="handle_ticketloop",cond=whenRequest("chargedeposited"))
-					transition(edgeName="t015",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
+					 transition(edgeName="t07",targetState="handle_data",cond=whenRequest("coldroomdatarequest"))
+					transition(edgeName="t08",targetState="handle_store",cond=whenRequest("storerequest"))
+					transition(edgeName="t09",targetState="handle_ticket",cond=whenRequest("insertticket"))
+					transition(edgeName="t010",targetState="handle_ticketloop",cond=whenRequest("chargedeposited"))
+					transition(edgeName="t011",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
 				}	 
 				state("handle_data") { //this:State
 					action { //it:State

@@ -39,8 +39,8 @@ class Serviceaccessgui ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handleGuicmd",cond=whenEvent("accessguicmd"))
-					transition(edgeName="t05",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
+					 transition(edgeName="t00",targetState="handleGuicmd",cond=whenEvent("accessguicmd"))
+					transition(edgeName="t01",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
 				}	 
 				state("handleGuicmd") { //this:State
 					action { //it:State
@@ -65,11 +65,11 @@ class Serviceaccessgui ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t16",targetState="handle_update_data",cond=whenReply("coldroomdata"))
-					transition(edgeName="t17",targetState="handle_store_accepted",cond=whenReply("storeaccepted"))
-					transition(edgeName="t18",targetState="handle_store_rejected",cond=whenReply("storerejected"))
-					transition(edgeName="t19",targetState="handle_ticket_accepted",cond=whenReply("ticketaccepted"))
-					transition(edgeName="t110",targetState="handle_ticket_rejected",cond=whenReply("ticketrejected"))
+					 transition(edgeName="t12",targetState="handle_update_data",cond=whenReply("coldroomdata"))
+					transition(edgeName="t13",targetState="handle_store_accepted",cond=whenReply("storeaccepted"))
+					transition(edgeName="t14",targetState="handle_store_rejected",cond=whenReply("storerejected"))
+					transition(edgeName="t15",targetState="handle_ticket_accepted",cond=whenReply("ticketaccepted"))
+					transition(edgeName="t16",targetState="handle_ticket_rejected",cond=whenReply("ticketrejected"))
 				}	 
 				state("handle_update_data") { //this:State
 					action { //it:State
@@ -91,7 +91,6 @@ class Serviceaccessgui ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 						if( checkMsgContent( Term.createTerm("storeaccepted(TICKET)"), Term.createTerm("storeaccepted(TICKET)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 val TIMESTAMP = payloadArg(0)  
-								forward("test_gotticket", "test_gotticket($TIMESTAMP)" ,"testtruck" ) 
 								CommUtils.outcyan("[ServiceAccessGui] Store Accepted. Received ticket $TIMESTAMP")
 						}
 						//genTimer( actor, state )

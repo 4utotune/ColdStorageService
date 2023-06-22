@@ -39,6 +39,10 @@ Dispatch 	updateled			: 	updateled(STATUS)
 Dispatch 	updatetrolleystatus	: 	updatetrolleystatus(STATE, POS)
 Dispatch 	updatestoragestatus	: 	updatestoragestatus(CURWEIGHT, REJREQUESTS)
 
+// TEST 
+Dispatch 	test_gotticket 		: 	test_gotticket(TICKET)
+
+
 // CONTEXTS
 Context ctx_basicrobot	ip [host="localhost" port=8020]
 Context ctx_coldstorage	ip [host="localhost" port=11800]
@@ -49,6 +53,65 @@ Context ctx_coldstorage	ip [host="localhost" port=11800]
 
 // ACTORS
 ExternalQActor basicrobot context ctx_basicrobot
+
+QActor testtruck context ctx_coldstorage {
+	State init initial {
+		
+	}
+	Goto loop
+	
+	State loop {
+		println("[TestTruck] Refresh gui") color yellow
+		emit accessguicmd: accessguicmd(refresh,_)
+		delay 2000
+	}
+	Goto request_store
+	
+	State request_store {
+		println("[TestTruck] New cycle: Requesting store") color yellow
+		emit accessguicmd: accessguicmd(store, 30) 
+		delay 2000
+	}
+	Transition t0 	whenTime 	6000 			-> handle_timeout	
+					whenMsg 	test_gotticket 	-> handle_ticket
+					
+	State handle_timeout {
+		println("[TestTruck] Storage request got (probably) rejected") color yellow
+	}
+	Goto loop
+	
+	State handle_ticket {
+		onMsg(test_gotticket: test_gotticket(TICKET)) {
+			[# val Ticket = payloadArg(0) #]
+			println("[TestTruck] Inputing ticket $Ticket") color yellow
+			emit accessguicmd: accessguicmd(ticket, $Ticket) 
+			delay 2000
+		}
+	}
+	Goto second_request_store
+	
+	State second_request_store {
+		println("[TestTruck] Requesting second store") color yellow
+		emit accessguicmd: accessguicmd(store, 30) 
+	}
+	Transition t1 	whenTime 	6000 			-> handle_timeout 	
+					whenMsg 	test_gotticket 	-> handle_ticket_for_fail
+	
+	State handle_ticket_for_fail {
+		onMsg(test_gotticket: test_gotticket(TICKET)) {
+			delay 5000
+			[# val Ticket = payloadArg(0) #]
+			println("[TestTruck] Inputing ticket $Ticket too late -> will fail") color yellow
+			emit accessguicmd: accessguicmd(ticket, $Ticket) 
+			delay 2000
+			println("[TestTruck] Inputing non-existent ticket -> will fail") color yellow
+			emit accessguicmd: accessguicmd(ticket, failfail) 
+			delay 2000
+		}
+	}
+	Goto loop
+}
+
 
 QActor serviceaccessgui context ctx_coldstorage { 
 	[#
@@ -99,7 +162,7 @@ QActor serviceaccessgui context ctx_coldstorage {
 	State handle_store_accepted {
 		onMsg(storeaccepted: storeaccepted(TICKET)) {
 			[# val TIMESTAMP = payloadArg(0) #]
-			// TODO show ticket on screen
+			forward testtruck -m test_gotticket: test_gotticket($TIMESTAMP) // TODO replace with show ticket on screen
 			println("[ServiceAccessGui] Store Accepted. Received ticket $TIMESTAMP") color cyan
 		}
 	}
