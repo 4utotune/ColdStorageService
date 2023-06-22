@@ -21,7 +21,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 		return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
-						forward("updateled", "updateled(_)" ,"led" ) 
+						CommUtils.outmagenta("[TransportTrolley] Init")
 						forward("updatetrolleystatus", "updatetrolleystatus(_)" ,"servicestatusgui" ) 
 						//genTimer( actor, state )
 					}
@@ -32,7 +32,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("idle") { //this:State
 					action { //it:State
-						CommUtils.outblack("[transporttrolley] Idle...")
+						CommUtils.outmagenta("[transporttrolley] Idle...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -44,9 +44,13 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("gotoindoor(_)"), Term.createTerm("gotoindoor(_)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
+								CommUtils.outmagenta("[transporttrolley] Going indoor")
 								forward("cmd", "cmd(_)" ,"basicrobot" ) 
 								request("step", "step(_)" ,"basicrobot" )  
+								CommUtils.outmagenta("[transporttrolley] Charge taken")
 								forward("chargetaken", "chargetaken(_)" ,"coldstorageservice" ) 
+								delay(500) 
+								CommUtils.outmagenta("[transporttrolley] Charge deposited")
 								request("chargedeposited", "chargedeposited(_)" ,"coldstorageservice" )  
 						}
 						//genTimer( actor, state )
@@ -61,6 +65,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("gohome(_)"), Term.createTerm("gohome(_)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
+								CommUtils.outmagenta("[transporttrolley] Going home")
 						}
 						//genTimer( actor, state )
 					}

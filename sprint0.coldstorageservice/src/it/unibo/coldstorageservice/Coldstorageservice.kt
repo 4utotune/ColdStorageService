@@ -23,7 +23,8 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				var CurrentWeight: Float = 0.0f
 				var ReservedWeight: Float = 0.0f
 				var RejectedRequests: Int = 0
-				var CurrentTicket: String = ""
+				var WaitingTicket: coldstorageservice.Ticket? = null
+				var WorkingTicket: coldstorageservice.Ticket? = null
 				var Tickets: MutableSet<coldstorageservice.Ticket> = mutableSetOf()
 		return { //this:ActionBasciFsm
 				state("init") { //this:State
@@ -33,10 +34,11 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 									ReservedWeight = 0.0f
 									MaxWeightcoldroom = 100f
 									RejectedRequests = 0
-									CurrentTicket = ""
+									WaitingTicket = null
+									WorkingTicket = null
 									Tickets = mutableSetOf()
+						CommUtils.outgreen("[ColdStorageService] Init")
 						forward("updatecoldstoragestatus", "updatecoldstoragestatus(_)" ,"servicestatusgui" ) 
-						CommUtils.outblack("[ColdStorageService] Initialized")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -46,7 +48,7 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("idle") { //this:State
 					action { //it:State
-						CommUtils.outblack("[ColdStorageService] Idle...")
+						CommUtils.outgreen("[ColdStorageService] Idle...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -60,10 +62,9 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("handle_data") { //this:State
 					action { //it:State
-						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
 						if( checkMsgContent( Term.createTerm("coldroomdatarequest(_)"), Term.createTerm("coldroomdatarequest(_)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
+								CommUtils.outgreen("[ColdStorageService] Sending current weight update")
 								answer("coldroomdatarequest", "coldroomdata", "coldroomdata($CurrentWeight)"   )  
 						}
 						//genTimer( actor, state )
@@ -75,10 +76,9 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("handle_store") { //this:State
 					action { //it:State
-						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
 						if( checkMsgContent( Term.createTerm("storerequest(FW)"), Term.createTerm("storerequest(FW)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
+								CommUtils.outgreen("[ColdStorageService] Handling store")
 								 val FW = payloadArg(0).toFloat()  
 								if(  ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom)  
 								 ){ RejectedRequests++  
@@ -102,13 +102,13 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("handle_ticket") { //this:State
 					action { //it:State
-						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
 						if( checkMsgContent( Term.createTerm("insertticket(TICKET)"), Term.createTerm("insertticket(TICKET)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
+								CommUtils.outgreen("[ColdStorageService] Handling ticket")
 								 val TICKET = Tickets.find { it.getTimestamp() == payloadArg(0).toString() }  
 								if(  (TICKET != null && TICKET.isValid())  
-								 ){ CurrentTicket = TICKET.getTimestamp()  
+								 ){ 
+													WaitingTicket = TICKET 				
 								answer("insertticket", "ticketaccepted", "ticketaccepted(_)"   )  
 								forward("gotoindoor", "gotoindoor(_)" ,"transporttrolley" ) 
 								}
@@ -130,11 +130,16 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("handle_ticketloop") { //this:State
 					action { //it:State
-						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
 						if( checkMsgContent( Term.createTerm("chargedeposited(_)"), Term.createTerm("chargedeposited(_)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								if(  (CurrentTicket != "")  
+								CommUtils.outgreen("[ColdStorageService] Deposit confirmation received")
+								
+												if (WorkingTicket!=null){
+													CurrentWeight += WorkingTicket!!.getWeight()
+													ReservedWeight -= WorkingTicket!!.getWeight()
+												}	
+												WorkingTicket = null
+								if(  (WaitingTicket != null)  
 								 ){answer("chargedeposited", "more", "more(_)"   )  
 								}
 								else
@@ -150,7 +155,10 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("handle_charge_taken") { //this:State
 					action { //it:State
-						 CurrentTicket = ""  
+						CommUtils.outgreen("[ColdStorageService] Forwarding charge taken")
+						 
+									WorkingTicket = WaitingTicket
+									WaitingTicket = null
 						forward("chargetaken", "chargetaken(_)" ,"serviceaccessgui" ) 
 						//genTimer( actor, state )
 					}

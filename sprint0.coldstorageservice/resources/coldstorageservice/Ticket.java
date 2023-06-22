@@ -7,6 +7,7 @@ import java.util.Date;
 
 public class Ticket {
 
+    private final String FORMAT = "yyyyMMddHHmmss"; // yyyy.MM.dd.HH.mm.ss
     private String timestamp;
     private Float FW;
 
@@ -14,7 +15,7 @@ public class Ticket {
 
     public Ticket(Float weight) {
         this.FW = weight;
-        this.timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(System.currentTimeMillis());
+        this.timestamp = new SimpleDateFormat(FORMAT).format(System.currentTimeMillis());
     }
 
     public String getTimestamp() {
@@ -29,7 +30,7 @@ public class Ticket {
         Date currentTimestamp = new Date();
 
         // Calcola la differenza in millisecondi tra i due timestamp
-        long difference = currentTimestamp.getTime() - new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").parse(timestamp).getTime();
+        long difference = currentTimestamp.getTime() - new SimpleDateFormat(FORMAT).parse(timestamp).getTime();
 
         return  (difference <= 5000);
     }

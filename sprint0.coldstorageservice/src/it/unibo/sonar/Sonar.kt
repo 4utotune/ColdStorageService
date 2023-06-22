@@ -21,13 +21,23 @@ class Sonar ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scop
 		return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
-						CommUtils.outblack("[Sonar] Init")
+						CommUtils.outblue("[Sonar] Init")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="alarm", cond=doswitch() )
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
+				}	 
+				state("idle") { //this:State
+					action { //it:State
+						CommUtils.outblue("[Sonar] Idle...")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t014",targetState="alarm",cond=whenDispatch("updateled"))
 				}	 
 				state("alarm") { //this:State
 					action { //it:State
@@ -37,6 +47,7 @@ class Sonar ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scop
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 			}
 		}

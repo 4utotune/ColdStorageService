@@ -3,7 +3,7 @@ System coldstorageservice_sprint0
 // MESSAGGI
 // serviceAccessGUI -> coldstorageservice
 Request coldroomdatarequest: coldroomdatarequest(_)
-Reply coldroomdata: coldroomdata(weight)
+Reply coldroomdata: coldroomdata(WEIGHT)
 
 Request storerequest: 	storerequest(FW)
 Reply storeaccepted:	storeaccepted(TICKET)
@@ -32,83 +32,99 @@ Request step:			step(_)
 Dispatch alarm: alarm(STATUS)
 
 // transporttrolley -> led
-Dispatch updateled: updateled(ledStatus) 
+Dispatch updateled: updateled(STATUS) 
 
 // transporttrolley -> servicestatusgui
-Dispatch updatetrolleystatus: updatetrolleystatus(trolleyState, trolleyPosition)
+Dispatch updatetrolleystatus: updatetrolleystatus(STATE, POS)
 
 // coldstorageservice -> servicestatusgui
-Dispatch updatecoldstoragestatus: updatecoldstoragestatus(currentWeight, rejectedRequest)
+Dispatch updatecoldstoragestatus: updatecoldstoragestatus(CURWEIGHT, REJREQUESTS)
 
 
 // CONTEXTS
-Context ctx_coldstorage ip [host="localhost" port=8020]
-Context ctx_accessgui 	ip [host="localhost" port=8021]
-Context ctx_basicrobot 	ip [host="localhost" port=8022]
-Context ctx_statusgui 	ip [host="localhost" port=8023]
-Context ctx_raspberry 	ip [host="localhost" port=8024]
+Context ctx_basicrobot 	ip [host="localhost" port=8020]
+Context ctx_coldstorage	ip [host="localhost" port=11800]
+//Context ctx_accessgui	ip [host="localhost" port=11801]
+//Context ctx_statusgui 	ip [host="localhost" port=11802]
+//Context ctx_raspberry 	ip [host="localhost" port=11803]
 
 // ACTORS
 ExternalQActor basicrobot context ctx_basicrobot
 
-QActor serviceaccessgui context ctx_accessgui {
+QActor serviceaccessgui context ctx_coldstorage { //ctx_accessgui {
 	[#
 		var currentWeight: Float	
 	#]
 	State init initial {
-		printCurrentMessage
+		println("[ServiceAccessGui] Init") color yellow
 		[# currentWeight = 0.0f #]
+	}
+	Goto update
+	
+	State update {
 		request coldstorageservice -m coldroomdatarequest: coldroomdatarequest(_)
+		
 	}
 	Transition t0	whenReply coldroomdata -> handle_update_data
 	
 	State handle_update_data {
-		onMsg(coldroomdata: coldroomdata(weight)) {
+		onMsg(coldroomdata: coldroomdata(WEIGHT)) {
 			[# 
 				currentWeight = payloadArg(0).toFloat()	
 			#]
+			println("[ServiceAccessGui] Updating weight -> $currentWeight ") color yellow
 		}
 	}
 	Goto idle
 	
 	State idle {
-		println("[ServiceAccessGui] Idle...")
-		request coldstorageservice -m storerequest: storerequest(3)
-		request coldstorageservice -m insertticket: inserticket("123456")
+		println("[ServiceAccessGui] Idle...") color yellow
+		delay 1000
+		println("[ServiceAccessGui] Sending request") color yellow
+		request coldstorageservice -m storerequest: storerequest(30)
 	}
 	Transition t1	whenReply 	storeaccepted 	-> handle_store_accepted
 					whenReply 	storerejected 	-> handle_store_rejected
-					whenReply 	ticketaccepted 	-> handle_ticket_accepted
-					whenReply 	ticketrejected 	-> handle_ticket_rejected
 					whenMsg		chargetaken 	-> handle_charge_taken		
 
 	
 	State handle_store_accepted {
 		onMsg(storeaccepted: storeaccepted(TICKET)) {
+			println("[ServiceAccessGui] Store Accepted") color yellow
+			delay 500
+			println("[ServiceAccessGui] Sending ticket") color yellow
+			[# val TIMESTAMP = payloadArg(0) #]
+			request coldstorageservice -m insertticket: insertticket($TIMESTAMP)
+			
 			// TODO show ticket
 		}
 	}
-	Goto idle
+	Transition t2 	whenReply 	ticketaccepted 	-> handle_ticket_accepted
+					whenReply 	ticketrejected 	-> handle_ticket_rejected
 	
 	State handle_store_rejected {
+		println("[ServiceAccessGui] Store Rejected") color yellow
 		// TODO show error message
 	}
 	Goto idle
 		
 	State handle_ticket_accepted {
+		println("[ServiceAccessGui] Ticket Accepted") color yellow
 		// TODO show success message
 	}
 	Goto idle
 	
 	State handle_ticket_rejected {
+		println("[ServiceAccessGui] Ticket Rejected") color yellow
 		// TODO show error message
 	}
 	Goto idle
 	
 	State handle_charge_taken {
+		println("[ServiceAccessGui] Charge Taken") color yellow
 		// TODO show charge taken message
 	}
-	Goto idle
+	Goto update
 }
 
 QActor coldstorageservice context ctx_coldstorage {
@@ -117,7 +133,8 @@ QActor coldstorageservice context ctx_coldstorage {
 		var CurrentWeight: Float = 0.0f
 		var ReservedWeight: Float = 0.0f
 		var RejectedRequests: Int = 0
-		var CurrentTicket: String = ""
+		var WaitingTicket: coldstorageservice.Ticket? = null
+		var WorkingTicket: coldstorageservice.Ticket? = null
 		var Tickets: MutableSet<coldstorageservice.Ticket> = mutableSetOf()
 	#]
 	State init initial {
@@ -126,16 +143,17 @@ QActor coldstorageservice context ctx_coldstorage {
 			ReservedWeight = 0.0f
 			MaxWeightcoldroom = 100f
 			RejectedRequests = 0
-			CurrentTicket = ""
+			WaitingTicket = null
+			WorkingTicket = null
 			Tickets = mutableSetOf()
-		#]		
+		#]
+		println("[ColdStorageService] Init") color green		
 		forward servicestatusgui -m updatecoldstoragestatus: updatecoldstoragestatus(_) 
-		println("[ColdStorageService] Initialized")
 	}
 	Goto idle
 	
 	State idle {
-		println("[ColdStorageService] Idle...")
+		println("[ColdStorageService] Idle...") color green
 	}
 	Transition t0 	whenRequest coldroomdatarequest -> handle_data
 					whenRequest storerequest		-> handle_store
@@ -144,16 +162,16 @@ QActor coldstorageservice context ctx_coldstorage {
 					whenMsg		chargetaken			-> handle_charge_taken
 					
 	State handle_data {
-		printCurrentMessage
 		onMsg(coldroomdatarequest: coldroomdatarequest(_)) {
+			println("[ColdStorageService] Sending current weight update") color green
 			replyTo coldroomdatarequest with coldroomdata: coldroomdata($CurrentWeight)
 		}
 	}
 	Goto idle
 	
 	State handle_store {
-		printCurrentMessage
 		onMsg(storerequest: storerequest(FW)) {
+			println("[ColdStorageService] Handling store") color green
 			[# val FW = payloadArg(0).toFloat() #]
 			if [# ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom) #] {
 				[# RejectedRequests++ #]
@@ -172,11 +190,13 @@ QActor coldstorageservice context ctx_coldstorage {
 	Goto idle
 	
 	State handle_ticket {
-		printCurrentMessage
 		onMsg(insertticket: insertticket(TICKET)) {
+			println("[ColdStorageService] Handling ticket") color green
 			[# val TICKET = Tickets.find { it.getTimestamp() == payloadArg(0).toString() } #]
 			if [# (TICKET != null && TICKET.isValid()) #]{
-				[# CurrentTicket = TICKET.getTimestamp() #]
+				[# 
+					WaitingTicket = TICKET 				
+				#]
 				replyTo insertticket with ticketaccepted: ticketaccepted(_)
 				forward transporttrolley -m gotoindoor: gotoindoor(_)
 			} else {
@@ -193,9 +213,16 @@ QActor coldstorageservice context ctx_coldstorage {
 	Goto idle
 	
 	State handle_ticketloop {
-		printCurrentMessage
 		onMsg(chargedeposited: chargedeposited(_)) {
-			if [# (CurrentTicket != "") #] {
+			println("[ColdStorageService] Deposit confirmation received") color green
+			[#
+				if (WorkingTicket!=null){
+					CurrentWeight += WorkingTicket!!.getWeight()
+					ReservedWeight -= WorkingTicket!!.getWeight()
+				}	
+				WorkingTicket = null
+			#]
+			if [# (WaitingTicket != null) #] {
 				replyTo chargedeposited with more: more(_)
 			} else {
 				replyTo chargedeposited with gohome: gohome(_)
@@ -205,7 +232,11 @@ QActor coldstorageservice context ctx_coldstorage {
 	Goto idle
 	
 	State handle_charge_taken {
-		[# CurrentTicket = "" #]
+		println("[ColdStorageService] Forwarding charge taken") color green
+		[# 
+			WorkingTicket = WaitingTicket
+			WaitingTicket = null
+		#]
 		forward serviceaccessgui -m chargetaken: chargetaken(_)
 	}
 	Goto idle
@@ -213,26 +244,31 @@ QActor coldstorageservice context ctx_coldstorage {
 
 QActor transporttrolley context ctx_coldstorage {
 	State init initial {
-		forward led -m updateled: updateled(_)
+		println("[TransportTrolley] Init") color magenta
+		//forward led -m updateled: updateled(_)
 		forward servicestatusgui -m updatetrolleystatus: updatetrolleystatus(_) 
 	}
 	Goto idle
 	
 	State idle {
-		println("[transporttrolley] Idle...")
+		println("[transporttrolley] Idle...") color magenta
 	}
 	Transition t0	whenMsg gotoindoor	-> handle_load_request
 	
 	State handle_load_request {
 		onMsg(gotoindoor: gotoindoor(_)) {
+			println("[transporttrolley] Going indoor") color magenta
 			forward basicrobot -m cmd: cmd(_)
 			request basicrobot -m step: step(_)
 			// TODO
 			// go to indoor
 			// pick up
+			println("[transporttrolley] Charge taken") color magenta
 			forward coldstorageservice -m chargetaken: chargetaken(_)
+			delay 500
 			// TODO
 			// go to coldroom
+			println("[transporttrolley] Charge deposited") color magenta
 			request coldstorageservice -m chargedeposited: chargedeposited(_)
 		}
 	}
@@ -241,6 +277,7 @@ QActor transporttrolley context ctx_coldstorage {
 				 	
 	State handle_gohome {
 		onMsg(gohome: gohome(_)) {
+			println("[transporttrolley] Going home") color magenta
 			// TODO 
 			// go to home
 		}
@@ -248,20 +285,29 @@ QActor transporttrolley context ctx_coldstorage {
 	Goto idle
 }
 
-QActor sonar context ctx_raspberry {
+
+QActor sonar context ctx_coldstorage { //ctx_raspberry {
 	State init initial {
-		println("[Sonar] Init")
+		println("[Sonar] Init") color blue
 	}
-	Goto alarm
+	Goto idle
 	
+	State idle {
+		println("[Sonar] Idle...") color blue
+		// TODO
+	}
+	Transition t0 whenMsg updateled -> alarm
+		
 	State alarm {
 		forward transporttrolley -m alarm: alarm(_)
 	}
+	Goto idle
 }
 
-QActor led context ctx_raspberry {
+
+QActor led context ctx_coldstorage { //ctx_raspberry {
 	State init initial {
-		println("[Led] Init")
+		println("[Led] Init") color blue
 	}
 	Goto led_off
 	
@@ -281,7 +327,7 @@ QActor led context ctx_raspberry {
 	Transition t2	whenMsg updateled	-> handle_update
 	
 	State handle_update {
-		onMsg(updateled: updateled(ledStatus)) {
+		onMsg(updateled: updateled(STATUS)) {
 			// TODO
 			// update led
 			// transition		
@@ -289,7 +335,7 @@ QActor led context ctx_raspberry {
 	}
 }
 
-QActor servicestatusgui context ctx_statusgui {
+QActor servicestatusgui context ctx_coldstorage { //ctx_statusgui {
 	[# 
 		var TrolleyState: String = "IDLE"
 		var TrolleyPosition: String = "HOME"
@@ -297,7 +343,7 @@ QActor servicestatusgui context ctx_statusgui {
 		var RejectedRequest: Int = 0
 	#]
 	State init initial {
-		println("[ServiceStatusGui] Init")
+		println("[ServiceStatusGui] Init") color red
 		[# 
 			TrolleyState = "IDLE"
 			TrolleyPosition = "HOME"
@@ -308,17 +354,20 @@ QActor servicestatusgui context ctx_statusgui {
 	Goto idle
 	
 	State idle {
-		println("[ServiceStatusGui] Wait for updates...")
+		println("[ServiceStatusGui] Idle...") color red
 	}
 	Transition t0	whenMsg updatetrolleystatus 	-> handle_trolley_update
 					whenMsg updatecoldstoragestatus -> handle_coldstorage_update
 					
 	State handle_trolley_update {
+		println("[ServiceStatusGui] Updating trolley") color red
+		
 		// TODO update values
 	}
 	Goto idle
 	
 	State handle_coldstorage_update {
+		println("[ServiceStatusGui] Updating coldroom") color red
 		// TODO update values
 	}
 	Goto idle

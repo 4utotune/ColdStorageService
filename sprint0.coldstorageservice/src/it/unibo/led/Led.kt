@@ -21,7 +21,7 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 		return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
-						CommUtils.outblack("[Led] Init")
+						CommUtils.outblue("[Led] Init")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -36,7 +36,7 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t014",targetState="handle_update",cond=whenDispatch("updateled"))
+					 transition(edgeName="t015",targetState="handle_update",cond=whenDispatch("updateled"))
 				}	 
 				state("led_on") { //this:State
 					action { //it:State
@@ -45,7 +45,7 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t115",targetState="handle_update",cond=whenDispatch("updateled"))
+					 transition(edgeName="t116",targetState="handle_update",cond=whenDispatch("updateled"))
 				}	 
 				state("led_blink") { //this:State
 					action { //it:State
@@ -54,11 +54,11 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t216",targetState="handle_update",cond=whenDispatch("updateled"))
+					 transition(edgeName="t217",targetState="handle_update",cond=whenDispatch("updateled"))
 				}	 
 				state("handle_update") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("updateled(ledStatus)"), Term.createTerm("updateled(ledStatus)"), 
+						if( checkMsgContent( Term.createTerm("updateled(STATUS)"), Term.createTerm("updateled(STATUS)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 						}
 						//genTimer( actor, state )
