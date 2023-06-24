@@ -281,8 +281,8 @@
     <div class="body">
 
         <h2>Introduction</h2>
-        Lo Sprint1 si impegna ad analizzare il core business identificato dallo Sprint0, ovvero la gestione del 
-        trasporto dei carichi dalla INDOOR alla PORT. <br>
+        Lo <b>Sprint1</b> si impegna ad analizzare il core business identificato dallo Sprint0, ovvero la gestione del 
+        trasporto dei carichi dalla <b>INDOOR</b> alla <b>PORT</b>. <br>
         A tal fine i macro-componenti <b>ColdStorageService</b> e <b>Transport Trolley</b> vanno approfonditi identificando punti critici
         e valutando i costi di eventuali soluzioni.
 
@@ -306,7 +306,7 @@
         </div>
 
         <h2>Requirement analysis</h2>
-        Lo scopo del progetto finale è quello di creare e gestire un ColdStorageService.
+
         <h5>Chiarimenti del committente</h5>
         L'interazione con il committente ha permesso di chiarire alcuni aspetti del progetto:
         <ul>
@@ -319,6 +319,8 @@
                 Se durante il tragitto dalla ColdRoom alla HOME si presenta una nuova richiesta di carico/scarico il Transport Trolley
                  deve avere l'accortezza di direzionarsi direttamente alla INDOOR, senza quindi passare prima dalla HOME.
             </li>
+            <li>Il <b>Transport Trolley</b> per raggiungere una determinata posizione della <b>Service Area</b> non deve per forza percorrere sempre la strada ottimale, ma 
+            ma non dovrebbe nemmeno fare giri particolarmente inefficienti. Quindi come conclusione vi è un minimo di tolleranza nei suoi spostamenti.</li>
         </ul>
         <h5>Da chiarire con il committente</h5>
         <ol>
@@ -597,67 +599,46 @@
 
 
             <h2>Analisi del Problema</h2>
-            Dati i requisiti del <a href="http://calendar.altervista.org/TemaFinale23.pdf"
-                target="_blank">TemaFinale23</a> e le interazioni
-            appena definite, si è deciso di modellare il sistema tramite il
-            modello ad attori QAK. Gli attori identificati sono:
-            <table>
-                <tbody>
-                    <tr>
-                        <th>Attore</th>
-                        <th>Type</th>
-                    </tr>
-                    <tr>
-                        <td>ServiceAccessGUI</td>
-                        <td>Proattiva e Reattiva</td>
-                    </tr>
-                    <tr>
-                        <td>ServiceStatusGUI</td>
-                        <td>Reattiva</td>
-                    </tr>
-                    <tr>
-                        <td>Transport Trolley</td>
-                        <td>Proattivo e Reattivo</td>
-                    </tr>
-                    <tr>
-                        <td>ColdStorageService</td>
-                        <td>Proattivo e Reattivo</td>
-                    </tr>
-                    <tr>
-                        <td>BasicRobot</td>
-                        <td>Reattivo</td>
-                    </tr>
-                    <tr>
-                        <td>Sonar</td>
-                        <td>Proattivo</td>
-                    </tr>
-                    <tr>
-                        <td>Led</td>
-                        <td>Reattivo</td>
-                    </tr>
-                </tbody>
-            </table>
-            <table>
-                <caption>Occorre aggiungere un attore di test che simuli il comportamento del conducente di un Fridge
-                    Truck
-                </caption>
-                <tbody>
-                    <tr>
-                        <th>Attore di Test</th>
-                        <th>Type</th>
-                    </tr>
-                    <tr>
-                        <td>Test Truck</td>
-                        <td>Proattivo</td>
-                    </tr>
-                </tbody>
-            </table>
-            Note:
+
+
+            Esplorando il core-business si possono delineare 2 principali problematiche con le annesse considerazioni ed osservazioni:
             <ul>
-                <li>Reattivo: entità che agisce in risposta ad una situazioni piuttosto che controllarla.</li>
-                <li>Proattivo: entità che crea o controlla una situazione piuttosto che rispondere passivamente dopo che
-                    si è verificata.</li>
+                <li><b>Gestione del movimento per effettuare il carico/scarico da parte del Transport Trolley</b></li>
+                <ul>
+                    <li>Il committente ci mette a disposizione già il <a href='BasicRobot23.html'>BasicRobot23</a> che permette astrarre la gestione del <b>DDR-robot</b>,
+                    presentanodosi come componente componente software che esegue comandi di spostamento di un DDR-robot in 'modo indipendente dalla tecnologia' con cui è 
+                    realizzato del robot (virtuale o reale).<br>
+                    Questo componente ci torna molto utile perché ci permette di comandare il robot tramite coordinate, un comando evoluto rispetto ai classici comandi come: vai avanti,
+                    vai indietro, gira a destra di 90° e gira a sinistra di 90°(<a href='BasicRobot23.html#basicrobot23-le-funzioni'>qui</a> la raccolta di tutti i comandi utilizzabili sul BasicRobot23)<br>
+                    </li>
+                    <li>Il <b>BasicRobot23</b> ci obbliga a descrivere la <b>Service Area</b> come una griglia di coordinate, il che però non rappresenta alcun problema perché 
+                    è compatibile con il nostro progetto. Infatti in seguito si riporta l'immagine descrittiva della <b>Service Area</b> adottando una griglia numerata avente 
+                    origine nell'angolo in alto a sinistra, scelto per comodità in quanto coincide con la <b>HOME</b>, e lato di ogni cella pari alla dimensione <b>RD</b> del <b>Transport Trolley</b>:
+                    <center>
+                        <img src="./ServiceArea23Griglia.jpg" alt="service area"><br>
+                    </center>
+                    <br>file:///C:/Users/kossk/OneDrive/Documents/GitHub/issLab23/iss23Material/html/BasicRobot23.html#uso-del-planner
+                    Siccome la mappa del nostro progetto coincide con quella de <b>BasicRobot23</b>(<a href='BasicRobot23.html#uso-del-planner'>link</a>) la mappatura della 
+                    stanza xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    </li>
+                </ul>
+
+                <li><b>Gestione dei meccanismi di gestione delle richieste in arrivo</b></li>
+                <ul>
+
+                </ul>
             </ul>
+            -gestire movimento TT (abbiamo <a href='BasicRobot23.html'>BasicRobot23</a>)
+                -comandarlo nudo e crudo, giusto erp essere padroni del TT
+            -gestire politica di accettazione
+                -solleva tutti probelmi di logica e modellazione degli scenari
+                -come rappresentare ticket
+
+
+
+
+
+
             <h5>Considerazioni</h5>
             <ul>
                 <li> In fase di analisi si è affrontata la problematica relativa alla concomitanza di richieste da parte
