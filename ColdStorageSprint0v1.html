@@ -884,7 +884,7 @@
         </center>
         <h2>Piano di lavoro</h2>
         <div class="remark">
-            Considernado la struttura appena effettuata è possibile suddividere il progetto (in ordine di priorità)
+            Considerando la struttura appena effettuata è possibile suddividere il progetto (in ordine di priorità)
             nella maniera seguente:
             <ul>
                 <li><b>Core-Business</b>: include le funzionalità base del sistema e raggruppa dunque il
@@ -916,7 +916,7 @@
                         <td>ServiceAccessGUI</td>
                         <td>
                             <span class="stelle">
-                                &#9733;&#9733;&#9733;&#9733;&#9734;
+                                &#9733;&#9733;&#9733;&#9734;&#9734;
                             </span>
                         </td>
                     </tr>
@@ -953,10 +953,10 @@
         I test mirano a mostrare e verificare come il sistema reagisce quando riceve le richieste di store in
         diverse situazioni:
         <ul>
-            <li>Store request con Cold Room piena -> StoreRejected</li>
-            <li>Store request con Cold Room non piena -> StoreAccepted</li>
-            <li>Invio Ticket inesistente -> TicketNotOK</li>
-            <li>Invio Ticket con TICKETTIME scaduto -> TicketNotOK</li>
+            <li>Store request con Cold Room piena       -> StoreRejected</li>
+            <li>Store request con Cold Room non piena   -> StoreAccepted</li>
+            <li>Invio Ticket inesistente                -> TicketNotOK</li>
+            <li>Invio Ticket con TICKETTIME scaduto     -> TicketNotOK</li>
             <li>Invio Ticket con TICKETTIME non scaduto -> TicketOK</li>
         </ul>
         Per il primo prototipo scegliamo di modellare i Ticket come semplici oggetti Java (POJO) che mantengono come
