@@ -704,7 +704,7 @@
         possibile effettuare una bozza della struttura
         del sistema, il quale presenterà 5 macro-componenti:
         <ul>
-            <li>Warning e Alarm Device</li>
+            <li>Warning e Alarm Devices</li>
             <li>ServiceAccessGui</li>
             <li>ServiceStatusGui</li>
             <li>DDR Robot</li>
@@ -712,7 +712,7 @@
         </ul> <br>
         <center>
             <div class="piccolo">
-                <img src="./system.jpg" alt="system">
+                <img src="./system.png" alt="system">
             </div>
         </center>
         Si evince dunque che tutti i componenti evidenziati comunicano tra loro in maniera bidirezionale, all'infuori
@@ -902,14 +902,63 @@
             </center>
             <h3>Piano di lavoro</h3>
             <div class="remark">
-                Considerando la struttura appena effettuata è possibile raggruppare i requisiti del progetto in 3
-                Sprint, ordinati per priorità:
+                Considernado la struttura appena effettuata è possibile suddividere il progetto in (in ordine di priorità):
+                <ul>
+                    <li><b>Core-Business</b>: include le funzionalità base del sistema e raggruppa dunque il ColdStorageService e il Transport Trolley</li>
+                    <li><b>ServiceAccessGUI</b>: aggiunge al sistema le funzionalità di richiesta di store e di inserimento di un Ticket, consentendo al Fridge Truck di interagire con il sistema</li>
+                    <li><b>Warning e Alarm Devices</b>: include le funzionalità di mostrare tramite un Led lo stato del Transport Trolley e la possibilità di fermare il Transport Trolley tramite il Sonar</li>
+                    <li><b>ServiceStatusGUI</b>: consente al Service-manager di monitorare l'intero sistema</li>
+                </ul>
+                <table>
+                    <caption>Difficoltà</caption>
+                    <thead>
+                      <tr>
+                        <th>Componente</th>
+                        <th>Difficoltà</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Core-Business</td>
+                        <td>
+                          <span class="stelle">
+                            &#9733;&#9733;&#9733;&#9733;&#9733;
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>ServiceAccessGUI</td>
+                        <td>
+                          <span class="stelle">
+                            &#9733;&#9733;&#9733;&#9733;&#9734;
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Warning e Alarm Devices</td>
+                        <td>
+                          <span class="stelle">
+                            &#9733;&#9733;&#9733;&#9734;&#9734;
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>ServiceStatusGUI</td>
+                        <td>
+                          <span class="stelle">
+                            &#9733;&#9733;&#9734;&#9734;&#9734;
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  
+                <b>Piano di Lavoro:</b>
                 <ol>
-                    <li><b>Sprint 1: </b>(requisiti <b>1, 2</b> e <b>3</b>) si genera un sistema che include la
-                        ServiceArea, il Transport Trolley, la ServiceAccessGUI e la ColdStorageService.</li>
-                    <li><b>Sprint 2: </b>(<b>Alarm Requirements</b>) si gestiscono il Led e il Sonar connessi al
-                        Rasberry Pi.</li>
-                    <li><b>Sprint 3: </b>(requisito <b>4</b>) si inserisce nel sistema la ServiceStatusGUI.</li>
+                    <li><b>Sprint 1: </b>(requisiti <b>1, 2</b>) Core-Business</li>
+                    <li><b>Sprint 2:</b> (requisito <b>3</b>) ServiceAccessGUI</li>
+                    <li><b>Sprint 3: </b>(<b>Alarm Requirements</b>) Warning e Alarm Devices</li>
+                    <li><b>Sprint 4: </b>(requisito <b>4</b>) ServiceStatusGUI.</li>
                 </ol>
             </div>
             <h2>Test plans</h2>
