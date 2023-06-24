@@ -38,7 +38,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t012",targetState="handle_load_request",cond=whenDispatch("gotoindoor"))
+					 transition(edgeName="t011",targetState="handle_load_request",cond=whenDispatch("gotoindoor"))
 				}	 
 				state("handle_load_request") { //this:State
 					action { //it:State
@@ -60,8 +60,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t113",targetState="handle_load_request",cond=whenReply("more"))
-					transition(edgeName="t114",targetState="handle_gohome",cond=whenReply("gohome"))
+					 transition(edgeName="t112",targetState="handle_load_request",cond=whenReply("more"))
+					transition(edgeName="t113",targetState="handle_gohome",cond=whenReply("gohome"))
 				}	 
 				state("handle_gohome") { //this:State
 					action { //it:State

@@ -40,16 +40,12 @@ class Serviceaccessgui ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					sysaction { //it:State
 					}	 	 
 					 transition(edgeName="t00",targetState="handleGuicmd",cond=whenEvent("accessguicmd"))
-					transition(edgeName="t01",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
+					transition(edgeName="t01",targetState="handle_update_data",cond=whenDispatch("coldroomdata"))
+					transition(edgeName="t02",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
 				}	 
 				state("handleGuicmd") { //this:State
 					action { //it:State
 						discardMessages = false
-						if( checkMsgContent( Term.createTerm("accessguicmd(CMD,ARG)"), Term.createTerm("accessguicmd(refresh,_)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								CommUtils.outcyan("[ServiceAccessGui] Requesting update")
-								request("coldroomdatarequest", "coldroomdatarequest(_)" ,"coldstorageservice" )  
-						}
 						if( checkMsgContent( Term.createTerm("accessguicmd(CMD,ARG)"), Term.createTerm("accessguicmd(store,FW)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								CommUtils.outcyan("[ServiceAccessGui] Sending store request")
@@ -65,8 +61,7 @@ class Serviceaccessgui ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t12",targetState="handle_update_data",cond=whenReply("coldroomdata"))
-					transition(edgeName="t13",targetState="handle_store_accepted",cond=whenReply("storeaccepted"))
+					 transition(edgeName="t13",targetState="handle_store_accepted",cond=whenReply("storeaccepted"))
 					transition(edgeName="t14",targetState="handle_store_rejected",cond=whenReply("storerejected"))
 					transition(edgeName="t15",targetState="handle_ticket_accepted",cond=whenReply("ticketaccepted"))
 					transition(edgeName="t16",targetState="handle_ticket_rejected",cond=whenReply("ticketrejected"))

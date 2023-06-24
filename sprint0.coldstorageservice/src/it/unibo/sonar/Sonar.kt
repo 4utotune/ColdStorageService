@@ -37,11 +37,9 @@ class Sonar ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scop
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t015",targetState="alarm",cond=whenDispatch("updateled"))
 				}	 
 				state("alarm") { //this:State
 					action { //it:State
-						forward("alarm", "alarm(_)" ,"transporttrolley" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

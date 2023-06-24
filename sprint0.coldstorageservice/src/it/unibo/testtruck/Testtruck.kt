@@ -30,18 +30,6 @@ class Testtruck ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, 
 				}	 
 				state("loop") { //this:State
 					action { //it:State
-						CommUtils.outyellow("[TestTruck] Refresh gui")
-						emit("accessguicmd", "accessguicmd(refresh,_)" ) 
-						delay(2000) 
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="request_store", cond=doswitch() )
-				}	 
-				state("request_store") { //this:State
-					action { //it:State
 						CommUtils.outyellow("[TestTruck] New cycle: Requesting store")
 						emit("accessguicmd", "accessguicmd(store,30)" ) 
 						delay(2000) 
@@ -49,10 +37,10 @@ class Testtruck ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, 
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
-				 	 		stateTimer = TimerActor("timer_request_store", 
-				 	 					  scope, context!!, "local_tout_testtruck_request_store", 6000.toLong() )
+				 	 		stateTimer = TimerActor("timer_loop", 
+				 	 					  scope, context!!, "local_tout_testtruck_loop", 6000.toLong() )
 					}	 	 
-					 transition(edgeName="t00",targetState="handle_timeout",cond=whenTimeout("local_tout_testtruck_request_store"))   
+					 transition(edgeName="t00",targetState="handle_timeout",cond=whenTimeout("local_tout_testtruck_loop"))   
 					transition(edgeName="t01",targetState="handle_ticket",cond=whenDispatch("test_gotticket"))
 				}	 
 				state("handle_timeout") { //this:State
