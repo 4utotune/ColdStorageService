@@ -20,6 +20,7 @@ class Testserviceaccessgui ( name: String, scope: CoroutineScope  ) : ActorBasic
 		val interruptedStateTransitions = mutableListOf<Transition>()
 		
 				var currentWeight: Float = 0.0f	
+				var Timestamp: String = ""
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -48,8 +49,8 @@ class Testserviceaccessgui ( name: String, scope: CoroutineScope  ) : ActorBasic
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("storeaccepted(TICKET)"), Term.createTerm("storeaccepted(TICKET)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 val TIMESTAMP = payloadArg(0)  
-								CommUtils.outcyan("$name | Store Accepted. Received ticket $TIMESTAMP")
+								 Timestamp = payloadArg(0)  
+								CommUtils.outcyan("$name | Store Accepted. Received ticket $Timestamp")
 						}
 						//genTimer( actor, state )
 					}
@@ -71,7 +72,7 @@ class Testserviceaccessgui ( name: String, scope: CoroutineScope  ) : ActorBasic
 				state("sendticket") { //this:State
 					action { //it:State
 						CommUtils.outcyan("$name | Sending ticket ")
-						request("insertticket", "insertticket(TIMESTAMP)" ,"coldstorageservice" )  
+						request("insertticket", "insertticket($Timestamp)" ,"coldstorageservice" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

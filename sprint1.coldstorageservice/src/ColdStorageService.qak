@@ -51,7 +51,7 @@ Request		insertticket		: 	insertticket(TICKET)
 Reply		ticketaccepted		: 	ticketaccepted(_)
 Reply		ticketrejected		: 	ticketrejected(_)
 
-Context ctx_basicrobot ip [host="localhost" port=8020]
+Context ctx_basicrobot ip [host="127.0.0.1" port=8020]
 Context ctx_coldstorage ip [host="localhost" port=11800]
 
 
@@ -60,6 +60,7 @@ ExternalQActor basicrobot context ctx_basicrobot
 QActor testserviceaccessgui context ctx_coldstorage { 
 	[#
 		var currentWeight: Float = 0.0f	
+		var Timestamp: String = ""
 	#]
 	State s0 initial {
 		println("$name | init") color cyan
@@ -76,8 +77,8 @@ QActor testserviceaccessgui context ctx_coldstorage {
 				  
 	State handle_store_accepted {
 		onMsg(storeaccepted: storeaccepted(TICKET)) {
-			[# val TIMESTAMP = payloadArg(0) #]
-			println("$name | Store Accepted. Received ticket $TIMESTAMP") color cyan
+			[# Timestamp = payloadArg(0) #]
+			println("$name | Store Accepted. Received ticket $Timestamp") color cyan
 		}
 	}
 	Goto sendticket
@@ -90,7 +91,7 @@ QActor testserviceaccessgui context ctx_coldstorage {
 	
 	State sendticket {
 		println("$name | Sending ticket ") color cyan
-		request coldstorageservice -m insertticket: insertticket(TIMESTAMP)
+		request coldstorageservice -m insertticket: insertticket($Timestamp)
 	}
 	Transition t0   whenReply 	ticketaccepted 	-> handle_ticket_accepted
 					whenReply 	ticketrejected 	-> handle_ticket_rejected
