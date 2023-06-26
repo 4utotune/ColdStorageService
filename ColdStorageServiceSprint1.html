@@ -276,6 +276,18 @@
         max-width: 100%;
         height: 8em;
     }
+
+    #myTable tbody tr:nth-child(odd) {
+        background-color: lightgray;
+    }
+    #myTable td:first-child {
+        background-color: rgb(81, 145, 233);
+    }
+    #myTable td:nth-child(-n+4) {
+         text-align: center;
+         font-weight: bold;
+    }
+
 </style>
 
 <head>
@@ -860,11 +872,110 @@
         all'inserimento del <b>Ticket</b>.<br>
         <b>Per quanto riguarda le interazioni?Qualcosa da specificare? fai tabelle dei messaggi</b>
 
+        <h3>Interazioni</h3>
+        
+            
+
+
+        <table id="myTable">
+        <thead>
+            <tr>
+                <th>Messaggio</th>
+                <th>Mittente</th>
+                <th>Destinatario</th>
+                <th>Semantica messaggio</th>
+                <th>Descrizione</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>insertticket</td>
+                <td>ServiceAccessGUI</td>
+                <td>ColdStorageService</td>
+                <td>Request</td>
+                <td>Semantica Request perché all'inserimento del ticket il conducente del <b>Fridge Truck</b> deve sapere immediatamente l'esito dell'inserimento. Conterrà il numero del ticket inserito</td>
+            </tr>
+            <tr>
+                <td>replyinsertticket</td>
+                <td>ColdStorageService</td>
+                <td>ServiceAccessGUI</td>
+                <td>Reply</td>
+                <td>Reply alla <u>insertticket</u>, conterrà l'informazione della validità del <b>ticket</b> precedentemente inserito</td>
+            </tr>
+            <tr>
+                <td>storerequest</td>
+                <td>ServiceAccessGUI</td>
+                <td>ColdStorageService</td>
+                <td>Request</td>
+                <td>Semantica Request perché il conducente del <b>Fridge Truck</b> vuole sapere miiediatamente se c'è posto per il suo carico. La richiesta conterrà il numero di Kg del carico da scaricare.</td>
+            </tr>
+            <tr>
+                <td>replystorerequest</td>
+                <td>ColdStorageService</td>
+                <td>ServiceAccessGUI</td>
+                <td>Reply</td>
+                <td>Reply alla <u>storerequest</u>, conterrà il numero del <b>ticket</b> nel caso il carico sia stato preso in considerazione, altrimenti bisogna comunicare che la richiesta è stata rifiutata dal sistema</td>
+            </tr>
+            <tr>
+                <td>chargedeposisted</td>
+                <td>transporttrolley</td>
+                <td>ColdStorageService</td>
+                <td>Request</td>
+                <td>Semantica Request perchè quando il <b>Transport Trolley</b> comunica che ha scaricato il carico alla <b>ColdRoom</b> deve necessariamente sapere quale sarà la sua successiva mossa: se procedere alla <b>INDOOR</b> per soddifare un altro <b>Fridge Truck</b> oppure se andare in <b>HOME</b> perché non si sono rischieste sospese nel sistema</td>
+            </tr>
+            <tr>
+                <td>chargedeposisted</td>
+                <td>ColdStorageService</td>
+                <td>transporttrolley</td>
+                <td>Reply</td>
+                <td>Reply alla <u>chargedeposisted</u>, conterrà la prossima mossa del <b>Transport Trolley</b>: se andare alla <b>INDOOR</b> per soddifare un altro <b>Fridge Truck</b> oppure se andare in <b>HOME</b> perché non si sono rischieste sospese nel sistema</td>
+            </tr>
+            <tr>
+                <td>chargetaken</td>
+                <td>transporttrolley</td>
+                <td>ColdStorageService</td>
+                <td>Dispatch</td>
+                <td>Semantica Dispatch perché il <b>Transport Trolley</b> deve comunicare il fatto che abbia caricato il carico che in quel momento si trovava alla <b>INDOOR</b>, senza aspettarsi in cambio una informazione di qualche tipo</td>
+            </tr>
+            <tr>
+                <td>chargetaken</td>
+                <td>ColdStorageService</td>
+                <td>ServiceAccessGUI</td>
+                <td>Dispatch</td>
+                <td>Il <b>ColdStorageService</b> propaga il messaggio <u>chargetaken</u> alla <b>ServiceAccessGUI</b> in modo tale da informare il conducente del <b>Fridge Truck</b> che il suo carico è stato preso dal <b>Transport Trolley</b> e che ora se ne può andare</td>
+            </tr>
+            <tr>
+                <td>gotoindoor</td>
+                <td>ColdStorageService</td>
+                <td>transporttrolley</td>
+                <td>Dispatch</td>
+                <td>Semantica Dispatch perché il <b>ColdStorageService</b> comunica al <b>Transport Trolley</b> di occuparsi di soddisfare il <b>Fridge Truck</b>. Mentre il <b>Transport Trolley</b> lavora il <b>ColdStorageService</b> deve essere in grado di accettare le richieste che arrivano nel frattempo, per questo motivo si è scelta una semantica dispatch</td>
+            </tr>
+            <tr>
+                <td>coldroomdata</td>
+                <td>ColdStorageService</td>
+                <td>ServiceAccessGUI</td>
+                <td>Dispatch</td>
+                <td>Semantica dispatch perché il <b>ColdStorageService</b> comunica in maniera fire-and-forget alla <b>ServiceAccessGUI</b> il peso corrente della <b>ColdRoom</b> ogni volta che questo varia. Questo messaggio serve solo ad informare la <b>ServiceAccessGUI</b> del peso corrente della <b>ColdRoom</b></td>
+            </tr>
+
+            
+
+
+        </tbody>
+    </table>
+
         <div class="remark">
             Codice QAK per la modellazione del sistema: <a
                 href="./sprint0.coldstorageservice/src/ColdStorageService.qak"
                 target="_blank">ColdStorageService.qak</a>
         </div>
+        
+        
+
+
+
+
         <h3>Architettura logica</h3>
         Il sistema da noi modellato, presenta la seguente architettura logica:
         <center>
