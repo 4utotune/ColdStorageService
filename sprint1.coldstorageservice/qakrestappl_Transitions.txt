@@ -1,0 +1,4 @@
+{"actor":"testserviceaccessgui", "msgType":"dispatch", "curstate":"handle_ticket_accepted", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}
+{"actor":"testserviceaccessgui", "msgType":"dispatch", "curstate":"handle_ticket_rejected", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}
+{"actor":"coldstorageservice", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}
+{"actor":"transporttrolley", "msgType":"dispatch", "curstate":"idle", "nextstate":"moveToIndoor", "msgId":"gotoindoor"}

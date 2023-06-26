@@ -306,14 +306,14 @@
             <a target="_blank" href="http://calendar.altervista.org/TemaFinale23.pdf">Descrizione del
                 TemaFinale23</a><br>
 
-            <bc>Goals dello sprint 1</bc>:
+            <bc>Goals dello Sprint1</bc>:
             <ol>
                 <li>Identificare ed analizzare tutti i problemi relativi ai requisiti che coinvolgono
                     <b>ColdStorageService</b> e <b>Transport Trolley</b>
                 </li>
                 <li>Formulare un modello di interazione dei componenti individuati e quindi fornire un'architettura
                     logica</li>
-                <li>Realizzare un simulatore(O MOCK?) della <b>ServiceAccessGUI</b></li>
+                <li>Realizzare un simulatore della <b>ServiceAccessGUI</b> ai fini di test</li> 
                 <li>Pianificazione del lavoro</li>
                 <li>Realizzare i componenti software <b>ColdStorageService</b> e <b>Transport Trolley</b></li>
                 <li>Testare i componenti software realizzati</li>
@@ -329,9 +329,9 @@
         <ul>
             <li>Qualora un Fridge Truck chieda di scaricare un carico superiore alla portata massima
                 del Transport Trolley per il momento si adotta la politica di rifiutare a priori tale richiesta.<br>
-                Il committente però richiede una analisi dei costi che comporterebbero accettando carichi che superano
-                il peso del Transport Trolley obbligandolo così ad effettuare più giri per soddisfare la medesima
-                richiesta
+                Il committente richiede tuttavia un'analisi dei costi relativa allo scenario in cui il Transport Trolley
+                accetti carichi che superano la sua capacità massima di carico, obbligandolo così ad effettuare più giri 
+                per soddisfare la richiesta di store.
             </li>
             <li>Quando il Transport Trolley ha completato tutte le richieste al momento presenti nel sistema torna alla
                 HOME.
@@ -340,14 +340,10 @@
                 deve avere l'accortezza di direzionarsi direttamente alla INDOOR, senza quindi passare prima dalla HOME.
             </li>
             <li>Il <b>Transport Trolley</b> per raggiungere una determinata posizione della <b>Service Area</b> non deve
-                per forza percorrere sempre la strada ottimale, ma
+                per forza percorrere sempre la strada ottimale,
                 ma non dovrebbe nemmeno fare giri particolarmente inefficienti. Quindi come conclusione vi è un minimo
                 di tolleranza nei suoi spostamenti.</li>
         </ul>
-        <h5>Da chiarire con il committente</h5>
-        <ol>
-            <li></li>
-        </ol>
         <h3>Dizionario</h3>
         <h5>NOMI:</h5>
         <table>
@@ -613,7 +609,7 @@
         considerarsi
         "at INDOOR" o "at Cold Room" quando si trova rispettivamente vicino al muro INDOOR o alla porta della Cold Room.
         <h5>Sistema</h5>
-        Dall'analisi fatta nello Sprint0 ci possiamo soffermare sui seguenti componenti:
+        Dall'analisi effettuata nello Sprint0 ci possiamo soffermare sui seguenti componenti:
         <ul>
             <li>DDR Robot</li>
             <li>ColdStorageService</li>
@@ -623,19 +619,15 @@
                 <img src="./systemSprint1.jpg" alt="system">
             </div>
         </center>
-
-
-
         <h2>Analisi del Problema</h2>
         L'esplorazione del core-business del servizio porta all'analisi dei due macro componenti,
         <b>TransportTrolley</b> e <b>ColdStorageService</b>, a cui corrispondono indipendenti discussione dei problemi
         ed osservazioni.
-
         <h3>Transport Trolley</h3>
         <ul>
-            <li>Il committente ci mette a disposizione già il <a href='BasicRobot23.html'>BasicRobot23</a> che permette
+            <li>Il committente mette a disposizione il <a href='BasicRobot23.html'>BasicRobot23</a> che permette di
                 astrarre la gestione del <b>DDR-robot</b>,
-                presentanodosi come componente componente software che esegue comandi di spostamento di un DDR-robot in
+                presentanodosi come componente software che esegue comandi di spostamento di un DDR-robot in
                 'modo indipendente dalla tecnologia' con cui è
                 realizzato del robot (virtuale o reale).<br>
                 Questo componente ci torna molto utile perché ci permette di comandare il robot tramite coordinate, un

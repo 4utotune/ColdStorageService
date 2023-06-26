@@ -1,0 +1,293 @@
+System coldstorageservice_sprint1
+
+//MESSAGES
+
+// Interagire con il BasicRobot
+Request engage		: engage(OWNER,STEPTIME)
+Reply engagedone	: engagedone(ARG)
+Reply engagerefused	: engagerefused(ARG)
+
+Dispatch disengage	: disengage(ARG)
+
+Dispatch cmd		: cmd(MOVE)
+Dispatch end		: end(ARG)
+
+Request step		: step(TIME)
+Reply stepdone		: stepdone(V)
+Reply stepfailed	: stepfailed(DURATION, CAUSE)
+
+Request doplan		: doplan(PATH,OWNER,STEPTIME)
+Reply doplandone	: doplandone(ARG)
+Reply doplanfailed	: doplanfailed(ARG)
+
+Request moverobot	: moverobot(TARGETX, TARGETY)
+Reply moverobotdone	: moverobotok(ARG)
+Reply moverobotfailed	: moverobotfailed(PLANDONE,PLANTODO)
+
+Dispatch setrobotstate	: setpos(X,Y,D)
+Dispatch setdirection	: dir(D) //up,down,left,right
+
+Request getrobotstate	: getrobotstate(ARG)
+Reply robotstate	: robotstate(POS,DIR)
+
+// transport trolley -> coldstorageservice
+Dispatch	chargetaken			: 	chargetaken(_)
+Request 	chargedeposited		: 	chargedeposited(_)
+
+// coldstorageservice -> transporttrolley
+Reply 		more				:	more(_)
+Reply 		gohome				: 	gohome(_)
+Dispatch 	gotoindoor			: 	gotoindoor(_)
+
+//PER MOCK:
+// serviceAccessGUI <-> coldstorageservice
+Dispatch 	coldroomdata		: 	coldroomdata(WEIGHT)
+
+Request 	storerequest		: 	storerequest(FW)
+Reply		storeaccepted		:	storeaccepted(TICKET)
+Reply		storerejected		: 	storerejected(_)
+
+Request		insertticket		: 	insertticket(TICKET)
+Reply		ticketaccepted		: 	ticketaccepted(_)
+Reply		ticketrejected		: 	ticketrejected(_)
+
+Context ctx_basicrobot ip [host="localhost" port=8020]
+Context ctx_coldstorage ip [host="localhost" port=11800]
+
+
+ExternalQActor basicrobot context ctx_basicrobot
+
+QActor testserviceaccessgui context ctx_coldstorage { 
+	[#
+		var currentWeight: Float = 0.0f	
+	#]
+	State s0 initial {
+		println("$name | init") color cyan
+		[# currentWeight = 0.0f #]
+	}
+	Goto sendstore
+	
+	State sendstore{
+		println("$name | invio store request") color cyan
+		request coldstorageservice -m storerequest: storerequest(30)
+	}
+	Transition t0 whenReply storeaccepted 	-> handle_store_accepted
+				  whenReply storerejected 	-> handle_store_rejected
+				  
+	State handle_store_accepted {
+		onMsg(storeaccepted: storeaccepted(TICKET)) {
+			[# val TIMESTAMP = payloadArg(0) #]
+			println("$name | Store Accepted. Received ticket $TIMESTAMP") color cyan
+		}
+	}
+	Goto sendticket
+	
+	State handle_store_rejected {
+		println("$name | Store Rejected") color cyan
+		// TODO show error message
+	}
+	Goto idle
+	
+	State sendticket {
+		println("$name | Sending ticket ") color cyan
+		request coldstorageservice -m insertticket: insertticket(TIMESTAMP)
+	}
+	Transition t0   whenReply 	ticketaccepted 	-> handle_ticket_accepted
+					whenReply 	ticketrejected 	-> handle_ticket_rejected
+	 
+	State handle_ticket_accepted {
+		println("$name | Ticket Accepted") color cyan
+		// TODO show success message
+	}
+	Transition t0 whenMsg chargetaken -> handle_charge_taken
+	
+	State handle_ticket_rejected {
+		println("$name | Ticket Rejected") color cyan
+		// TODO show error message
+	}
+	Transition t0 whenMsg chargetaken -> handle_charge_taken
+	
+	State handle_charge_taken {
+		println("$name | charge taken! Il Fridge Truck si allontana")
+	}
+	Goto sendstore
+	
+	State idle{
+		println("$name | Richiesta di store rifiutata la Cold Room è piena")
+	}
+}
+
+QActor coldstorageservice context ctx_coldstorage {
+	//da modificare il coldstorageservice.Ticket
+	[#	
+		var MaxWeightcoldroom: Float = 100.0f
+		var CurrentWeight: Float = 0.0f
+		var RejectedRequests: Int = 0
+		var WorkingTicket: coldstorageservice.Ticket? = null
+		var Tickets: MutableSet<coldstorageservice.Ticket> = mutableSetOf()
+	#]
+	State s0 initial {
+		[# 
+			MaxWeightcoldroom = 100f
+			CurrentWeight = 0.0f 
+			RejectedRequests = 0
+			WorkingTicket = null
+			Tickets = mutableSetOf()
+		#]
+		println("$name | init") color green
+	}
+	Goto idle
+	
+	State idle {
+		println("$name | idle") color green
+	}
+	Transition t0 whenRequest storerequest		-> handle_store
+				  whenRequest insertticket		-> handle_ticket
+				  whenRequest chargedeposited	-> handle_ticketloop
+				  whenMsg	  chargetaken		-> handle_charge_taken
+					
+	State handle_store {
+		onMsg(storerequest: storerequest(FW)) {
+			println("$name Received store request for ${payloadArg(0)} kg") color green
+			[# val FW = payloadArg(0).toFloat() #]
+			if [# ((CurrentWeight + FW) > MaxWeightcoldroom) #] {
+				[# RejectedRequests++ #]
+				replyTo storerequest with storerejected: storerejected(_)
+			} else {
+				[#
+					val TICKET = coldstorageservice.Ticket(FW)
+				  	Tickets.add(TICKET)
+				  	val Timestamp = TICKET.getTimestamp()
+				#]
+				replyTo storerequest with storeaccepted: storeaccepted($Timestamp)
+			}
+		}
+	}
+	Goto idle
+	
+	State handle_ticket {
+		onMsg(insertticket: insertticket(TICKET)) {
+			[# 
+				val Received = payloadArg(0).toString()
+				val TICKET = Tickets.find { it.getTimestamp() == Received }
+			#]
+			println("$name | Handling ticket $Received") color green
+			if [# (TICKET != null && TICKET.isValid) #]{
+				[# 
+					WorkingTicket = TICKET 				
+				#]
+				replyTo insertticket with ticketaccepted: ticketaccepted(_)
+				forward transporttrolley -m gotoindoor: gotoindoor(_)
+			} else {
+				[# 
+					if (TICKET != null) {
+						Tickets.remove(TICKET) 
+				   	}
+				#]
+				replyTo insertticket with ticketrejected: ticketrejected(_)
+			}
+		}
+	}
+	Goto idle
+	
+	State handle_charge_taken {
+		[# 
+			val Timestamp = WorkingTicket!!.getTimestamp()
+		#]
+		println("$name | Forwarding charge taken for ticket $Timestamp") color green
+		forward testserviceaccessgui -m chargetaken: chargetaken(_)
+	}
+	Goto idle
+	
+	State handle_ticketloop {
+		onMsg(chargedeposited: chargedeposited(_)) {
+			println("$name | Deposit confirmation received") color green
+			[#
+				if (WorkingTicket!=null){
+					CurrentWeight += WorkingTicket!!.getWeight()
+				}	
+				WorkingTicket = null
+			#]
+			//println("[ColdStorageService] Sending current weight update") color green
+			//forward serviceaccessgui -m coldroomdata: coldroomdata($CurrentWeight)
+			//forward servicestatusgui -m updatestoragestatus: updatestoragestatus($CurrentWeight, $RejectedRequests)
+			
+			replyTo chargedeposited with gohome: gohome(_)	
+		}
+	}
+	Goto idle
+}
+
+QActor transporttrolley context ctx_coldstorage {
+	State s0 initial {
+		println("$name | init e engage basicrobot") color magenta
+		//Il transporttrolley richiede l'impegno del basicrobot
+		request basicrobot -m engage : engage(transporttrolley,330)
+	}
+	Transition t0 whenReply engagedone -> idle
+	
+	State idle{
+		println("$name | attende comandi...") color magenta
+	}
+	Transition t0 whenMsg gotoindoor -> moveToIndoor
+	
+	State moveToIndoor {
+		println("$name | vado all'INDOOR") color magenta
+		request basicrobot -m moverobot : moverobot (0,4)
+	}
+	Transition t0 whenReply moverobotdone -> loadTheCharge
+	
+	State loadTheCharge{
+		println("$name | sto caricando il carico presso l'INDOOR") color magenta
+		//simulo azione di carico
+		delay 2000
+		forward coldstorageservice -m chargetaken : chargetaken(_)
+	}
+	Goto movetocoldroom
+	
+	State movetocoldroom {
+		request basicrobot -m moverobot: moverobot (4,3)
+		println("$name | vado a verso la cold room")
+	}
+	Transition t0 whenReply moverobotdone -> storethecharge
+	
+	State storethecharge {
+		println("$name | scarico il carico presso la Cold Room")
+		//simulo azione di scarico
+		delay 2000
+		request coldstorageservice -m chargedeposited : chargedeposited(_)
+	}
+	Transition t0 whenReply more -> moveToIndoor
+				  whenReply gohome -> movetohome
+	
+	State movetohome{
+		println("$name | vado alla posizione HOME")
+		request basicrobot -m moverobot : moverobot (0,0)
+	}
+	Transition t0 whenReply moverobotdone -> trolleyathome
+	
+	State trolleyathome {
+		println("$name | trolley at HOME")
+		forward basicrobot -m setdirection : dir(down) //request?
+		delay 1000
+		forward basicrobot -m disengage : disengage(transporttrolley)
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
