@@ -1010,6 +1010,7 @@
             </div>
         </center>
         <h2>Test plans</h2>
+        <b>VERIFICARE CHE TUTTI I TEST RICOPRANO I REQUISITI DEL Problema</b>
 
         <table id="myTable1">
             <thead>
@@ -1036,7 +1037,7 @@
                     <td>La <b>ServiceAccessGUI</b> riceve un messaggio <b>replyinsertticket</b> che dichiara l'invalidità del <b>ticket</b>.</td>
                 </tr>
                 <tr>
-                    <td>UpdateWeightGUI</td>
+                    <td>UpdateWeight</td>
                     <td>ColdStorageService</td>
                     <td>La <b>ServiceAccessGUI</b> richiede un <b>storerequest</b> con un carico di <b>FW</b> Kg e successivamente un <b>insertticket</b>.</td>
                     <td>Quando la <b>ColdStorageService</b> riceve <b>chargedeposited</b> ci si aspetta che il suo contatore del peso presente nella <b>ColdRoom</b> sia stato aggiornato con <b>FW</b> Kg in più.</td>
@@ -1051,19 +1052,40 @@
                 <tr>
                     <td>TransportTrolleyToIndoor</td>
                     <td>TransportTrolley</td>
-                    <td>Si richiede al <b>Transport Trolley</b> di recarsi ad una delle coordinate che rappresentano la <b>INDOOR</b>.</td>
+                    <td>Si richiede al <b>Transport Trolley</b> di recarsi ad una delle coordinate che rappresentano una delle posizioni speciali: la <b>INDOOR</b>, <b>HOME</b> o <b>PORT</b>.</td>
                     <td><b>NON VA BENE</b>Dopo un lasso ti tempo breve si riceve un messaggio <u>doplandone</u> da parte del <b>BasicRobot23</b></td>
                 </tr>
+
 
             </tbody>
         </table>
 
 
 
-        <!-- 
+        
         <h2>Project</h2>
+        <ul>
+            <li>Descrivere come abbiamo implementato i ticket</li>
+            <li>Può mostrare la struttura della architettura finale del sistema? In quale forma ritiene sia
+                 più opportuno presentare l’architettura (o in generale una architettura software) per poterne 
+                 discutere in modo pragmaticamente utile (cioè non solo in modo vago e discorsivo)?</li>
+                 <li>L’architettura finale è’ stata preceduta dalla definizione di una archittura logica 
+                    scaturita come deliverable della fase di analisi del problema?</li>
+            <li>Immagino che come linguaggio di codifica si sia usato principlamente Java e/o Kotlin, insieme 
+                a qualche parte scritta in C, C++, Python, JavaScript, etc). Nella fase di analisi del problema, 
+                è stato evidenziato qualche macroscopico gap rispetto queste tecnologie? Se sì’ come si è pensato 
+                di colmare questo ‘abstraction gap’?</li>
+            <li>L’architettura finale del sistema mostra qualche pattern architetturale riconoscibile (ad es. client-server, layer, clean …)
+                 e in quale fase dello sviluppo (analisi/progetto) è stato deciso di introdurlo? E perchè? Queste 
+                 motivazioni sono riportate/discusse in qualche documento?</li>
+            <li>Come viene rappresentato lo stato del sistema? E’ uno stato ‘concentrato’, cioè gestito da
+                 un solo componente o distribuito tra più componenti? Chi e quando ha preso una decisione 
+                 in merito a questo punto? => <b>DOBBIAMO DECIDERE COME RAPPRSENTARE GLI STATI MA SOPRATTUTTO COME RAPPRESENTARE LA COLDROOM</b></li>
+            <li>Il sistema finale e’ stato sviluppato tenendo conto dei principi SOLID? E’ possibile vederne qualche esempio?</li>
+            
+        </ul>
 
-
+<!--
         <h2>Testing</h2>
 
 
