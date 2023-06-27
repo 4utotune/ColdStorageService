@@ -682,10 +682,10 @@
                 Questo è un compromesso più che valido ai nostro scopi perché
                 il robot non ha requisiti di precisione stringenti.
             </li>
-            <li><u>Per quanto riguarda i movimenti: il <b>Planner</b> offerto da <b>BasicRobot23</b> offre le
-                funzionalità?->se semplicemente calcola il percorso senza
-                badare ad ostacoli allora sarà sufficiente scartare le proposte di percorsi che contengono una cella
-                occupata da un ostacolo</u></li>
+            <li>Il <b>Planner</b> offerto da <b>BasicRobot23</b> offre le
+                funzionalità  di posizionarsi in un punto della <b>Service Area</b> considerando anche gli ostacoli. Quindi nel caso 
+                si specifichi una destinazione in coordinate che corrispondono ad un ostacolo la richiesta verrà immediatamente
+                rifiutata, altrimenti il percorso viene calcolato evitando di collidere con ostacoli.</li>
             <li>Siccome le posizioni speciali <b>PORT</b> ed <b>INDOOR</b> sono più ampie di una cella, per considerare
                 valido il punto di scarico o carico sarà sufficiente
                 posizionare il <b>Transport Trolley</b> in una qualsiasi delle celle che identificano tale posizione
