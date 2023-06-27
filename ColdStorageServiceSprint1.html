@@ -287,6 +287,16 @@
          text-align: center;
          font-weight: bold;
     }
+    #myTable1 tbody tr:nth-child(odd) {
+        background-color: lightgray;
+    }
+    #myTable1 td:first-child {
+        background-color: rgb(81, 145, 233);
+    }
+    #myTable1 td:first-child {
+         text-align: center;
+         font-weight: bold;
+    }
 
 </style>
 
@@ -1000,19 +1010,56 @@
             </div>
         </center>
         <h2>Test plans</h2>
-        <s>
-            I test prevedono che il sistema riceva diverse richieste dal conducente del Fridge Truck tramite la
-            ServiceAccessGUI.
-            I tests mirano a mostrare e verificare come il sistema reagisce quando riceve le richieste di store in
-            diverse situazioni:
-            <ul>
-                <li>Store request con Cold Room piena -> StoreRejected</li>
-                <li>Store request con Cold Room non piena -> StoreAccepted</li>
-                <li>Invio Ticket inesistente -> TicketNotOK</li>
-                <li>Invio Ticket con TICKETTIME scaduto -> TicketNotOK</li>
-                <li>Invio Ticket con TICKETTIME non scaduto -> TicketOK</li>
-            </ul>
-        </s>
+
+        <table id="myTable1">
+            <thead>
+                <tr>
+                    <th>Test</th>
+                    <th>Entità coinvolte</th>
+                    <th>Scenario</th>
+                    <th>Comportamento atteso</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>MultipleRequestsHandling</td>
+                    <td>ColdStorageService</td>
+                    <td>Dalla <b>ServiceAccessGUI</b> vengono richieste alla <b>ColdStorageService</b> due richieste consecutive: un <b>insertticket</b> e successivamente,dopo aver
+                        ricevuto il messaggio <b>replyinsertticket</b> di validità del <b>ticket</b>,
+                    un <b>storerequest</b> con peso inferiore alla capacità massima del robot. Al fine di verificare se il sistema accetta richieste mentre si sta servendo una richiesta di un <b>Fridge Truck</b>.</td>
+                    <td>La <b>ServiceAccessGUI</b> alla seconda richiesta di <b>storerequest</b> riceve una risposta affermativa.</td>
+                </tr>
+                <tr>
+                    <td>TicketExpired</td>
+                    <td>ColdStorageService</td>
+                    <td>La <b>ServiceAccessGUI</b> richiede un <b>storerequest</b> e successivamente dopo <b>TICKETTIME</b> secondi invia la richiesta di <b>insertticket</b>.</td>
+                    <td>La <b>ServiceAccessGUI</b> riceve un messaggio <b>replyinsertticket</b> che dichiara l'invalidità del <b>ticket</b>.</td>
+                </tr>
+                <tr>
+                    <td>UpdateWeightGUI</td>
+                    <td>ColdStorageService</td>
+                    <td>La <b>ServiceAccessGUI</b> richiede un <b>storerequest</b> con un carico di <b>FW</b> Kg e successivamente un <b>insertticket</b>.</td>
+                    <td>Quando la <b>ColdStorageService</b> riceve <b>chargedeposited</b> ci si aspetta che il suo contatore del peso presente nella <b>ColdRoom</b> sia stato aggiornato con <b>FW</b> Kg in più.</td>
+                </tr>
+                <tr>
+                    <td>TransportTrolleyServiceTruck</td>
+                    <td>ColdStorageService<br>TransportTrolley</td>
+                    <td>La <b>ColdStorageService</b> richiede tramite la <b>gotoindoor</b> al <b>Transport Trolley</b> di andare alla <b>INDOOR</b> per soddisfare una richiesta
+                    di un <b>Fridge Truck</b>.</td>
+                    <td>La <b>ColdStorageService</b> dopo un lasso di tempo non troppo lungo riceve un messaggio di <b>chargetaken</b> seguito,non immediatamente , da un messaggio <b>chargedeposited</b>.</td>
+                </tr>
+                <tr>
+                    <td>TransportTrolleyToIndoor</td>
+                    <td>TransportTrolley</td>
+                    <td>Si richiede al <b>Transport Trolley</b> di recarsi ad una delle coordinate che rappresentano la <b>INDOOR</b>.</td>
+                    <td><b>NON VA BENE</b>Dopo un lasso ti tempo breve si riceve un messaggio <u>doplandone</u> da parte del <b>BasicRobot23</b></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+
+
         <!-- 
         <h2>Project</h2>
 
@@ -1035,6 +1082,7 @@
                 <img src="./gabriele.jpeg" alt="mbot" width="15%" height="15%">
                 <img src="./Baraldi.jpeg" alt="mbot" width="15%" height="15%">
                 <img src="./kriss.jpeg" alt="mbot" width="15%" height="15%">
+                
             </div>
             <br>
             GIT repo: https://github.com/4utotune/ColdStorageService/ <br>
