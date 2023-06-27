@@ -339,17 +339,17 @@
         <h5>Chiarimenti del committente</h5>
         L'interazione con il committente ha permesso di chiarire alcuni aspetti del progetto:
         <ul>
-            <li>Qualora un Fridge Truck chieda di scaricare un carico superiore alla portata massima
-                del Transport Trolley per il momento si adotta la politica di rifiutare a priori tale richiesta.<br>
-                Il committente richiede tuttavia un'analisi dei costi relativa allo scenario in cui il Transport Trolley
+            <li>Qualora un <b>Fridge Truck </b> di scaricare un carico superiore alla portata massima
+                del <b>Transport Trolley</b> per il momento si adotta la politica di rifiutare a priori tale richiesta.<br>
+                Il committente richiede tuttavia un'analisi dei costi relativa allo scenario in cui il <b>Transport Trolley</b>
                 accetti carichi che superano la sua capacità massima di carico, obbligandolo così ad effettuare più giri 
                 per soddisfare la richiesta di store.
             </li>
-            <li>Quando il Transport Trolley ha completato tutte le richieste al momento presenti nel sistema torna alla
-                HOME.
-                Se durante il tragitto dalla ColdRoom alla HOME si presenta una nuova richiesta di carico/scarico il
-                Transport Trolley
-                deve avere l'accortezza di direzionarsi direttamente alla INDOOR, senza quindi passare prima dalla HOME.
+            <li>Quando il <b>Transport Trolley</b> ha completato tutte le richieste al momento presenti nel sistema torna alla
+                <b>HOME</b>.
+                Se durante il tragitto dalla <b>ColdRoom</b> alla <b>HOME</b> si presenta una nuova richiesta di carico/scarico il
+                <b>Transport Trolley</b>
+                deve avere l'accortezza di direzionarsi direttamente alla <b>INDOOR</b>, senza quindi passare prima dalla <b>HOME</b>.
             </li>
             <li>Il <b>Transport Trolley</b> per raggiungere una determinata posizione della <b>Service Area</b> non deve
                 per forza percorrere sempre la strada ottimale,
@@ -653,30 +653,29 @@
                 è compatibile con il nostro progetto. Infatti in seguito si riporta l'immagine descrittiva della
                 <b>Service Area</b> adottando una griglia numerata avente
                 origine nell'angolo in alto a sinistra, scelto per comodità in quanto coincide con la <b>HOME</b>, e
-                lato di ogni cella pari alla dimensione <b>RD</b> del <b>Transport Trolley</b>:
+                lato di ogni cella pari alla dimensione <b>RD</b> del <b>Transport Trolley</b>:<br><br>
                 <center>
                     <img src="./ServiceArea23Griglia.jpg" alt="service area"><br>
                 </center>
-                <b>C'E' ANCHE LA RIGA 5??????????????????''</b>
                 <br>
                 Siccome la mappa del nostro progetto coincide con quella de <b>BasicRobot23</b>(<a
                     href='BasicRobot23.html#uso-del-planner'>link</a>) la mappatura della
                 stanza la conosciamo a priori. In particolare vengono evidenziate quelle che sono le posizioni
                 speciali(<b>HOME,PORT,INDOOR</b>). Per la <b>HOME</b> si è scelto
                 la cella nell'origine, mentre <b>PORT</b> ed <b>INDOOR</b> le celle adiacenti alla porzione di parete
-                che le definiscono.[Sollevo un problema:la griglia combacia
+                che le definiscono.<u>[Sollevo un problema:la griglia combacia
                 esattamente con la mappa? oppure ci sono degli scarti?? Siccome le celle hanno dimensione del robot(ma
-                la dimensione combacia con il BasicRobot23?)]<br>
+                la dimensione combacia con il BasicRobot23?)]</u><br>
                 Anche se alcuni ostacoli non coincidono esattamente di dimensioni alla cella corrispondente,quindi sono
                 di dimensioni inferiori, è conveniente dedicare l'intera
                 cella a tale ostacolo per rimanere coerenti con il modello di mappatura della <b>Service Area</b>.
                 Questo è un compromesso più che valido ai nostro scopi perché
                 il robot non ha requisiti di precisione stringenti.
             </li>
-            <li>Per quanto riguarda i movimenti: il <b>Planner</b> offerto da <b>BasicRobot23</b> offre le
+            <li><u>Per quanto riguarda i movimenti: il <b>Planner</b> offerto da <b>BasicRobot23</b> offre le
                 funzionalità?->se semplicemente calcola il percorso senza
                 badare ad ostacoli allora sarà sufficiente scartare le proposte di percorsi che contengono una cella
-                occupata da un ostacolo</li>
+                occupata da un ostacolo</u></li>
             <li>Siccome le posizioni speciali <b>PORT</b> ed <b>INDOOR</b> sono più ampie di una cella, per considerare
                 valido il punto di scarico o carico sarà sufficiente
                 posizionare il <b>Transport Trolley</b> in una qualsiasi delle celle che identificano tale posizione
@@ -686,14 +685,14 @@
                 si posizioni. Conoscendo già a priori i tragitti che il <b>Transport Trolley</b> può fare possiamo
                 decidere in base alla coppia partenza-destinazione
                 in quale delle celle valide mandare il robot:
-                <ul>
-                    <li>HOME-INDOOR -> cella di destinazione: (5,0)</li>
-                    <li>INDOOR-PORT -> cella di destinazione: (3,4)</li>
-                    <li>PORT-INDOOR -> cella di destinazione: (5,1)</li>
-                    <li>PORT-HOME -> unica cella di destinazione possibile: (0,0)</li>
-                    <li>???-INDOOR -> se mentre sta arrivando in <b>HOME</b> viene richiesto al <b>Transport Trolley</b>
+                <ul><br>
+                    <li><b>HOME-INDOOR</b> -> cella di destinazione: <b>(5,0)</b></li>
+                    <li><b>INDOOR-PORT</b> -> cella di destinazione: <b>(3,4)</b></li>
+                    <li><b>PORT-INDOOR</b> -> cella di destinazione: <b>(5,1)</b></li>
+                    <li><b>PORT-HOME</b> -> unica cella di destinazione possibile: <b>(0,0)</b></li>
+                    <li><b>???-INDOOR</b> -> se mentre sta arrivando in <b>HOME</b> viene richiesto al <b>Transport Trolley</b>
                         di dirigersi immediatamente alla
-                        <b>INDOOR</b> la cella di destinazione sarà: (5,1)
+                        <b>INDOOR</b> la cella di destinazione sarà: <b>(5,1)</b>
                     </li>
                 </ul>
 
@@ -864,13 +863,18 @@
 
 
         <br><b>Ma la roba che segue siam sicuri sia interessante??</b><br>
+        <b>(secondo il kossovaro->Si perché se un conducente inserisce il ticket sbagliato e non si distinguono i due messaggi di errore 
+            potrebbe pensare che il suo ticket sia scaduto, anche se in realtà non lo è. Se nessuno gli fa notare che ha sbagliato ad inserire ticket
+             c'è il rischio che lui dia per scontato che sia stato inserito correttamente). Altro dubbio venuto sul momento: quando il conducnete riceve il ticket non sarebbe bene 
+            comunicargli anche il tempo di durata del biglietto?Oppure stamparlo sullaAccessGUI insieme al peso della coldroom. Forse/probabilmente queste domande sarebbero da 
+            fare al committente</b><br>
         Se un conducente di un <b>Fridge Truck</b> inserisce erroneamente il <b>Ticket</b> sarebbe necessario
         comunicare all'interessato che il <b>Ticket</b> inserito
         non è corretto, distinguendo il messaggio di risposta <u>Ticket scaduto</u> da <u>Ticket inserito non
             valido</u>(inteso come "Ticket inserito non corrisponde a nessun
         Ticket presente nel servizio", quindi si deduce che il conducente abbia sbagliato durante l'inserimento)
         all'inserimento del <b>Ticket</b>.<br>
-        <b>Per quanto riguarda le interazioni?Qualcosa da specificare? fai tabelle dei messaggi</b>
+        
 
         <h3>Interazioni</h3>
         
@@ -893,70 +897,82 @@
                 <td>ServiceAccessGUI</td>
                 <td>ColdStorageService</td>
                 <td>Request</td>
-                <td>Semantica Request perché all'inserimento del ticket il conducente del <b>Fridge Truck</b> deve sapere immediatamente l'esito dell'inserimento. Conterrà il numero del ticket inserito</td>
+                <td>Semantica Request perché all'inserimento del ticket il conducente del <b>Fridge Truck</b> deve sapere immediatamente 
+                    l'esito dell'inserimento. Conterrà il numero del ticket inserito.</td>
             </tr>
             <tr>
                 <td>replyinsertticket</td>
                 <td>ColdStorageService</td>
                 <td>ServiceAccessGUI</td>
                 <td>Reply</td>
-                <td>Reply alla <u>insertticket</u>, conterrà l'informazione della validità del <b>ticket</b> precedentemente inserito</td>
+                <td>Reply alla <u>insertticket</u>, conterrà l'informazione della validità del <b>ticket</b> precedentemente inserito.</td>
             </tr>
             <tr>
                 <td>storerequest</td>
                 <td>ServiceAccessGUI</td>
                 <td>ColdStorageService</td>
                 <td>Request</td>
-                <td>Semantica Request perché il conducente del <b>Fridge Truck</b> vuole sapere miiediatamente se c'è posto per il suo carico. La richiesta conterrà il numero di Kg del carico da scaricare.</td>
+                <td>Semantica Request perché il conducente del <b>Fridge Truck</b> vuole sapere immediatamente se c'è posto per il suo carico. 
+                    La richiesta conterrà il numero di Kg del carico da scaricare.</td>
             </tr>
             <tr>
                 <td>replystorerequest</td>
                 <td>ColdStorageService</td>
                 <td>ServiceAccessGUI</td>
                 <td>Reply</td>
-                <td>Reply alla <u>storerequest</u>, conterrà il numero del <b>ticket</b> nel caso il carico sia stato preso in considerazione, altrimenti bisogna comunicare che la richiesta è stata rifiutata dal sistema</td>
+                <td>Reply alla <u>storerequest</u>, conterrà il numero del <b>ticket</b> nel caso il carico sia stato preso in considerazione, 
+                    altrimenti bisogna comunicare che la richiesta è stata rifiutata dal sistema.</td>
             </tr>
             <tr>
-                <td>chargedeposisted</td>
+                <td>chargedeposited</td>
                 <td>transporttrolley</td>
                 <td>ColdStorageService</td>
                 <td>Request</td>
-                <td>Semantica Request perchè quando il <b>Transport Trolley</b> comunica che ha scaricato il carico alla <b>ColdRoom</b> deve necessariamente sapere quale sarà la sua successiva mossa: se procedere alla <b>INDOOR</b> per soddifare un altro <b>Fridge Truck</b> oppure se andare in <b>HOME</b> perché non si sono rischieste sospese nel sistema</td>
+                <td>Semantica Request perchè quando il <b>Transport Trolley</b> comunica che ha scaricato il carico alla <b>ColdRoom</b>
+                     deve necessariamente sapere quale sarà la sua successiva mossa: se procedere alla <b>INDOOR</b> per soddifare un altro
+                      <b>Fridge Truck</b> oppure se andare in <b>HOME</b> perché non si sono rischieste sospese nel sistema.</td>
             </tr>
             <tr>
-                <td>chargedeposisted</td>
+                <td>replychargedeposited</td>
                 <td>ColdStorageService</td>
                 <td>transporttrolley</td>
                 <td>Reply</td>
-                <td>Reply alla <u>chargedeposisted</u>, conterrà la prossima mossa del <b>Transport Trolley</b>: se andare alla <b>INDOOR</b> per soddifare un altro <b>Fridge Truck</b> oppure se andare in <b>HOME</b> perché non si sono rischieste sospese nel sistema</td>
+                <td>Reply alla <u>chargedeposited</u>, conterrà la prossima mossa del <b>Transport Trolley</b>: se andare alla <b>INDOOR</b> 
+                    per soddifare un altro <b>Fridge Truck</b> oppure se andare in <b>HOME</b> perché non si sono rischieste sospese nel sistema.</td>
             </tr>
             <tr>
                 <td>chargetaken</td>
                 <td>transporttrolley</td>
                 <td>ColdStorageService</td>
                 <td>Dispatch</td>
-                <td>Semantica Dispatch perché il <b>Transport Trolley</b> deve comunicare il fatto che abbia caricato il carico che in quel momento si trovava alla <b>INDOOR</b>, senza aspettarsi in cambio una informazione di qualche tipo</td>
+                <td>Semantica Dispatch perché il <b>Transport Trolley</b> deve comunicare il fatto che abbia caricato il carico che in quel momento
+                     si trovava alla <b>INDOOR</b>, senza aspettarsi in cambio alcuna informazione.</td>
             </tr>
             <tr>
                 <td>chargetaken</td>
                 <td>ColdStorageService</td>
                 <td>ServiceAccessGUI</td>
                 <td>Dispatch</td>
-                <td>Il <b>ColdStorageService</b> propaga il messaggio <u>chargetaken</u> alla <b>ServiceAccessGUI</b> in modo tale da informare il conducente del <b>Fridge Truck</b> che il suo carico è stato preso dal <b>Transport Trolley</b> e che ora se ne può andare</td>
+                <td>Il <b>ColdStorageService</b> propaga il messaggio <u>chargetaken</u> alla <b>ServiceAccessGUI</b> in modo tale da informare il
+                     conducente del <b>Fridge Truck</b> che il suo carico è stato preso dal <b>Transport Trolley</b> e che quindi se ne può andare.</td>
             </tr>
             <tr>
                 <td>gotoindoor</td>
                 <td>ColdStorageService</td>
                 <td>transporttrolley</td>
                 <td>Dispatch</td>
-                <td>Semantica Dispatch perché il <b>ColdStorageService</b> comunica al <b>Transport Trolley</b> di occuparsi di soddisfare il <b>Fridge Truck</b>. Mentre il <b>Transport Trolley</b> lavora il <b>ColdStorageService</b> deve essere in grado di accettare le richieste che arrivano nel frattempo, per questo motivo si è scelta una semantica dispatch</td>
+                <td>Semantica Dispatch perché il <b>ColdStorageService</b> comunica al <b>Transport Trolley</b> di occuparsi di soddisfare il 
+                    <b>Fridge Truck</b>. Mentre il <b>Transport Trolley</b> lavora il <b>ColdStorageService</b> deve essere in grado di accettare
+                     le richieste che arrivano nel frattempo.</td>
             </tr>
             <tr>
                 <td>coldroomdata</td>
                 <td>ColdStorageService</td>
                 <td>ServiceAccessGUI</td>
                 <td>Dispatch</td>
-                <td>Semantica dispatch perché il <b>ColdStorageService</b> comunica in maniera fire-and-forget alla <b>ServiceAccessGUI</b> il peso corrente della <b>ColdRoom</b> ogni volta che questo varia. Questo messaggio serve solo ad informare la <b>ServiceAccessGUI</b> del peso corrente della <b>ColdRoom</b></td>
+                <td>Semantica Dispatch perché il <b>ColdStorageService</b> comunica in maniera fire-and-forget alla <b>ServiceAccessGUI</b> il
+                     peso corrente della <b>ColdRoom</b> ogni volta che questo varia. Questo messaggio serve solo ad informare la <b>ServiceAccessGUI</b>
+                      del peso corrente della <b>ColdRoom</b>.</td>
             </tr>
 
             
