@@ -6,15 +6,16 @@ import java.util.Date;
 
 public class Ticket {
 
-    private final String FORMAT = "yyyyMMddHHmmss"; // yyyy.MM.dd.HH.mm.ss
-    private String timestamp;
-    private Float FW;
+    private final String FORMAT;
+    private final Integer TIMEOUT;
+    private final String timestamp;
+    private final Float FW;
 
-    // TODO add status
-
-    public Ticket(Float weight) {
-        this.FW = weight;
-        this.timestamp = new SimpleDateFormat(FORMAT).format(System.currentTimeMillis());
+    public Ticket(Float weight, Integer timeout, String format) {
+        FW = weight;
+        TIMEOUT = timeout;
+        FORMAT = format;
+        timestamp = new SimpleDateFormat(FORMAT).format(System.currentTimeMillis());
     }
 
     public String getTimestamp() {
@@ -25,12 +26,12 @@ public class Ticket {
         return FW;
     }
 
-    public Boolean isValid() throws ParseException {
-        Date currentTimestamp = new Date();
-
-        // Calcola la differenza in millisecondi tra i due timestamp
-        long difference = currentTimestamp.getTime() - new SimpleDateFormat(FORMAT).parse(timestamp).getTime();
-
-        return  (difference <= 5000);
+    public Boolean isValid() {
+        try {
+            long difference = new Date().getTime() - new SimpleDateFormat(FORMAT).parse(timestamp).getTime();
+            return  (difference <= TIMEOUT);
+        } catch (ParseException e) {
+            return false;
+        }
     }
 }
