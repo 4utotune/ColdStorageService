@@ -19,20 +19,23 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
 			
-				var MaxWeightcoldroom: Float = 100.0f
-				var CurrentWeight: Float = 0.0f
-				var RejectedRequests: Int = 0
-				var WorkingTicket: coldstorageservice.Ticket? = null
-				var Tickets: MutableSet<coldstorageservice.Ticket> = mutableSetOf()
+				val MaxWeightcoldroom = 100.0f
+				val TicketTimeout = 20000
+				val TicketFormat = "yyyyMMddHHmmss"; // yyyy.MM.dd.HH.mm.ss
+				
+				var ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
+				
+				var CurrentWeight = 0.0f
+				var ReservedWeight = 0.0f
+				var RejectedRequests = 0 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						 
-									MaxWeightcoldroom = 100f
+									ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
 									CurrentWeight = 0.0f 
+									ReservedWeight = 0.0f
 									RejectedRequests = 0
-									WorkingTicket = null
-									Tickets = mutableSetOf()
 						CommUtils.outgreen("$name | init")
 						//genTimer( actor, state )
 					}
@@ -43,32 +46,32 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("idle") { //this:State
 					action { //it:State
-						CommUtils.outgreen("$name | idle")
+						CommUtils.outgreen("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t06",targetState="handle_store",cond=whenRequest("storerequest"))
-					transition(edgeName="t07",targetState="handle_ticket",cond=whenRequest("insertticket"))
-					transition(edgeName="t08",targetState="handle_ticketloop",cond=whenRequest("chargedeposited"))
-					transition(edgeName="t09",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
+					 transition(edgeName="t017",targetState="handle_store",cond=whenRequest("storerequest"))
+					transition(edgeName="t018",targetState="handle_ticket",cond=whenRequest("insertticket"))
+					transition(edgeName="t019",targetState="handle_deposited",cond=whenRequest("chargedeposited"))
+					transition(edgeName="t020",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
 				}	 
 				state("handle_store") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("storerequest(FW)"), Term.createTerm("storerequest(FW)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								CommUtils.outgreen("$name Received store request for ${payloadArg(0)} kg")
+								CommUtils.outgreen("$name | Received store request for ${payloadArg(0)} kg")
 								 val FW = payloadArg(0).toFloat()  
-								if(  ((CurrentWeight + FW) > MaxWeightcoldroom)  
+								if(  ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom)  
 								 ){ RejectedRequests++  
-								answer("storerequest", "storerejected", "storerejected(_)"   )  
+								answer("storerequest", "storerejected", "storerejected(full)"   )  
 								}
 								else
 								 {
-								 					val TICKET = coldstorageservice.Ticket(FW)
-								 				  	Tickets.add(TICKET)
-								 				  	val Timestamp = TICKET.getTimestamp()
+								 					val TICKET = ticketManager.newTicket(FW)
+								 				  	ReservedWeight += FW
+								 				  	val Timestamp = TICKET.timestamp
 								 answer("storerequest", "storeaccepted", "storeaccepted($Timestamp)"   )  
 								 }
 						}
@@ -85,20 +88,35 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 
 												val Received = payloadArg(0).toString()
-												val TICKET = Tickets.find { it.getTimestamp() == Received }
-								CommUtils.outgreen("$name | Handling ticket $Received")
+												val TICKET = ticketManager.getTicket(Received)
 								if(  (TICKET != null && TICKET.isValid)  
-								 ){ 
-													WorkingTicket = TICKET 				
-								answer("insertticket", "ticketaccepted", "ticketaccepted(_)"   )  
-								forward("gotoindoor", "gotoindoor(_)" ,"transporttrolley" ) 
+								 ){if(  (ticketManager.isWaiting)  
+								 ){answer("insertticket", "ticketrejected", "ticketrejected(queuefull)"   )  
 								}
 								else
-								 { 
-								 					if (TICKET != null) {
-								 						Tickets.remove(TICKET) 
-								 				   	}
-								 answer("insertticket", "ticketrejected", "ticketrejected(_)"   )  
+								 {if(  (!ticketManager.isWorking)  
+								  ){CommUtils.outgreen("$name | Approved ticket [ $Received ]. Requesting charge")
+								 forward("gotoindoor", "gotoindoor(_)" ,"transporttrolley" ) 
+								 }
+								 else
+								  {CommUtils.outgreen("$name | Approved ticket [ $Received ]. Currenty working on [ ${ticketManager.working} ]. Please wait")
+								  }
+								   ticketManager.setWaiting(Received)  
+								 answer("insertticket", "ticketaccepted", "ticketaccepted(_)"   )  
+								 }
+								}
+								else
+								 {if( (TICKET != null) 
+								  ){
+								 						ticketManager.remove(TICKET)
+								 						ReservedWeight -= TICKET.weight
+								 CommUtils.outgreen("$name | Rejected ticket [ $Received ] - timedout")
+								 answer("insertticket", "ticketrejected", "ticketrejected(timedout)"   )  
+								 }
+								 else
+								  {CommUtils.outgreen("$name | Rejected ticket [ $Received ] - doesn't exist")
+								  answer("insertticket", "ticketrejected", "ticketrejected(invalid)"   )  
+								  }
 								 }
 						}
 						//genTimer( actor, state )
@@ -110,10 +128,10 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("handle_charge_taken") { //this:State
 					action { //it:State
-						 
-									val Timestamp = WorkingTicket!!.getTimestamp()
-						CommUtils.outgreen("$name | Forwarding charge taken for ticket $Timestamp")
-						forward("chargetaken", "chargetaken(_)" ,"testserviceaccessgui" ) 
+						 			
+									val Timestamp = ticketManager.waitingNowWorking()
+						CommUtils.outgreen("$name | Charge taken for ticket [ $Timestamp ]")
+						forward("chargetaken", "chargetaken(_)" ,"accessguimock" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -121,17 +139,24 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					}	 	 
 					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
-				state("handle_ticketloop") { //this:State
+				state("handle_deposited") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("chargedeposited(_)"), Term.createTerm("chargedeposited(_)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								CommUtils.outgreen("$name | Deposit confirmation received")
 								
-												if (WorkingTicket!=null){
-													CurrentWeight += WorkingTicket!!.getWeight()
-												}	
-												WorkingTicket = null
-								answer("chargedeposited", "gohome", "gohome(_)"   )  
+												if (ticketManager.isWorking) {
+													CurrentWeight += ticketManager.workingTicket().weight
+													ReservedWeight -= ticketManager.workingTicket().weight
+												}
+												ticketManager.stopWorking()
+								CommUtils.outgreen("$name | Deposit confirmation received")
+								if(  (ticketManager.isWaiting)  
+								 ){CommUtils.outgreen("$name | Next ticket: [ ${ticketManager.waiting} ]")
+								answer("chargedeposited", "more", "more(_)"   )  
+								}
+								else
+								 {answer("chargedeposited", "gohome", "gohome(_)"   )  
+								 }
 						}
 						//genTimer( actor, state )
 					}
