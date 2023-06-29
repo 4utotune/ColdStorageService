@@ -56,8 +56,9 @@ Dispatch	next_test			:	next_test(_)
 
 
 // Context ctx_mockgui		ip [host="localhost" port=11800]
+Context ctx_basicrobot 	ip [host="127.0.0.1" port=8020]
 Context ctx_coldstorage ip [host="localhost" port=11802]
-Context ctx_basicrobot 	ip [host="127.0.0.1" port=8020 ]
+
 // Context ctx_trolley 	ip [host="localhost" port=11801] 
 
 
