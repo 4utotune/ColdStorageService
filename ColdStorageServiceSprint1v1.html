@@ -361,6 +361,12 @@
                 ma non dovrebbe nemmeno fare giri particolarmente inefficienti. Quindi come conclusione vi è un minimo
                 di tolleranza nei suoi spostamenti.</li>
         </ul>
+        <h5>Chiarimenti con il committente</h5>
+        Al committente piace questa gestione dei Ticket? <br>
+        Problematica: <br>
+        Se un conducente errando inesrisce il Ticket di un altro conducente, il sistema non è in grado di riconoscere l'errore e, supponendo che i due conducenti trasportino un peso diverso, verrà conseguentemente visualizzato un peso errato della Cold Room. <br>
+        Possibile Soluzione: <br>
+        Il conducente oltre ad inserire il Ticket, inserisce anche un secondo valore, come ad esempio il peso del carico che sta trasportando.
         <h5>Sistema</h5>
         Lo Sprint1 prevede l'interazione tra due componenti principali: <b>ColdStorageService</b> e <b>Transport
             Trolley</b>. <br>
@@ -631,10 +637,10 @@
             Robot verrà respinta</div>
 
         <h5>Inserimento Ticket</h5>
-        In quanto analisti, abbiamo anche pensato allo scenario nel quale un conducente inserisca un Ticket errato, ovvero 
+        Nello scenario in cui un conducente inserisce un Ticket errato, ovvero quando
         durante l'inserimento del Ticket, il conducente, effttuando un errore di battitura, carica un Ticket inesatto. In questo caso, il sistema 
         respinge la richiesta del conducente il quale dovrà abbandonare l'INDOOR.
-        <div class="remark keypoint">Il sistema non fornisce alcuna indicazione al conducente sul motivo per cui la
+        <div class="remark keypoint">Il sistema fornisce indicazioni al conducente sul motivo per cui la
             richiesta è stata respinta
         </div>
 
