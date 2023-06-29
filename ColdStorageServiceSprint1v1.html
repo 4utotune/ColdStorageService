@@ -832,38 +832,45 @@
         Questa classe rappresenta il Ticket stesso, si occupa dunque di mantenere il Timestamp di creazione del Ticket (corrispondente ad un ID univoco) e il Timeout che rappresenta dopo quanto tempo il Ticket deve scadere.<br>
         In questa maniera, il tempo di scadenza del Ticket non solo risulta personalizzabile da parte del Committente, bensì è anche possibile esprimere diverse scadenze per Ticket diversi. Questa classe oltre ai metodi Setter e Getter, tipici dei POJO, presenta anche una funzione <b>isValid</b> che restituisce un booleano che indica se il Ticket è scaduto o meno, ovvero se la differenza tra il Timestamp attuale e quello generato al momento di creazione del Ticket 
         è maggiore o minore del tempo di scadenza.<br>
-        <div class="piccolo">
-            <img src="./sprint0.coldstorageservice/Ticket.png" alt="Ticket">
-        </div>
         Occorre utilizzare un SimpleDateFormat per la gestione del Timestamp, in particolare per la conversione da String a Date e viceversa.<br>
-        <div class="piccolo">
-            <img src="./Ticket.png" alt="TicketSimpleDateFormat">
-        </div>
-        
+        <center>
+            <div class="piccolo">
+                <img src="./Ticket.png" alt="TicketSimpleDateFormat">
+            </div>
+        </center>
         <h6>UML Ticket</h6>
-        <div class="piccolo">
-            <img src="./tickuml.png" alt="TicketUML">
-        </div>
-
+        <center>
+            <div class="piccolo">
+                <img src="./tickuml.png" alt="TicketUML">
+            </div>
+        </center>
         <h5>TicketManager.java</h5>
         Il TicketManager è la classe che gestisce i Ticket, e viene qui implementata come Singleton.
         Il TicketManager viene dunque istanziato all'interno della ColdStorageService, che è dunque l'unica che ha accesso ai Ticket.<br>
         Il TicketManager si occupa quindi di gestire i Ticket in base ai messaggi che riceve dalla ServiceAccessGUI, in particolare si occupa di creare i Ticket, di verificare la loro validità e di eliminarli una volta scaduti.<br>
         Per fare ciò il TicketManager contiene una lista di Ticket, che viene aggiornata in base ai messaggi ricevuti.<br>
-        <div class="piccolo">
-            <img src="./Ticketmanager_list.png" alt="TicketManager">
-        </div>
+        <center>
+            <div class="piccolo">
+                <img src="./Ticketmanager_list.png" alt="TicketManager">
+            </div>
+        </center>
+        
         Per implementare la logica espressa nel Keypoint 3, ovvero il passaggio dei Ticket da Waiting a Working, vengono dichiarate due variabili private waiting e working di tipo String. Queste variabili mantengono i timestamp del biglietto in attesa e del biglietto in lavorazione rispettivamente. <br>
         Viene inoltre definito il metodo waitingNowWorking, che utilizza i metodi: isWorking, isWaiting, stopWorking e stopWaiting, per gestire la transizione del biglietto in attesa a quello in lavorazione. <br>
         Una volta gestito il Ticket, questo viene eliminato dalla lista dei Ticket. <br>
-        <div class="piccolo">
-            <img src="./TicketManager_waiwork.png" alt="TicketManager2">
-        </div>
-
+        <center>
+            <div class="piccolo">
+                <img src="./TicketManager_waiwork.png" alt="TicketManager2">
+            </div>
+        </center>
+        
         <h6>UML TicketManager</h6>
-        <div class="piccolo">
-            <img src="./tmuml.png" alt="TicketUML">
-        </div>
+        <center>
+            <div class="piccolo">
+                <img src="./tmuml.png" alt="TicketUML">
+            </div>
+        </center>
+        
         <!-- 
         <h2>Testing</h2>
 
