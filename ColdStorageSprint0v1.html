@@ -719,7 +719,7 @@
             </div>
         </center>
         Si evince dunque che tutti i componenti evidenziati comunicano tra loro in maniera bidirezionale, all'infuori
-        della ServiceStatusGUI che si limita a ricevere informazioni dal sistema.
+        della <b>ServiceStatusGUI</b> che si limita a ricevere informazioni dal sistema.
         <h5>Interazioni</h5>
         Partendo dal testo del <a href="http://calendar.altervista.org/TemaFinale23.pdf"
             target="_blank">TemaFinale23</a> mostriamo graficamente le interazioni tra i componenti del sistema, in modo
@@ -737,8 +737,8 @@
                     </center>
                 </li>
                 -->
-            <li>Viene effettuato dal conducente del Fridge Truck una richiesta di store utilizzando la
-                ServiceAccessGUI.<br>
+            <li>Viene effettuato dal conducente del <b>Fridge Truck</b> una richiesta di store utilizzando la
+                <b>ServiceAccessGUI</b>.<br>
                 <center>
                     <div class="piccolo">
                         <img src="./momento2.png" alt="momento2">
@@ -746,8 +746,8 @@
                 </center>
             </li>
 
-            <li>Quando il conducente del Fridge Truck arriva all'INDOOR, inserisce il Ticket ed innesca le azioni di
-                carico e scarico della merce presente nel Fridge Truck.<br>
+            <li>Quando il conducente del <b>Fridge Truck</b> arriva all'<b>INDOOR</b>, inserisce il <b>Ticket</b> ed innesca le azioni di
+                carico e scarico della merce presente nel <b>Fridge Truck</b>.<br>
                 <div id="mio">
                 </div>
                 <center>
@@ -756,7 +756,7 @@
                     </div>
                 </center>
             </li>
-            <li>Il Service-manager utilizza la ServiceStatusGUI per monitorare il sistema.<br>
+            <li>Il <b>Service-manager</b> utilizza la <b>ServiceStatusGUI</b> per monitorare il sistema.<br>
                 <center>
                     <div class="piccolo">
                         <img src="./momento4.png" alt="momento4">
@@ -768,42 +768,43 @@
         <h5>Analisi Interazioni</h5>
         <ol>
             <li>Possiamo considerare come <b>Momento 0</b> (non mostrato nella sezione precedente) quello che coincide
-                con <b>l'avvio del sistema</b>, durante il quale la ColdStorageService comunicherà alla
-                ServiceAccessGUI lo stato della Cold Room. Ciò è necessario
-                poichè all'avvio la Cold Room potrebbe non essere necessariamente totalmente vuota. <br>
+                con <b>l'avvio del sistema</b>, durante il quale la <b>ColdStorageService</b> comunicherà alla
+                <b>ServiceAccessGUI</b> lo stato della <b>Cold Room</b>. Ciò è necessario
+                poichè all'avvio la <b>Cold Room</b> potrebbe non essere necessariamente totalmente vuota. <br>
                 La comunicazione tra i due componenti potrebbe essere vista come <b>un'interazione tra due attori</b>, e
                 dunque o tramite <b>Dispatch</b>,
-                emanato dalla ColdStorageService alla ServiceAccessGUI, oppure tramite una <b>Request-Reply</b>, inviato
-                dalla ServiceAccessGUI al ColdStorageService.
+                emanato dalla <b>ColdStorageService</b> alla <b>ServiceAccessGUI</b>, oppure tramite una <b>Request-Reply</b>, inviato
+                dalla <b>ServiceAccessGUI</b> al <b>ColdStorageService</b>.
             </li>
-            <li>Il <b>Momento 1</b> prevede la richiesta di store da parte del Fridge truck. <br>La ServiceAccessGUI in
+            <li>Il <b>Momento 1</b> prevede la richiesta di store da parte del <b>Fridge truck</b>. <br>La <b>ServiceAccessGUI</b> in
                 quanto GUI occorre utilizzarla principalmente
-                come componente Reattivo, ovvero in grado di reagire ai comandi inviati dal Fridge Truck o dalla
-                ColdStorageService. <br>
+                come componente Reattivo, ovvero in grado di reagire ai comandi inviati dal <b>Fridge Truck</b> o dalla
+                <b>ColdStorageService</b>. <br>
                 Si decide dunque che l'invio dello stato della Cold Room e la verifica della disponibilità di spazio
                 venga
-                effettuata dalla ColdStorageService.
+                effettuata dalla <b>ColdStorageService</b>.
             </li>
             <li>
-                Il <b>Momento 2</b> prevede che il Fridge Truck arrivi all'INDOOR e inserisca il Ticket. <br>
-                La ServiceAccessGUI continua ad essere modellata come un componente reattivo che si limita a mettere in
+                Il <b>Momento 2</b> prevede che il <b>Fridge Truck</b> arrivi all'<b>INDOOR</b> e inserisca il <b>Ticket</b>. <br>
+                La <b>ServiceAccessGUI</b> continua ad essere modellata come un componente reattivo che si limita a mettere in
                 comunicazione
-                il Fridge Truck con la ColdStorageService. La logica di gestione del Ticket viene dunque gestita dalla
-                ColdStorageService, il quale si occupa di verificarne la correttezza e la validità.
-                La ColdStorageService si occuperà inoltre di inoltrare il messaggio "charge taken", proveniente dal
-                Transport Trolley, al Fridge Truck, in modo da consentire a quest'ultimo di lasciare l'INDOOR. <br>
-                Per aggiornare la ServiceAccessGUI sullo stato della Cold Room, la ColdStorageService invierà un
-                messaggio di update (<a href="#mio">messaggio 8 dell'immagine</a>) alla ServiceAccessGUI.
+                il <b>Fridge Truck</b> con la <b>ColdStorageService</b>. La logica di gestione del <b>Ticket</b> viene dunque gestita dalla
+                <b>ColdStorageService</b>, il quale si occupa di verificarne la correttezza e la validità.
+                La <b>ColdStorageService</b> si occuperà inoltre di inoltrare il messaggio "charge taken", proveniente dal
+                <b>Transport Trolley</b>, al <b>Fridge Truck</b>, in modo da consentire a quest'ultimo di lasciare l'<b>INDOOR</b>. <br>
+                Per aggiornare la <b>ServiceAccessGUI</b> sullo stato della Cold Room, la ColdStorageService invierà un
+                messaggio di update (<a href="#mio">messaggio 8 dell'immagine</a>) alla <b>ServiceAccessGUI</b>.
             </li>
             <li>
-                Il <b>Momento 3</b> prevende che il Service-manager utilizzi la ServiceStatusGUI per monitorare il
+                Il <b>Momento 3</b> prevende che il <b>Service-manager</b> utilizzi la <b>ServiceStatusGUI</b> per monitorare il
                 sistema. <br> Se si decide di modellare la
-                ServiceStatusGUI come un componente Reattivo, che si limiti a ricevere informazioni dal sistema, è
+                <b>ServiceStatusGUI</b> come un componente Reattivo, che si limiti a ricevere informazioni dal sistema, è
                 necessario utilizzare o un <b>pattern
                     Observer</b>, che agisca ad ogni cambiamento di stato, oppure un
-                <b>pattern Dispatch</b> in modo da consentire al sistema di notificare la ServiceStatusGUI di
+                <b>pattern Dispatch</b> in modo da consentire al sistema di notificare la <b>ServiceStatusGUI</b> di
                 ogni cambiamento di stato. <br>
-                Un'altra opzione può essere un periodico polling delle informazioni tramite <b>Request-Reply</b>, in modo da consentire alla ServiceStatusGUI di richiedere direttamente lo stato del sistema.
+                Un'altra opzione può essere un periodico polling delle informazioni tramite <b>Request-Reply</b>, in
+                modo da consentire alla <b>ServiceStatusGUI</b> di richiedere direttamente lo stato del sistema.
             </li>
         </ol>
         <h5>Attori</h5>
@@ -948,21 +949,62 @@
             </ol>
         </div>
         <h2>Test plans</h2>
-        I test prevedono che il sistema riceva diverse richieste dal conducente del Fridge Truck tramite la
-        ServiceAccessGUI.
+        I test prevedono che il sistema riceva diverse richieste dal conducente del <b>Fridge Truck</b> tramite la
+        <b>ServiceAccessGUI</b>.
         I test mirano a mostrare e verificare come il sistema reagisce quando riceve le richieste di store in
         diverse situazioni:
         <ul>
-            <li>Store request con Cold Room piena       -> StoreRejected</li>
-            <li>Store request con Cold Room non piena   -> StoreAccepted</li>
-            <li>Invio Ticket inesistente                -> TicketNotOK</li>
-            <li>Invio Ticket con TICKETTIME scaduto     -> TicketNotOK</li>
-            <li>Invio Ticket con TICKETTIME non scaduto -> TicketOK</li>
+            <li>Store request con <b>Cold Room</b> piena -> StoreRejected</li>
+            <li>Store request con <b>Cold Room</b> non piena -> StoreAccepted</li>
+            <li>Invio <b>Ticket</b> inesistente -> TicketNotOK</li>
+            <li>Invio <b>Ticket</b> con <b>TICKETTIME</b> scaduto -> TicketNotOK</li>
+            <li>Invio <b>Ticket</b> con <b>TICKETTIME</b> non scaduto -> TicketOK</li>
         </ul>
-        Per il primo prototipo scegliamo di modellare i Ticket come semplici oggetti Java (POJO) che mantengono come
+        Per il primo prototipo scegliamo di modellare i <b>Ticket</b> come semplici oggetti Java (POJO) che mantengono come
         informazioni solo il peso richiesto e un identificativo univoco nella forma di una sequenza di numeri
         corrispondenti al timestamp di richiesta dello stesso. Il Ticket non verrà considerato valido se un certo numero
         di secondi è passato dalla sua creazione.
+
+
+        <h2>Conclusioni</h2>
+
+
+        <h4>Struttura</h4>
+        Considerando la struttura appena effettuata è possibile suddividere il progetto (in ordine di priorità)
+        nella maniera seguente:
+        <ul>
+            <li><b>Core-Business</b>: include le funzionalità base del sistema e raggruppa dunque il
+                ColdStorageService e il Transport Trolley</li>
+            <li><b>ServiceAccessGUI</b>: aggiunge al sistema le funzionalità di richiesta di store e di inserimento
+                di un Ticket, consentendo al Fridge Truck di interagire con il sistema</li>
+            <li><b>Warning e Alarm Devices</b>: include le funzionalità di mostrare tramite un Led lo stato del
+                Transport Trolley e la possibilità di fermare il Transport Trolley tramite il Sonar</li>
+            <li><b>ServiceStatusGUI</b>: consente al Service-manager di monitorare l'intero sistema</li>
+        </ul>
+
+        <h4>Piano di lavoro</h4>
+        Si sono potuti delineare gli sprint necessari per realizzare l'applicazione finale, suddivisi nella seguente
+        maniera:
+        <ol>
+            <li><b>Sprint 1: </b>(requisiti <b>1, 2</b>) Core-Business</li>
+            <li><b>Sprint 2:</b> (requisito <b>3</b>) ServiceAccessGUI</li>
+            <li><b>Sprint 3: </b>(<b>Alarm Requirements</b>) Warning e Alarm Devices</li>
+            <li><b>Sprint 4: </b>(requisito <b>4</b>) ServiceStatusGUI.</li>
+        </ol>
+
+        <h4>Requisiti Sprint 1</h4>
+        Si possono definire in seguito i requisiti relativi allo Sprint1:
+        <ol>
+            <li>Identificare ed analizzare tutti i problemi relativi ai requisiti che coinvolgono
+                <b>ColdStorageService</b> e <b>Transport Trolley</b>
+            </li>
+            <li>Formulare un modello del sistema composto dal <b>ColdStorageService</b> e dal <b>Transport
+                    Trolley</b> e quindi fornire un'architettura logica del sistema</li>
+            <li>Realizzare ai fini di test un simulatore in grado di interfacciarsi con il sistema</li>
+            <li>Testare il sistema</li>
+        </ol>
+
+
 
         <!-- 
         <h2>Project</h2>
