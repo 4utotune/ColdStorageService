@@ -49,7 +49,9 @@ class Test_suite ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name,
 					}))
 					transition(edgeName="t4",targetState="test5",cond=whenDispatchGuarded("next_test",{ Current == 5  
 					}))
-					transition(edgeName="t5",targetState="reset",cond=whenDispatch("next_test"))
+					transition(edgeName="t5",targetState="test6",cond=whenDispatchGuarded("next_test",{ Current == 6  
+					}))
+					transition(edgeName="t6",targetState="reset",cond=whenDispatch("next_test"))
 				}	 
 				state("reset") { //this:State
 					action { //it:State
@@ -73,7 +75,7 @@ class Test_suite ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name,
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t06",targetState="test1_b",cond=whenDispatch("test_gotticket"))
+					 transition(edgeName="t07",targetState="test1_b",cond=whenDispatch("test_gotticket"))
 				}	 
 				state("test1_b") { //this:State
 					action { //it:State
@@ -107,7 +109,7 @@ class Test_suite ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name,
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="firstticket7",targetState="test2_b",cond=whenDispatch("test_gotticket"))
+					 transition(edgeName="firstticket8",targetState="test2_b",cond=whenDispatch("test_gotticket"))
 				}	 
 				state("test2_b") { //this:State
 					action { //it:State
@@ -122,7 +124,7 @@ class Test_suite ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name,
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="secondticket8",targetState="test2_c",cond=whenDispatch("test_gotticket"))
+					 transition(edgeName="secondticket9",targetState="test2_c",cond=whenDispatch("test_gotticket"))
 				}	 
 				state("test2_c") { //this:State
 					action { //it:State
@@ -173,7 +175,7 @@ class Test_suite ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name,
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t19",targetState="test5_b",cond=whenDispatch("test_gotticket"))
+					 transition(edgeName="t110",targetState="test5_b",cond=whenDispatch("test_gotticket"))
 				}	 
 				state("test5_b") { //this:State
 					action { //it:State
@@ -184,6 +186,18 @@ class Test_suite ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name,
 								delay(2000) 
 								forward("next_test", "next_test(_)" ,"test_suite" ) 
 						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
+				}	 
+				state("test6") { //this:State
+					action { //it:State
+						CommUtils.outblack("$name | Test 6 - Requesting store exceeding DDR capacity")
+						forward("mock_store_request", "mock_store_request(60)" ,"accessguimock" ) 
+						delay(2000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

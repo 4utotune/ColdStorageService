@@ -39,9 +39,9 @@ class Accessguimock ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t010",targetState="handle_mock_store_request",cond=whenDispatch("mock_store_request"))
-					transition(edgeName="t011",targetState="handle_mock_ticket_input",cond=whenDispatch("mock_ticket_input"))
-					transition(edgeName="t012",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
+					 transition(edgeName="t011",targetState="handle_mock_store_request",cond=whenDispatch("mock_store_request"))
+					transition(edgeName="t012",targetState="handle_mock_ticket_input",cond=whenDispatch("mock_ticket_input"))
+					transition(edgeName="t013",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
 				}	 
 				state("handle_mock_store_request") { //this:State
 					action { //it:State
@@ -55,8 +55,8 @@ class Accessguimock ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t13",targetState="handle_store_accepted",cond=whenReply("storeaccepted"))
-					transition(edgeName="t14",targetState="handle_store_rejected",cond=whenReply("storerejected"))
+					 transition(edgeName="t14",targetState="handle_store_accepted",cond=whenReply("storeaccepted"))
+					transition(edgeName="t15",targetState="handle_store_rejected",cond=whenReply("storerejected"))
 				}	 
 				state("handle_store_accepted") { //this:State
 					action { //it:State
@@ -99,8 +99,8 @@ class Accessguimock ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t15",targetState="handle_ticket_accepted",cond=whenReply("ticketaccepted"))
-					transition(edgeName="t16",targetState="handle_ticket_rejected",cond=whenReply("ticketrejected"))
+					 transition(edgeName="t16",targetState="handle_ticket_accepted",cond=whenReply("ticketaccepted"))
+					transition(edgeName="t17",targetState="handle_ticket_rejected",cond=whenReply("ticketrejected"))
 				}	 
 				state("handle_ticket_accepted") { //this:State
 					action { //it:State

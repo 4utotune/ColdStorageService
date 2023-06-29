@@ -19,6 +19,7 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
 			
+				val MaxWeightDDR = 50.0f
 				val MaxWeightcoldroom = 100.0f
 				val TicketTimeout = 20000
 				val TicketFormat = "yyyyMMddHHmmss"; // yyyy.MM.dd.HH.mm.ss
@@ -52,10 +53,10 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t017",targetState="handle_store",cond=whenRequest("storerequest"))
-					transition(edgeName="t018",targetState="handle_ticket",cond=whenRequest("insertticket"))
-					transition(edgeName="t019",targetState="handle_deposited",cond=whenRequest("chargedeposited"))
-					transition(edgeName="t020",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
+					 transition(edgeName="t018",targetState="handle_store",cond=whenRequest("storerequest"))
+					transition(edgeName="t019",targetState="handle_ticket",cond=whenRequest("insertticket"))
+					transition(edgeName="t020",targetState="handle_deposited",cond=whenRequest("chargedeposited"))
+					transition(edgeName="t021",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
 				}	 
 				state("handle_store") { //this:State
 					action { //it:State
@@ -63,16 +64,22 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								CommUtils.outgreen("$name | Received store request for ${payloadArg(0)} kg")
 								 val FW = payloadArg(0).toFloat()  
-								if(  ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom)  
+								if(  (FW > MaxWeightDDR)  
 								 ){ RejectedRequests++  
-								answer("storerequest", "storerejected", "storerejected(full)"   )  
+								answer("storerequest", "storerejected", "storerejected(tooheavy)"   )  
 								}
 								else
-								 {
-								 					val TICKET = ticketManager.newTicket(FW)
-								 				  	ReservedWeight += FW
-								 				  	val Timestamp = TICKET.timestamp
-								 answer("storerequest", "storeaccepted", "storeaccepted($Timestamp)"   )  
+								 {if(  ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom)  
+								  ){ RejectedRequests++  
+								 answer("storerequest", "storerejected", "storerejected(full)"   )  
+								 }
+								 else
+								  {
+								  						val TICKET = ticketManager.newTicket(FW)
+								  					  	ReservedWeight += FW
+								  					  	val Timestamp = TICKET.timestamp
+								  answer("storerequest", "storeaccepted", "storeaccepted($Timestamp)"   )  
+								  }
 								 }
 						}
 						//genTimer( actor, state )

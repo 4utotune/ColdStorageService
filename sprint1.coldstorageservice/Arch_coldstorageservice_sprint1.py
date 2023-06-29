@@ -19,13 +19,13 @@ eventedgeattr = {
 with Diagram('coldstorageservice_sprint1Arch', show=False, outformat='png', graph_attr=graphattr) as diag:
   with Cluster('env'):
      sys = Custom('','./qakicons/system.png')
+     with Cluster('ctx_basicrobot', graph_attr=nodeattr):
+          basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      with Cluster('ctx_coldstorage', graph_attr=nodeattr):
           test_suite=Custom('test_suite','./qakicons/symActorSmall.png')
           accessguimock=Custom('accessguimock','./qakicons/symActorSmall.png')
           coldstorageservice=Custom('coldstorageservice','./qakicons/symActorSmall.png')
           transporttrolley=Custom('transporttrolley','./qakicons/symActorSmall.png')
-     with Cluster('ctx_basicrobot', graph_attr=nodeattr):
-          basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      test_suite >> Edge(color='blue', style='solid', xlabel='next_test', fontcolor='blue') >> test_suite
      test_suite >> Edge(color='blue', style='solid', xlabel='mock_store_request', fontcolor='blue') >> accessguimock
      test_suite >> Edge(color='blue', style='solid', xlabel='mock_ticket_input', fontcolor='blue') >> accessguimock

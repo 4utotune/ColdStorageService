@@ -40,7 +40,6 @@ Reply 		gohome				: 	gohome(_)
 Dispatch 	gotoindoor			: 	gotoindoor(_)
 
 // PER MOCK:
-// serviceAccessGUI <-> coldstorageservice
 Request 	storerequest		: 	storerequest(FW)
 Reply		storeaccepted		:	storeaccepted(TICKET)
 Reply		storerejected		: 	storerejected(_)
@@ -58,7 +57,6 @@ Dispatch	next_test			:	next_test(_)
 // Context ctx_mockgui		ip [host="localhost" port=11800]
 Context ctx_basicrobot 	ip [host="127.0.0.1" port=8020]
 Context ctx_coldstorage ip [host="localhost" port=11802]
-
 // Context ctx_trolley 	ip [host="localhost" port=11801] 
 
 
@@ -81,6 +79,7 @@ QActor test_suite context ctx_coldstorage {
 					whenMsg next_test and [# Current == 3 #] -> test3
 					whenMsg next_test and [# Current == 4 #] -> test4
 					whenMsg next_test and [# Current == 5 #] -> test5
+					whenMsg next_test and [# Current == 6 #] -> test6
 					whenMsg next_test -> reset 
 					
 	State reset {
@@ -164,6 +163,13 @@ QActor test_suite context ctx_coldstorage {
 		}
 	}
 	Goto idle
+	
+	State test6 {
+		println("$name | Test 6 - Requesting store exceeding DDR capacity")
+		forward accessguimock -m mock_store_request: mock_store_request(60)
+		delay 2000
+	}
+	Goto idle
 }
 
 
@@ -243,6 +249,7 @@ QActor accessguimock context ctx_coldstorage {
 
 QActor coldstorageservice context ctx_coldstorage {
 	[#	
+		val MaxWeightDDR = 50.0f
 		val MaxWeightcoldroom = 100.0f
 		val TicketTimeout = 20000
 		val TicketFormat = "yyyyMMddHHmmss"; // yyyy.MM.dd.HH.mm.ss
@@ -276,16 +283,22 @@ QActor coldstorageservice context ctx_coldstorage {
 		onMsg(storerequest: storerequest(FW)) {
 			println("$name | Received store request for ${payloadArg(0)} kg") color green
 			[# val FW = payloadArg(0).toFloat() #]
-			if [# ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom) #] {
+			
+			if [# (FW > MaxWeightDDR) #] {
 				[# RejectedRequests++ #]
-				replyTo storerequest with storerejected: storerejected(full)
+				replyTo storerequest with storerejected: storerejected(tooheavy)
 			} else {
-				[#
-					val TICKET = ticketManager.newTicket(FW)
-				  	ReservedWeight += FW
-				  	val Timestamp = TICKET.timestamp
-				#]
-				replyTo storerequest with storeaccepted: storeaccepted($Timestamp)
+				if [# ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom) #] {
+					[# RejectedRequests++ #]
+					replyTo storerequest with storerejected: storerejected(full)
+				} else {
+					[#
+						val TICKET = ticketManager.newTicket(FW)
+					  	ReservedWeight += FW
+					  	val Timestamp = TICKET.timestamp
+					#]
+					replyTo storerequest with storeaccepted: storeaccepted($Timestamp)
+				}	
 			}
 		}
 	}
@@ -423,7 +436,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	State trolleyathome {
 		discardMsg On
 		println("$name | trolley at HOME") color magenta
-		forward basicrobot -m setdirection : dir(down) //request?
+		forward basicrobot -m setdirection : dir(down)
 		delay 500
 		
 		forward test_suite -m next_test: next_test(_)

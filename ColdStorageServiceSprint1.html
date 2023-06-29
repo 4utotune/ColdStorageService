@@ -1,304 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <!--
-<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
 <script type="text/javascript" src="../css/issStyle.js"></script>
 -->
-<style type="text/css">
-    body {
-        margin-left: 30px;
-        margin-right: 30px;
 
-
-        counter-reset: css-counter 0;
-    }
-
-    .keypoint {
-        counter-increment: css-counter 1;
-    }
-
-    .keypoint:before {
-        content: "Keypoint-" counter(css-counter)" ";
-        /* font-style: italic; */
-        font-weight: bold;
-    }
-
-    ;
-
-    P {
-        font-family: Tahoma;
-        font-size: 10pt;
-    }
-
-    ;
-
-    a,
-    a:visited,
-    a:active,
-    a:link,
-    a:hover {
-        text-decoration: underline;
-        color: #545454;
-        background-color: transparent;
-        font-size: 93%;
-    }
-
-    a:hover {
-        background-color: #cccccc;
-    }
-
-
-    hr {
-        clear: both;
-        height: 1px;
-        color: #242424;
-        background-color: transparent;
-    }
-
-    h1,
-    h2,
-    h3 {
-        color: #242424;
-        clear: left;
-        font: 100% Tahoma, Helvetica, Arial, sans-serif;
-        margin-bottom: 0.5em;
-        padding-top: 0.5em;
-        border-radius: 10px;
-        padding: 5px;
-    }
-
-    top {
-        width: 100%;
-    }
-
-
-    #i {
-        color: #ff1010;
-    }
-
-    tt {
-        font-family: "Arial";
-        font-size: 90%;
-        color: #006600;
-    }
-
-    em {
-        font-family: "Arial";
-        font-size: 80%;
-        font-weight: bold;
-        border-style: solid;
-        border-color: #abe876;
-        color: #1632cc;
-    }
-
-    bc {
-        font-family: "Arial";
-        font-size: 90%;
-        font-weight: bold;
-        color: #990000;
-    }
-
-    ks {
-        font-family: "Arial";
-        font-weight: bold;
-        color: #0000CD;
-        font-size: 90%;
-    }
-
-    kc {
-        font-family: "Arial";
-        font-weight: bold;
-        color: #008000;
-        font-size: 90%;
-    }
-
-    pre {
-        font-family: "Consolas";
-        font-size: 85%;
-        background-color: #f5f5f5;
-        border: 1.5px solid silver;
-        padding: 5px;
-    }
-
-    m {
-        font-family: "Helvetica";
-        line-height: 100%;
-        font-size: 75%;
-    }
-
-    div.body {
-
-        font-size: 18px;
-    }
-
-    k {
-        color: #990000;
-        font-weight: bold;
-        font-size: 90%;
-    }
-
-    h1 {
-        font-size: 150%;
-        background-color: #b2c0ff;
-        padding: 10px;
-    }
-
-    h2 {
-        background-color: #9ed8ff;
-        font-size: 130%;
-    }
-
-    h3 {
-        background-color: #e6ccff;
-        font-size: 100%;
-    }
-
-    h4 {
-        background-color: #ccffcc;
-        font-size: 100%;
-        width: 95%;
-        border-radius: 5px;
-        padding: 2px;
-    }
-
-    h5 {
-        background-color: #d5ffb0;
-        font-size: 100%;
-
-    }
-
-    div.req {
-        background-color: #d9ffb3;
-        font-size: 18px;
-        width: 700px;
-        border: 3px solid green;
-        padding: 15px;
-        margin: 10px;
-    }
-
-    div.remark {
-        background-color: #E3F2FD;
-        border: 1.5px solid #d5f2ed;
-        padding: 15px;
-        margin: 10px;
-        border-radius: 25px;
-    }
-
-    table {
-        width: 90%;
-    }
-
-    table,
-    th,
-    td {
-        border: 1px solid black;
-        border-collapse: collapse;
-    }
-
-    ol,
-    ul,
-    li {
-        margin: 0;
-        margin-left: 10px;
-        padding: 0;
-        padding-bottom: 5px;
-    }
-
-    table,
-    th,
-    td {
-        border: 1px solid black;
-    }
-
-    img {
-        border: 1.5px solid #d5f2ed
-    }
-
-    a,
-    a:visited,
-    a:active,
-    a:link,
-    a:hover {
-        text-decoration: underline;
-        color: #545454;
-        background-color: transparent;
-    }
-
-    div.wrapdesc {
-        width: 90%;
-        margin: auto;
-    }
-
-    div.imagedesc {
-        width: 85%;
-        margin: auto;
-    }
-
-    .piccolo {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 40%;
-    }
-
-    .piccola {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 50%;
-        height: auto;
-    }
-
-    .piccola img {
-        border-radius: 20px;
-        max-width: 100%;
-        max-height: 100%;
-    }
-
-    .piccolo img {
-        border-radius: 20px;
-        max-width: 100%;
-        max-height: 100%;
-    }
-
-    .foto {
-        margin: 0px;
-        padding: 0px;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        width: 100%;
-        object-fit: fill;
-    }
-
-    .foto img {
-        border-radius: 20px;
-        max-width: 100%;
-        height: 8em;
-    }
-
-    #myTable tbody tr:nth-child(odd) {
-        background-color: lightgray;
-    }
-    #myTable td:first-child {
-        background-color: rgb(81, 145, 233);
-    }
-    #myTable td:nth-child(-n+4) {
-         text-align: center;
-         font-weight: bold;
-    }
-    #myTable1 tbody tr:nth-child(odd) {
-        background-color: lightgray;
-    }
-    #myTable1 td:first-child {
-        background-color: rgb(81, 145, 233);
-    }
-    #myTable1 td:first-child {
-         text-align: center;
-         font-weight: bold;
-    }
-
-</style>
+<link rel="stylesheet" type="text/css" href="./sprintstyle.css">
 
 <head>
     <title>Sprint1TKB</title>
@@ -316,11 +22,10 @@
     <div class="body">
 
         <h2>Introduction</h2>
-        Lo <b>Sprint1</b> si impegna ad analizzare il core business identificato dallo Sprint0, ovvero la gestione del
-        trasporto dei carichi dalla <b>INDOOR</b> alla <b>PORT</b>. <br>
-        A tal fine i macro-componenti <b>ColdStorageService</b> e <b>Transport Trolley</b> vanno approfonditi
-        identificando punti critici
-        e valutando i costi di eventuali soluzioni.
+        Lo <b>Sprint1</b> si impegna ad analizzare il core-business delineato dallo Sprint0, ovvero la gestione delle
+        richieste e il trasporto dei carichi dalla INDOOR alla PORT. Queste funzionalità sono espresse dai
+        macro-componenti <b>ColdStorageService</b> e <b>Transport Trolley</b>, che saranno approfonditi in questo
+        Sprint identificando punti critici e valutando i costi di eventuali soluzioni.
 
         <h2>Requirements</h2>
 
@@ -330,394 +35,160 @@
 
             <bc>Goals dello Sprint1</bc>:
             <ol>
-                <li>Identificare ed analizzare tutti i problemi relativi ai requisiti che coinvolgono
+                <li>Identificare ed analizzare i problemi relativi ai requisiti che coinvolgono
                     <b>ColdStorageService</b> e <b>Transport Trolley</b>
                 </li>
-                <li>Formulare un modello di interazione dei componenti individuati e quindi fornire un'architettura
-                    logica</li>
-                <li>Realizzare un simulatore della <b>ServiceAccessGUI</b> ai fini di test</li> 
-                <li>Pianificazione del lavoro</li>
-                <li>Realizzare i componenti software <b>ColdStorageService</b> e <b>Transport Trolley</b></li>
-                <li>Testare i componenti software realizzati</li>
-                <li>Sviluppare un prototipo su base non distribuita</li>
+                <li>Formulare un modello del sistema composto dal <b>ColdStorageService</b> e dal <b>Transport
+                        Trolley</b> e quindi fornire un'architettura logica del sistema</li>
+                <li>Realizzare ai fini di test un simulatore in grado di interfacciarsi con il sistema</li>
+                <li>Testare il sistema</li>
             </ol>
 
         </div>
 
         <h2>Requirement analysis</h2>
-
-        <h5>Chiarimenti del committente</h5>
+        <h4>Chiarimenti del committente</h4>
         L'interazione con il committente ha permesso di chiarire alcuni aspetti del progetto:
         <ul>
-            <li>Qualora un <b>Fridge Truck </b> di scaricare un carico superiore alla portata massima
-                del <b>Transport Trolley</b> per il momento si adotta la politica di rifiutare a priori tale richiesta.<br>
-                Il committente richiede tuttavia un'analisi dei costi relativa allo scenario in cui il <b>Transport Trolley</b>
-                accetti carichi che superano la sua capacità massima di carico, obbligandolo così ad effettuare più giri 
+            <li>Qualora un <b>Fridge Truck </b> debba scaricare un carico superiore alla portata massima
+                del <b>Transport Trolley</b>, per il momento si adotta la politica di rifiutare a priori tale
+                richiesta.<br>
+                Il committente richiede tuttavia un'analisi dei costi relativa allo scenario in cui il <b>Transport
+                    Trolley</b>
+                accetti carichi che superano la sua capacità massima di carico, obbligandolo così ad effettuare più giri
                 per soddisfare la richiesta di store.
             </li>
-            <li>Quando il <b>Transport Trolley</b> ha completato tutte le richieste al momento presenti nel sistema torna alla
+            <li>Quando il <b>Transport Trolley</b> ha completato tutte le richieste al momento presenti nel sistema
+                torna alla
                 <b>HOME</b>.
-                Se durante il tragitto dalla <b>ColdRoom</b> alla <b>HOME</b> si presenta una nuova richiesta di carico/scarico il
+                Se durante il tragitto dalla <b>ColdRoom</b> alla <b>HOME</b> si presenta una nuova richiesta di azione
+                di carico e scarico il
                 <b>Transport Trolley</b>
-                deve avere l'accortezza di direzionarsi direttamente alla <b>INDOOR</b>, senza quindi passare prima dalla <b>HOME</b>.
+                deve avere l'accortezza di direzionarsi direttamente alla <b>INDOOR</b>, senza quindi passare prima
+                dalla <b>HOME</b>.
             </li>
             <li>Il <b>Transport Trolley</b> per raggiungere una determinata posizione della <b>Service Area</b> non deve
                 per forza percorrere sempre la strada ottimale,
                 ma non dovrebbe nemmeno fare giri particolarmente inefficienti. Quindi come conclusione vi è un minimo
                 di tolleranza nei suoi spostamenti.</li>
         </ul>
-        <h3>Dizionario</h3>
-        <h5>NOMI:</h5>
-        <table>
-            <thead>
-                <tr>
-                    <th>Termini</th>
-                    <th>Descrizioni</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>ColdStorageService</td>
-                    <td>Il ColdStorageService è un Sistema Distribuito e corrisponde all'entità del sistema che coordina
-                        il comportamento degli altri componenti implementando la business-logic dell'applicazione.
-                        Definisce il prodotto finale che soddisfa tutti i requisiti forniti dal committente.</td>
-                </tr>
-                <tr>
-                    <td>Service area</td>
-                    <td>Superficie piatta, rettangolare, con ostacoli fissi e circoscritta da 4 pareti. Definisce la
-                        zona di manovra del <u>Transport Trolley</u> ed è inoltre composta da:<ol>
-                            <li>una <u>Cold Room</u></li>
-                            <li>una <u>INDOOR</u></li>
-                            <li>una <u>HOME</u></li>
-                        </ol>
-                        Per ostacoli si intendono oggetti che limitano l'area percorribile dal <u>Transport Trolley</u>.
-                    </td>
-                </tr>
-                <tr>
-                    <td>Ostacolo</td>
-                    <td>Un ostacolo è un oggetto che limita l'area percorribile dal <u>Transport Trolley</u></td>
-                </tr>
-                <tr>
-                    <td>INDOOR</td>
-                    <td>Posizione identificata su una parete della <u>Service Area</u> adibita allo scambio di alimenti
-                        dal
-                        <u>Fridge Truck</u> al
-                        <u>Transport Trolley</u>.
-                    </td>
-                </tr>
-                <tr>
-                    <td>PORT</td>
-                    <td>Posizione della <u>Service Area</u> identificata su una faccia della ColdRoom utilizzata per
-                        scaricare gli alimenti dal
-                        <u>Transport Trolley</u>.
-                    </td>
-                </tr>
-                <tr>
-                    <td>HOME</td>
-                    <td>Posizione identificata sul pavimento della <u>Service Area</u> che identifica la zona dove il
-                        robot
-                        risiede alla partenza o in attesa di nuove richieste.</td>
-                </tr>
-                <tr>
-                    <td>Transport Trolley</td>
-                    <td>Un robot virtuale a forma di quadrato, con lato di lunghezza <u>RD</u>, che è inizialmente
-                        posizionato nella sua posizione <u>HOME</u> e svolge un'<u>azione di deposito</u>. Può muoversi
-                        in avanti, indietro, fermarsi e ruotare di 90°.
-                        Il <u>Transport Trolley</u> è un <b>attuatore di comando</b>: può utilizzare il <u>robot DDR</u>
-                        per eseguire azioni in un ambiente reale.</td>
-                </tr>
-                <tr>
-                    <td>RD</td>
-                    <td>Lunghezza di ogni lato del <u>Transport Trolley</u>.</td>
-                </tr>
-                <tr>
-                    <td>Alimenti</td>
-                    <td>Contenuto del carico che il <u>Transport Trolley</u> gestisce.</td>
-                </tr>
-                <tr>
-                    <td>ColdRoom</td>
-                    <td>Una stanza o un ambiente appositamente progettato e controllato termicamente per conservare e
-                        mantenere la temperatura dei prodotti alimentari a bassa temperatura. Costituisce la
-                        destinazione del materiale ritirato dal <u>Transport Trolley</u> al punto di <u>INDOOR</u>.</td>
-                </tr>
-                <tr>
-                    <td>MAXW</td>
-                    <td>Quantità massima di alimenti espressa in Kg che la <u>Cold Room</u> è in grado di immagazzinare.
-                    </td>
-                </tr>
-                <tr>
-                    <td>DDR robot</td>
-                    <td>Differential Drive Robot (DDR), robot fisico fornito dal committente. È in grado di muoversi
-                        all'interno della <u>Service Area</u>
-                        grazie al software BasicRobot, anch'esso fornito dal committente.</td>
-                </tr>
-                <tr>
-                    <td>Azione di deposito</td>
-                    <td>Sequenza di azioni del <u>Transport Trolley</u> che vengono eseguite ogni volta che un <u>Fridge
-                            Truck</u> è
-                        pronto per scaricare il carico:
-                        <ol>
-                            <li>Raccogliere il carico dal <u>Fridge Truck</u> situato nella <u>INDOOR</u></li>
-                            <li>Andare dalla INDOOR alla <u>PORT</u> della <u>Cold Room</u></li>
-                            <li>Depositate il carico nella <u>Cold Room</u></li>
-                        </ol>
-                    </td>
-                </tr>
-                <tr>
-                    <td>FW</td>
-                    <td>Peso del carico espresso in Kg.</td>
-                </tr>
-                <tr>
-                    <td>Carico</td>
-                    <td>Quantità in kg di <u>alimenti</u> che viene depositato dal <u>Fridge Truck</u> presso
-                        l'<u>INDOOR</u>.</td>
-                </tr>
-                <tr>
-                    <td> ServiceAccessGUI </td>
-                    <td>Interfaccia grafica utilizzata dai conducenti del <u>Fridge Truck</u> per interagire con il
-                        <u>ColdStorageService</u> al fine
-                        di scaricare il carico.
-                    </td>
-                </tr>
-                <tr>
-                    <td>Ticket</td>
-                    <td>Identificatore univoco della richiesta del conducente del <u>Fridge Truck</u> al
-                        <u>ColdStorageService</u> per consentire lo scarico del
-                        carico.
-                    </td>
-                </tr>
-                <tr>
-                    <td>TICKETTIME</td>
-                    <td>Tempo di validità del <u>Ticket</u>, espresso in secondi.</td>
-                </tr>
-                <tr>
-                    <td>Stato della Service Area</td>
-                    <td>Informazioni sul sistema ad un preciso istante di tempo, che includono:
-                        <ul>
-                            <li>La posizione corrente del <u>Transport Trolley</u> ed il suo <u>Stato</u></li>
-                            <li>Il peso corrente immagazzinato dalla <u>Cold Room</u></li>
-                            <li>Il numero di richieste respinte dall'avvio del servizio</li>
-                        </ul>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Stato del Transport Trolley</td>
-                    <td>Informazione riguardante l'azione svolta dal <u>Transport Trolley</u>, visibile anche grazie al
-                        <u>Led</u>. Può essere:
-                        <ul>
-                            <li>OFF: quando il <u>Transport Trolley</u> è in <u>HOME</u>.</li>
-                            <li>Blinking: quando il <u>Transport Trolley</u> si sta muovendo.</li>
-                            <li>ON: quando il <u>Transport Trolley</u> è fermo.</li>
-                        </ul>
-                    </td>
-                </tr>
-                <tr>
-                    <td>DLIMT</td>
-                    <td>Distanza limite misurata dal <u>Sonar</u>. È usata per fermare il <u>Transport Trolley</u>.</td>
-                </tr>
-                <tr>
-                    <td>MINT</td>
-                    <td>Tempo espresso in millisecondi che identifica l'intervallo minimo che può intercorrere tra due
-                        stop consecutivi del <u>Transport Trolley</u>.</td>
-                </tr>
-                <tr>
-                    <td>Posizioni speciali</td>
-                    <td>Posizioni sulla <u>Service Area</u> che identificano: la <u>INDOOR</u>,la <u>HOME</u> e la
-                        <u>PORT</u>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <br>
-        <h5>VERBI:</h5>
-        <table>
-            <tbody>
-                <tr>
-                    <th>Soggetto</th>
-                    <th>Termine</th>
-                    <th>Descrizione</th>
-                </tr>
-                <tr>
-                    <td rowspan="6">Transport Trolley</td>
-                    <td>Essere pronto</td>
-                    <td>Il <b>Transport Trolley</b> è in condizioni di servire una nuova operazione di scarico.</td>
-                </tr>
-                <tr>
-                    <td>Essere in movimento</td>
-                    <td>Il <b>Transport Trolley</b> si sta muovendo all'interno della Service Area, si considera in
-                        movimento anche quando è fermo ma sta svolgendo una azione. Durante questa fase devono essere
-                        soddisfatti gli <b>Alarm requirements.</b></td>
-                </tr>
-                <tr>
-                    <td>Terminare l'azione di scarico</td>
-                    <td>Il <b>Transport Trolley</b> ha completato una azione di scarico ed è pronto per gestire una
-                        nuova richiesta se presente, altrimenti ritorna in HOME.</td>
-                </tr>
-                <tr>
-                    <td>Raccogliere il carico</td>
-                    <td>Il <b>Transport Trolley</b> si trova in <b>INDOOR</b> e prende il <b>carico</b> impiegandoci il
-                        tempo necessario ed avendo cura di non superare la sua capacità massima di trasporto.</td>
-                </tr>
-                <tr>
-                    <td>Depositare il carico</td>
-                    <td>Il <b>Transport Trolley</b> si trova in <b>PORT</b> della <b>Cold Room</b> e scarica il
-                        <b>carico</b> impiegandoci il tempo necessario.
-                    </td>
-                </tr>
-                <tr>
-                    <td>Fare un'azione di carico-scarico</td>
-                    <td>Il task effettuato dal <b>Transport Trolley</b> consiste di 3 azioni:
-                        <ol>
-                            <li><b>Raccogliere il carico</b> dall'INDOOR</li>
-                            <li>Recarsi alla <b>Cold Room</b></li>
-                            <li>Depositare il <b>carico</b></li>
-                        </ol>
-                    </td>
-                </tr>
-                <tr>
-                    <td rowspan="3">ColdStorageService</td>
-                    <td>Avviare il sistema</td>
-                    <td>Viene avviato il software del sistema ed il <b>Transport Trolley</b> risulta posizionato in
-                        <b>HOME</b>.
-                    </td>
-                </tr>
-                <tr>
-                    <td>Inviare una risposta di storage</td>
-                    <td>Azione che si verifica quando il sistema riceve una richiesta di storage. Il
-                        <b>ColdStorageService</b>
-                        risponde con una risposta che può essere:
-                        <ul>
-                            <li>Positiva: se la <b>Cold Room</b> ha abbastanza spazio per immagazzinare il carico del
-                                <b>Fridge Truck</b>
-                                , in questo caso viene emesso un <b>Ticket</b>
-                            </li>
-                            <li>Negativa: se la <b>Cold Room</b> non ha abbastanza spazio per immagazzinare il carico
-                                del
-                                <b>Fridge Truck</b>, in questo caso non viene emesso alcun <b>Ticket</b>
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Invio charge taken</td>
-                    <td>Il sistema comunica al conducente del <b>Fridge Truck</b> che il carico è stato correttamente
-                        ritirato.
-                    </td>
-                </tr>
-                <tr>
-                    <td rowspan="2">ServiceAccessGUI</td>
-                    <td>Inviare una richiesta di storage</td>
-                    <td>Il conducente del Fridge Truck si avvicina all'area <b>INDOOR</b> del servizio e chiede al
-                        sistema
-                        <b>ColdStorageService</b> (tramite un dispositivo intelligente) se può depositare un carico di
-                        <b>FW</b>
-                        kg.
-                    </td>
-                </tr>
-                <tr>
-                    <td>Inviare il Ticket</td>
-                    <td>Il conducente del <b>Fridge Truck</b> invia il proprio <b>Ticket</b> al sistema.</td>
-                </tr>
-            </tbody>
-        </table>
-        <h5>Service Area</h5>
+        <h4>Chiarimenti con il committente</h4>
+        <ul>
+            <li>
+                I Ticket sono al momento rappresentati da una sequenza di numeri corrispondenti al "timestamp" della
+                richiesta di store.<br>
+                Un problema sorge da questa scelta di rappresentazione: è semplice, univoco ma anche ambiguo. Un Truck
+                driver potrebbe inserire un Ticket che non gli appartiene, per sbaglio o intenzionalmente, e il sistema
+                non sarebbe in grado di accorgersi dell'errore. Ciò potrebbe anche portare, nel caso in cui un Truck
+                acceda con un
+                Ticket non suo e un peso diverso da quello richiesto, a un errore di conteggio del peso interno alla
+                ColdRoom. <br>
+                Una possibile soluzione è che il conducente oltre a inserire il Ticket includa un secondo valore, come
+                ad esempio il peso del carico che trasporta o un proprio identificativo che utilizzerà sia per la
+                richiesta di store che una volta giunto alla INDOOR.<br>
+                Il Servizio può dare per scontato che ogni Truck adopererà solo il proprio Ticket o il committente
+                richiede che in un futuro Sprint venga effettuata una ulteriore analisi del problema e dei costi delle
+                possibili soluzioni?
+            </li>
+        </ul>
+        <h4>Sistema</h4>
+        Lo Sprint1 prevede l'interazione tra due componenti principali: <b>ColdStorageService</b> e <b>Transport
+            Trolley</b>. <br>
+        Ai fini di test includiamo nelle interazioni anche il componente di test MockServiceAccessGUI, che rappresenta
+        in questo Sprint un
+        componente proattivo che fungerà da simulatore, mentre la vera GUI del servizio verrà analizzata e introdotta
+        nello Sprint successivo, lo Sprint2. <br>
+
+        <center>
+            <img src="./sprint1/ServiceArea232.jpg" alt="sistema">
+        </center>
+        <h3>Analisi</h3>
+        Dai requisiti espressi nel <a target="_blank" href="http://calendar.altervista.org/TemaFinale23.pdf">Tema
+            Finale</a> e dall'analisi
+        già effettuata nello Sprint0, in questo Sprint occorre analizzare le entità:
+        <ul>
+            <li><b>ColdStorageService</b>, che si occupa di gestire le richieste di store e i movimenti del Transport
+                Trolley</li>
+            <li><b>Transport Trolley</b>, che gestisce le richieste del ColdStorageService ed invia comandi di più basso
+                livello al BasicRobot23</li>
+            <li><b>BasicRobot23</b>, entità che riceve comandi dal Transport Trolley e guida il DDR-Robot</li>
+        </ul>
+        <h4>Service Area (Requisito 1)</h4>
         Data la descrizione della stanza e l'immagine fornita dal committente, si è deciso di modellare la Service Area
         come un rettangolo, circoscritto da 4 mura,
         contentente due ostacoli fissi di cui uno è la Cold Room. <br>
         <center>
-            <img src="./ServiceArea23.jpg" alt="service area"><br>
+            <img src="./sprint1/ServiceArea23.jpg" alt="service area"><br>
         </center>
-        All'avvio il Transport Trolley si trova in posizione Home, ovvero sopra l'area Home. Il Transport Trolley è da
-        considerarsi
-        "at INDOOR" o "at Cold Room" quando si trova rispettivamente vicino al muro INDOOR o alla porta della Cold Room.
-        <h5>Sistema</h5>
-        Dall'analisi effettuata nello Sprint0 ci possiamo soffermare sui seguenti componenti:
+        La stanza, la cui mappa è fornita dal committente, presenta 4 zone rilevanti:
         <ul>
-            <li>DDR Robot</li>
-            <li>ColdStorageService</li>
-        </ul> <br>
-        <center>
-            <div class="piccolo">
-                <img src="./systemSprint1.jpg" alt="system">
-            </div>
-        </center>
-        <h2>Analisi del Problema</h2>
-        L'esplorazione del core-business del servizio porta all'analisi dei due macro componenti,
-        <b>TransportTrolley</b> e <b>ColdStorageService</b>, a cui corrispondono indipendenti discussione dei problemi
-        ed osservazioni.
-        <h3>Transport Trolley</h3>
-        <ul>
-            <li>Il committente mette a disposizione il <a href='BasicRobot23.html'>BasicRobot23</a> che permette di
-                astrarre la gestione del <b>DDR-robot</b>,
-                presentanodosi come componente software che esegue comandi di spostamento di un DDR-robot in
-                'modo indipendente dalla tecnologia' con cui è
-                realizzato del robot (virtuale o reale).<br>
-                Questo componente ci torna molto utile perché ci permette di comandare il robot tramite coordinate, un
-                comando evoluto rispetto ai classici comandi come: vai avanti,
-                vai indietro, gira a destra di 90° e gira a sinistra di 90°(<a
-                    href='BasicRobot23.html#basicrobot23-le-funzioni'>qui</a> la raccolta di tutti i comandi
-                utilizzabili sul BasicRobot23)<br>
-            </li>
-            <li>Il <b>BasicRobot23</b> ci obbliga a descrivere la <b>Service Area</b> come una griglia di coordinate, il
-                che però non rappresenta alcun problema perché
-                è compatibile con il nostro progetto. Infatti in seguito si riporta l'immagine descrittiva della
-                <b>Service Area</b> adottando una griglia numerata avente
-                origine nell'angolo in alto a sinistra, scelto per comodità in quanto coincide con la <b>HOME</b>, e
-                lato di ogni cella pari alla dimensione <b>RD</b> del <b>Transport Trolley</b>:<br><br>
-                <center>
-                    <img src="./ServiceArea23Griglia.jpg" alt="service area"><br>
-                </center>
-                <br>
-                Siccome la mappa del nostro progetto coincide con quella de <b>BasicRobot23</b>(<a
-                    href='BasicRobot23.html#uso-del-planner'>link</a>) la mappatura della
-                stanza la conosciamo a priori. In particolare vengono evidenziate quelle che sono le posizioni
-                speciali(<b>HOME,PORT,INDOOR</b>). Per la <b>HOME</b> si è scelto
-                la cella nell'origine, mentre <b>PORT</b> ed <b>INDOOR</b> le celle adiacenti alla porzione di parete
-                che le definiscono.<u>[Sollevo un problema:la griglia combacia
-                esattamente con la mappa? oppure ci sono degli scarti?? Siccome le celle hanno dimensione del robot(ma
-                la dimensione combacia con il BasicRobot23?)]</u><br>
-                Anche se alcuni ostacoli non coincidono esattamente di dimensioni alla cella corrispondente,quindi sono
-                di dimensioni inferiori, è conveniente dedicare l'intera
-                cella a tale ostacolo per rimanere coerenti con il modello di mappatura della <b>Service Area</b>.
-                Questo è un compromesso più che valido ai nostro scopi perché
-                il robot non ha requisiti di precisione stringenti.
-            </li>
-            <li>Il <b>Planner</b> offerto da <b>BasicRobot23</b> offre le
-                funzionalità  di posizionarsi in un punto della <b>Service Area</b> considerando anche gli ostacoli. Quindi nel caso 
-                si specifichi una destinazione in coordinate che corrispondono ad un ostacolo la richiesta verrà immediatamente
-                rifiutata, altrimenti il percorso viene calcolato evitando di collidere con ostacoli.</li>
-            <li>Siccome le posizioni speciali <b>PORT</b> ed <b>INDOOR</b> sono più ampie di una cella, per considerare
-                valido il punto di scarico o carico sarà sufficiente
-                posizionare il <b>Transport Trolley</b> in una qualsiasi delle celle che identificano tale posizione
-                speciale. Siccome però siamo noi a specificare in quali
-                coordinate posizionare il <b>Transport Trolley</b> bisogna capire in quale delle molteplici celle della
-                posizione speciale vogliamo che il <b>Transport Trolley</b>
-                si posizioni. Conoscendo già a priori i tragitti che il <b>Transport Trolley</b> può fare possiamo
-                decidere in base alla coppia partenza-destinazione
-                in quale delle celle valide mandare il robot:
-                <ul><br>
-                    <li><b>HOME-INDOOR</b> -> cella di destinazione: <b>(5,0)</b></li>
-                    <li><b>INDOOR-PORT</b> -> cella di destinazione: <b>(3,4)</b></li>
-                    <li><b>PORT-INDOOR</b> -> cella di destinazione: <b>(5,1)</b></li>
-                    <li><b>PORT-HOME</b> -> unica cella di destinazione possibile: <b>(0,0)</b></li>
-                    <li><b>???-INDOOR</b> -> se mentre sta arrivando in <b>HOME</b> viene richiesto al <b>Transport Trolley</b>
-                        di dirigersi immediatamente alla
-                        <b>INDOOR</b> la cella di destinazione sarà: <b>(5,1)</b>
-                    </li>
-                </ul>
-
+            <li><b>HOME</b>: area della stessa dimensione del Transport Trolley, in cui il TransportTrolley si trova
+                all'avvio del sistema</li>
+            <li><b>INDOOR</b>: zona lungo il perimetro, dove il TransportTrolley deve recarsi all'arrivo di un
+                ticket valido</li>
+            <li><b>PORT</b>: zona che identifica il punto di scambio tra il TransportTrolley e la ColdRoom. Per il robot
+                risulta un ostacolo, che andrà evitato durante il movimento.
             </li>
         </ul>
+        <h4>TransportTrolley e DDR-Robot (Requisito 2)</h4>
+        Il TransportTrolley e il DDR-Robot sono due entità distinte, ma che interagiscono tra loro, per effettuare le
+        operazioni di carico e scarico. <br> In particolare:
+        <ol>
+            <li>Carico della merce presso l'INDOOR</li>
+            <li>Trasporto della merce dall'INDOOR alla PORT</li>
+            <li>Scarico della merce presso la PORT</li>
+        </ol>
+        <h5>Note</h5>
+        Il committente ci fornisce:
+        <ul>
+            <li>La mappa della stanza</li>
+            <li>BasicRobot23</li>
+        </ul>
+        <h2>Analisi del Problema</h2>
+        L'esplorazione del core-business del servizio porta all'analisi dei due macro componenti,
+        <b>TransportTrolley</b> e <b>ColdStorageService</b>, a cui corrispondono indipendenti analisi dei problemi
+        ed osservazioni.
+        <h3>Transport Trolley</h3>
+        Il committente mette a disposizione il software <a href='BasicRobot23.html'>BasicRobot23</a>, che permette di
+        comandare un <b>DDR-robot</b> e introdurre il concetto di griglia con cui ci risulta possibile identificare la
+        posizione del TransportTrolley e degli ostacoli all'interno della mappa con un sistema a coordinate.
+        È fornito inoltre un Planner che individua il path che il DDR-Robot deve percorre per raggiungere una
+        determinata posizione (evitando gli
+        ostacoli) ed un Path Executor che esegue il path calcolato dal planner.<br>
+        (<a href='BasicRobot23.html#basicrobot23-le-funzioni'>Raccolta di tutti i comandi
+            utilizzabili sul BasicRobot23</a>)<br>
+
+        <br>
+        È dunque possibile rappresentare la mappa della stanza come una Matrice MxN, ovvero come una griglia di
+        coordinate.
+        <center>
+            <img src="./sprint1/ServiceArea23Griglia.jpg" alt="service area"><br>
+        </center>
+        <br>
+        È possibile identificare la posizione del TransportTrolley e degli ostacoli all'interno della mappa come segue:
+        <ul>
+            <li><b>HOME -> (0,0)</b></li>
+            <li><b>INDOOR -> (0,4)</b></li>
+            <li><b>PORT -> (4,3)</b></li>
+            <li><b>OSTACOLO -> (2,3)</b></li>
+        </ul>
+        Nel caso in cui il TransportTrolley, dopo aver scaricato la merce presso la Cold Room, si stia dirigendo verso
+        la Home e riceva una richiesta di store, dovrà, tramite il Planner, identificare la strada corretta per
+        raggiungere l'INDOOR. <br>
+        <div class="remark">Dopo una serie di test abbiamo concluso che allo stato delle cose questa funzionalità non
+            sia possibile: il
+            BasicRobot non permette interazioni mentre sta eseguendo un piano di movimento.</div>
 
         <h3>ColdStorageService</h3>
         Per quanto riguarda i meccanismi di gestione delle richieste in arrivo, le problematiche da affrontare sono
         principalmente tre.
-        <h5>1 - concomitanza di richieste da parte di Fridge Truck diversi</h5>
-        Il committente a seguito della review dello Sprint 0 ha confermato che i Ticket vengono inseriti dai Truck
-        Driver solo presso la zona Indoor.<br>
-        Ciò lascia comunque la questione di un eventuale inserimento di più Ticket da parte di più Driver nel caso in
-        cui si ammetta una coda di Truck. Si è deciso di non permettere questa opzione, e quindi a molteplici Truck di
-        inserire il proprio Ticket e mettersi "in
+        <h4>1 - Concomitanza di richieste da parte di Fridge Truck diversi</h4>
+        Il committente a seguito della review dello Sprint0 ha confermato che i Ticket vengono inseriti dai conducenti
+        dei Fridge Truck solo presso la zona Indoor.<br>
+        Ciò lascia comunque la questione di un eventuale inserimento di più Ticket da parte di più conducenti dei Fridge
+        Truck nel caso in
+        cui l'INDOOR presenti più postazioni e dunque più conducenti vengano serviti in contemporanea. Si è deciso di
+        non permettere questa opzione, e quindi i conducenti dei Truck devono mettersi "in
         coda" in attesa del proprio turno. Questo perchè:
         <ul>
             <li>il sistema è in grado di servire un carico per volta</li>
@@ -727,43 +198,39 @@
         </ul>
         <div class="remark keypoint">Il sistema non ammette una coda di Truck alla zona Indoor.</div>
 
-        Dopo che il Transport Trolley dà conferma al Fridge Truck tramite messaggio "charge taken" di aver preso in
+        Dopo che il Transport Trolley da conferma al Fridge Truck tramite messaggio "charge taken" di aver preso in
         carico la richiesta, si dirige verso la ColdRoom impiegando un certo tempo. Il Fridge Truck è allora libero di
         lasciare la zona INDOOR, e quindi il servizio potrebbe accettare un nuovo Ticket.<br>
-        Individuamo quindi due Ticket che in contemporanea ColdStorageService può gestire:<ul>
+        Individuiamo quindi due Ticket che in contemporanea ColdStorageService può gestire:<ul>
             <li>quello relativo al carico che il Transport Trolley sta trasportando -> WorkingTicket</li>
             <li>quello del Fridge Truck in attesa alla zona INDOOR -> WaitingTicket</li>
         </ul>
         <div class="remark keypoint">Il sistema può accettare un Ticket mentre il TransportTrolley sta ancora
             terminando la richiesta
-            del precedente. Il servizio perciò gestisce al massimo due Ticket contemporaneamente.</div>
+            del precedente. Il servizio perciò gestisce al massimo due Ticket contemporaneamente.
+        </div>
 
-        La sequenza di interazioni è quindi la seguente:<br>
-        Quando un Fridge Truck inserisce il proprio Ticket, nel caso il servizio dia conferma di validità, viene chiesto
-        al TransportTrolley di recarsi presso la zona carico. In questo caso diciamo che il Ticket è in attesa
-        (Waiting).<br>
-        Quando il Trolley da conferma di Charge Taken e si dirige verso la ColdRoom, il Ticket viene segnato
-        come in lavorazione (Working) e il Fridge Truck è libero di abbandonare la zona INDOOR.<br>
-        In questo momento un'altra richiesta di inserimento Ticket può essere gestita dal sistema. Questo
-        nuovo Ticket rimarrà in stato Waiting fino a che il TransportTrolley non avrà depositato il carico
-        corrente e richiesto al servizio se è presente un nuovo Ticket.
 
-        <div class="remark keypoint">Si può pensare che il TransportTrolley comandi indirettamente il passaggio dei
-            Ticket da Waiting a
-            Working, comunicando
-            a ColdStorageService quando ha preso il carico dal Truck e quando lo ha depositato nella ColdRoom.</div>
-
-        Esempio:
+        La sequenza di interazioni è quindi la seguente:
         <ol>
-            <li>Robot Idle -> Waiting null Working null</li>
-            <li>Truck in attesa arrivo Robot -> Waiting T1 Working null</li>
-            <li>Charge taken -> Waiting null Working T1</li>
-            <li>Nuovo Truck mentre Robot non ancora a Cold Room -> Waiting T2 Working T1</li>
-            <li>Robot deposita -> Waiting T2 Working null</li>
-            <li>Charge taken -> Waiting null Working T2</li>
+            <li>Quando un Fridge Truck inserisce il proprio Ticket, nel caso il servizio dia conferma di validità, viene
+                chiesto
+                al TransportTrolley di recarsi presso la zona carico. In questo caso diciamo che il Ticket è in attesa
+                (Waiting).</li>
+            <li>Quando il Trolley dà conferma di Charge Taken e si dirige verso la ColdRoom, il Ticket viene segnato
+                come in lavorazione (Working) e il Fridge Truck è libero di abbandonare la zona INDOOR.
+            </li>
+            <li>
+                In questo momento un'altra richiesta di inserimento Ticket può essere gestita dal sistema. Questo
+                nuovo Ticket rimarrà in stato Waiting fino a che il TransportTrolley non avrà depositato il carico
+                corrente e richiesto al servizio se è presente un nuovo Ticket.
+            </li>
         </ol>
+        <div class="remark keypoint">Si può pensare che il TransportTrolley comandi indirettamente il passaggio dei
+            Ticket da Waiting a Working, comunicando a ColdStorageService quando ha preso il carico dal Truck e quando
+            lo ha depositato nella ColdRoom.</div>
 
-        <h5>2 - gestione stato ColdRoom e richieste di storage</h5>
+        <h4>2 - gestione stato ColdRoom e richieste di storage</h4>
         Dato il tempo materiale di spostamento del carico da INDOOR a ColdRoom dovuto al movimento del
         TransportTrolley, e il grado di variabilità nel tempo tra richiesta di storage e inserimento del
         Ticket da parte dei Fridge Truck, serve una strategia per l'aggiornamento della capacità della ColdRoom
@@ -772,10 +239,10 @@
         presentarsi
         mai, oppure il Ticket stesso potrebbe scadere. Anche nel caso in cui la richiesta venga correttamente presa in
         carico,
-        potrebbe comunque verificarsi un problema al Transport Trolley.
+        potrebbe comunque verificarsi un malfunzionamento al Transport Trolley che gli impedisca di arrivare alla Cold
+        Room e dunque di terminare l'azione di carico e scarico.
         Il momento ideale per aggiornare il peso all'interno della ColdRoom è per ciò a termine di un deposito avvenuto
         con successo.
-
         <div class="remark keypoint">La quantità contenuta nella ColdRoom va aggiornata a deposito avvenuto.</div>
 
         Ciò però pone un altro problema: se un Truck richiede di scaricare un certo peso prima che vengano completate le
@@ -804,214 +271,215 @@
                 potrebbe influenzare l'accettazione dei <b>Fridge Truck</b> successivi.</div>
         </div>
 
-        Per il momento riteniamo che il modello scelto per i Ticket per il prototipo dello Sprint 0 sia adeguato.<br>
-        Il <b>ColdStorageService</b> può essere l'unico componente cosciente dei <b>Ticket</b>, quindi tutti quelli che
+        Il <b>ColdStorageService</b> deve essere l'unico componente cosciente dei <b>Ticket</b>, quindi tutti quelli che
         vogliono trarne delle informazioni devono riferirsi a lui.
 
         <div class="remark keypoint">I Ticket sono univocamente distinti da una sequenza di numeri pari al timestamp
             di quando la
-            richiesta è stata effettuata, e vengono gestiti unicamente da ColdStorageService.</div>
+            richiesta è stata effettuata, e vengono gestiti unicamente da ColdStorageService.
+        </div>
 
-        <h5>3 - comunicazione con TransportTrolley</h5>
+        Va gestito lo scenario in cui un conducente inserisca un Ticket errato, ovvero quando, magari per un errore di
+        battitura, carica un Ticket inesistente.
+        In questo caso, il sistema respinge la richiesta del conducente il quale dovrà abbandonare l'INDOOR. Il
+        conducente dovrà essere notificato che il motivo della mancata accettazione è per l'inesattezza del Ticket.
+        <div class="remark keypoint">Il sistema fornisce indicazioni al conducente sul motivo per cui la
+            richiesta è stata respinta
+        </div>
 
-        Essendo il <b>Transport Trolley</b> l'entità che si occupa di muovere il robot e che quindi è a
+        <h4>3 - comunicazione con TransportTrolley</h4>
+        Essendo il <b>Transport Trolley</b> l'entità che si occupa di muovere il DDR-Robot e che quindi è a
         conoscenza del metodo di rappresentazione a
-        coordinate della <b>Service Area</b> sarebbe bene che questa rappresentazione venga astratta al
-        <b>ColdStorageService</b>, che si occuperà solo
-        di gestire le richieste e comandare il <b>Transport Trolley</b> in modo molto di alto livello. Per
-        essere più chiari ci si aspetta che il <b>ColdStorageService</b>, senza esplicitare le coordinate,
-        sia in grado di comunicare al <b>Transport Trolley</b> di:
+        coordinate della <b>Service Area</b>, è consigliabile che la <b>ColdStorageService</b> gestisca solo le richieste ad
+        alto livello comandando il <b>Transport Trolley</b> tramite i comandi:
         <ul>
             <li>Andare in <b>INDOOR</b>, per soddifare la richiesta di un <b>Fridge Truck</b></li>
             <li>Andare in <b>HOME</b>, se non ci sono <b>Fridge Truck</b> da servire</li>
         </ul>
 
-        Si noti che <b>ColdStorageService</b> non possiede il comando <u>Andare in <b>PORT</b></u>. Questo è
-        dovuto al fatto che il <b>ColdStorageService</b> comunica al <b>Transport Trolley</b> che deve servire un
-        <b>Fridge Truck</b>, dando per scontato che i
-        viaggi saranno due:
+        Si noti che la <b>ColdStorageService</b> non possiede il comando <u>Andare in <b>PORT</b></u>. Questo è
+        dovuto al fatto che quando la <b>ColdStorageService</b> comunica al <b>Transport Trolley</b> che deve servire un
+        <b>Fridge Truck</b>, si sottintende che i viaggi saranno due:
         <ul>
             <li>Da dove si trova alla <b>INDOOR</b> per caricare gli alimenti</li>
             <li>Dalla <b>INDOOR</b> alla <b>PORT</b></li>
         </ul>
 
         <div class="remark keypoint">ColdStorageService ha una visione astratta della zona di movimento del Robot: ne
-            conosce solo i punti di interesse</div>
+            conosce solo i punti di interesse.
+        </div>
 
-        Ricordiamo che per il momento il committente vuole un servizio che rifiuti i <b>Fridge Truck</b> che richiedano
+        Ricordiamo che per il momento il committente desidera un servizio che rifiuti i <b>Fridge Truck</b> che
+        richiedano
         uno scarico di
         alimenti che supera la portata
-        massima del <b>Transport Trolley</b>. Quindi, quando il <b>ColdStorageService</b> ordina al <b>Transport
+        massima del <b>Transport Trolley</b>. Quindi, quando la <b>ColdStorageService</b> ordina al <b>Transport
             Trolley</b> di caricare/scaricare
-        un carico glielo ordina senza passarli alcun parametro, dato che nelle condizioni attuali dei requisiti non vi
-        sono informazioni utili che il <b>Transport Trolley</b>
-        potrebbe utilizzare durante il suo lavoro. Questo andrebbe contraddetto nel caso il sistema accettasse
+        un carico, lo effettua senza passarli alcun parametro. Questo andrebbe contraddetto nel caso il sistema
+        accettasse
         carichi da parte dei <b>Fridge truck</b> che
         superano la portata massima del robot, obbligandolo ad effettuare più giri per la medesima richiesta. In
-        questo caso infatti bisognerebbe avere
-        l'accortezza di comunicare al <b>Transport Trolley</b> il peso totale di carico da trasportare, in
-        maniera tale da essere in grado di partizionarlo su
-        più giri dalla <b>INDOOR</b> alla <b>HOME</b>. Il Committente ha richiesto una <u>analisi dei costi</u>
+        questo caso infatti bisognerebbe tenere conto del peso totale di carico da trasportare, in modo da riuscire ad
+        identificare il
+        numero di giri necessario per soddisfare la richiesta. Il Committente ha richiesto una <u>analisi dei costi</u>
         per valutare successivamente se supportare anche questa
         casistica.<br>
-        Analisi costi:
+        <h5>Analisi dei costi</h5>
         <ul>
-            <li>A livello di complessità di realizzazione il carico di lavoro sarebbe scaricato sul <b>Transport
-                    Trolley</b>, con una difficoltà media
-                nella sua implementazione</li>
-            <li>A livello di business significherebbe che meno <b>Fridge Truck</b> verrebero serviti in una
-                unità di tempo.<br>
-                Esempio pratico: se un <b>Fridge Truck</b> richiede 3 giri significa che dovrà fare 4 tratte in
-                più rispetto ad un carico singolo.<br>
-                Quindi se tutti i <b>Fridge Truck</b> portano allo stesso guadagno indipendentemente dal peso
-                del carico questa valutazione
-                di gestire carichi superiori alla capacità massima del <b>Transport Trolley</b> sarebbe da
-                evitare</li>
+            <li>Il sistema risulterebbe di maggiore complessità rispetto al modello creato.
+                Occorrerebbe infatti aggiungere
+                la logica riguardante il numero di giri che il Transport Trolley deve fare. Occorrerebbe anche valutare
+                se la decisione sul numero di giri da effettuare
+                debba essere di competenza della ColdStorageService o del TransportTrolley.
+            </li>
+            <li>
+                A livello prettamente economico il sistema potrebbe risultare meno redditizio, poichè il
+                TransportTrolley impiegherebbe più tempo per
+                soddisfare una richiesta, e quindi il numero di richieste soddisfatte in un'unità di tempo sarebbe
+                minore. Resta però da valutare con il committente se ciò non venga controbilanciato dall'impatto dato
+                dal respingere alcuni Truck.
+            </li>
+            <li>
+                Effettuando più giri occorrerebbe stimare la tempistica media di un giro del TransportTrolley, in modo
+                da poter valutare il tempo di attesa di un FridgeTruck e dunque riuscire
+                a fissare il Ticket Expiration Time in modo da far scadere il minor numero di Ticket possibile. Questo
+                andrebbe a complicare la logica di gestione dei Ticket.
+            </li>
         </ul>
         <div class="remark keypoint">Per il momento qualunque richiesta eccedente il peso massimo trasportabile dal DDR
             Robot verrà respinta</div>
 
-
-        <br><b>Ma la roba che segue siam sicuri sia interessante??</b><br>
-        <b>(secondo il kossovaro->Si perché se un conducente inserisce il ticket sbagliato e non si distinguono i due messaggi di errore 
-            potrebbe pensare che il suo ticket sia scaduto, anche se in realtà non lo è. Se nessuno gli fa notare che ha sbagliato ad inserire ticket
-             c'è il rischio che lui dia per scontato che sia stato inserito correttamente). Altro dubbio venuto sul momento: quando il conducnete riceve il ticket non sarebbe bene 
-            comunicargli anche il tempo di durata del biglietto?Oppure stamparlo sullaAccessGUI insieme al peso della coldroom. Forse/probabilmente queste domande sarebbero da 
-            fare al committente</b><br>
-        Se un conducente di un <b>Fridge Truck</b> inserisce erroneamente il <b>Ticket</b> sarebbe necessario
-        comunicare all'interessato che il <b>Ticket</b> inserito
-        non è corretto, distinguendo il messaggio di risposta <u>Ticket scaduto</u> da <u>Ticket inserito non
-            valido</u>(inteso come "Ticket inserito non corrisponde a nessun
-        Ticket presente nel servizio", quindi si deduce che il conducente abbia sbagliato durante l'inserimento)
-        all'inserimento del <b>Ticket</b>.<br>
-        
-
         <h3>Interazioni</h3>
-        
-            
-
-
         <table id="myTable">
-        <thead>
-            <tr>
-                <th>Messaggio</th>
-                <th>Mittente</th>
-                <th>Destinatario</th>
-                <th>Semantica messaggio</th>
-                <th>Descrizione</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>insertticket</td>
-                <td>ServiceAccessGUI</td>
-                <td>ColdStorageService</td>
-                <td>Request</td>
-                <td>Semantica Request perché all'inserimento del ticket il conducente del <b>Fridge Truck</b> deve sapere immediatamente 
-                    l'esito dell'inserimento. Conterrà il numero del ticket inserito.</td>
-            </tr>
-            <tr>
-                <td>replyinsertticket</td>
-                <td>ColdStorageService</td>
-                <td>ServiceAccessGUI</td>
-                <td>Reply</td>
-                <td>Reply alla <u>insertticket</u>, conterrà l'informazione della validità del <b>ticket</b> precedentemente inserito.</td>
-            </tr>
-            <tr>
-                <td>storerequest</td>
-                <td>ServiceAccessGUI</td>
-                <td>ColdStorageService</td>
-                <td>Request</td>
-                <td>Semantica Request perché il conducente del <b>Fridge Truck</b> vuole sapere immediatamente se c'è posto per il suo carico. 
-                    La richiesta conterrà il numero di Kg del carico da scaricare.</td>
-            </tr>
-            <tr>
-                <td>replystorerequest</td>
-                <td>ColdStorageService</td>
-                <td>ServiceAccessGUI</td>
-                <td>Reply</td>
-                <td>Reply alla <u>storerequest</u>, conterrà il numero del <b>ticket</b> nel caso il carico sia stato preso in considerazione, 
-                    altrimenti bisogna comunicare che la richiesta è stata rifiutata dal sistema.</td>
-            </tr>
-            <tr>
-                <td>chargedeposited</td>
-                <td>transporttrolley</td>
-                <td>ColdStorageService</td>
-                <td>Request</td>
-                <td>Semantica Request perchè quando il <b>Transport Trolley</b> comunica che ha scaricato il carico alla <b>ColdRoom</b>
-                     deve necessariamente sapere quale sarà la sua successiva mossa: se procedere alla <b>INDOOR</b> per soddifare un altro
-                      <b>Fridge Truck</b> oppure se andare in <b>HOME</b> perché non si sono rischieste sospese nel sistema.</td>
-            </tr>
-            <tr>
-                <td>replychargedeposited</td>
-                <td>ColdStorageService</td>
-                <td>transporttrolley</td>
-                <td>Reply</td>
-                <td>Reply alla <u>chargedeposited</u>, conterrà la prossima mossa del <b>Transport Trolley</b>: se andare alla <b>INDOOR</b> 
-                    per soddifare un altro <b>Fridge Truck</b> oppure se andare in <b>HOME</b> perché non si sono rischieste sospese nel sistema.</td>
-            </tr>
-            <tr>
-                <td>chargetaken</td>
-                <td>transporttrolley</td>
-                <td>ColdStorageService</td>
-                <td>Dispatch</td>
-                <td>Semantica Dispatch perché il <b>Transport Trolley</b> deve comunicare il fatto che abbia caricato il carico che in quel momento
-                     si trovava alla <b>INDOOR</b>, senza aspettarsi in cambio alcuna informazione.</td>
-            </tr>
-            <tr>
-                <td>chargetaken</td>
-                <td>ColdStorageService</td>
-                <td>ServiceAccessGUI</td>
-                <td>Dispatch</td>
-                <td>Il <b>ColdStorageService</b> propaga il messaggio <u>chargetaken</u> alla <b>ServiceAccessGUI</b> in modo tale da informare il
-                     conducente del <b>Fridge Truck</b> che il suo carico è stato preso dal <b>Transport Trolley</b> e che quindi se ne può andare.</td>
-            </tr>
-            <tr>
-                <td>gotoindoor</td>
-                <td>ColdStorageService</td>
-                <td>transporttrolley</td>
-                <td>Dispatch</td>
-                <td>Semantica Dispatch perché il <b>ColdStorageService</b> comunica al <b>Transport Trolley</b> di occuparsi di soddisfare il 
-                    <b>Fridge Truck</b>. Mentre il <b>Transport Trolley</b> lavora il <b>ColdStorageService</b> deve essere in grado di accettare
-                     le richieste che arrivano nel frattempo.</td>
-            </tr>
-            <tr>
-                <td>coldroomdata</td>
-                <td>ColdStorageService</td>
-                <td>ServiceAccessGUI</td>
-                <td>Dispatch</td>
-                <td>Semantica Dispatch perché il <b>ColdStorageService</b> comunica in maniera fire-and-forget alla <b>ServiceAccessGUI</b> il
-                     peso corrente della <b>ColdRoom</b> ogni volta che questo varia. Questo messaggio serve solo ad informare la <b>ServiceAccessGUI</b>
-                      del peso corrente della <b>ColdRoom</b>.</td>
-            </tr>
-
-            
-
-
-        </tbody>
-    </table>
-
-        <div class="remark">
-            Codice QAK per la modellazione del sistema: <a
-                href="./sprint0.coldstorageservice/src/ColdStorageService.qak"
-                target="_blank">ColdStorageService.qak</a>
-        </div>
-        
-        
-
-
-
+            <thead>
+                <tr>
+                    <th>Messaggio</th>
+                    <th>Mittente</th>
+                    <th>Destinatario</th>
+                    <th>Semantica messaggio</th>
+                    <th>Descrizione</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>insertticket</td>
+                    <td>ServiceAccessGUI</td>
+                    <td>ColdStorageService</td>
+                    <td>Request</td>
+                    <td>All'inserimento del ticket il conducente del <b>Fridge Truck</b> deve
+                        sapere immediatamente
+                        l'esito dell'inserimento. Conterrà il numero del ticket inserito.</td>
+                </tr>
+                <tr>
+                    <td>replyinsertticket</td>
+                    <td>ColdStorageService</td>
+                    <td>ServiceAccessGUI</td>
+                    <td>Reply</td>
+                    <td>Risposta alla <u>insertticket</u>, conterrà l'informazione della validità del <b>ticket</b>
+                        precedentemente inserito.</td>
+                </tr>
+                <tr>
+                    <td>storerequest</td>
+                    <td>ServiceAccessGUI</td>
+                    <td>ColdStorageService</td>
+                    <td>Request</td>
+                    <td>Il conducente del <b>Fridge Truck</b> vuole sapere immediatamente se
+                        c'è posto per il suo carico.
+                        La richiesta conterrà il numero di Kg del carico da scaricare.</td>
+                </tr>
+                <tr>
+                    <td>replystorerequest</td>
+                    <td>ColdStorageService</td>
+                    <td>ServiceAccessGUI</td>
+                    <td>Reply</td>
+                    <td>Risposta alla <u>storerequest</u>, conterrà il numero del <b>ticket</b> nel caso il carico sia
+                        stato preso in considerazione,
+                        altrimenti bisogna comunicare che la richiesta è stata rifiutata dal sistema.</td>
+                </tr>
+                <tr>
+                    <td>chargedeposited</td>
+                    <td>transporttrolley</td>
+                    <td>ColdStorageService</td>
+                    <td>Request</td>
+                    <td>Quando il <b>Transport Trolley</b> comunica che ha scaricato il carico
+                        alla <b>ColdRoom</b>
+                        deve necessariamente sapere quale sarà la sua successiva mossa: se procedere alla <b>INDOOR</b>
+                        per soddisfare un altro
+                        <b>Fridge Truck</b> oppure se andare in <b>HOME</b> perché non si sono richieste sospese nel
+                        sistema.
+                    </td>
+                </tr>
+                <tr>
+                    <td>replychargedeposited</td>
+                    <td>ColdStorageService</td>
+                    <td>transporttrolley</td>
+                    <td>Reply</td>
+                    <td>Risposta alla <u>chargedeposited</u>, conterrà la prossima mossa del <b>Transport Trolley</b>:
+                        se
+                        andare alla <b>INDOOR</b>
+                        per soddifare un altro <b>Fridge Truck</b> oppure se andare in <b>HOME</b> perché non si sono
+                        richieste sospese nel sistema.</td>
+                </tr>
+                <tr>
+                    <td>chargetaken</td>
+                    <td>transporttrolley</td>
+                    <td>ColdStorageService</td>
+                    <td>Dispatch</td>
+                    <td>Il <b>Transport Trolley</b> deve notificare di aver
+                        caricato il carico che si trovava alla <b>INDOOR</b>, senza aspettarsi in cambio alcuna
+                        informazione.</td>
+                </tr>
+                <tr>
+                    <td>chargetaken</td>
+                    <td>ColdStorageService</td>
+                    <td>ServiceAccessGUI</td>
+                    <td>Dispatch</td>
+                    <td>Il <b>ColdStorageService</b> propaga il messaggio <u>chargetaken</u> alla
+                        <b>ServiceAccessGUI</b> in modo tale da informare il
+                        conducente del <b>Fridge Truck</b> che il suo carico è stato preso dal <b>Transport Trolley</b>
+                        e quindi se ne può andare.
+                    </td>
+                </tr>
+                <tr>
+                    <td>gotoindoor</td>
+                    <td>ColdStorageService</td>
+                    <td>transporttrolley</td>
+                    <td>Dispatch</td>
+                    <td>Il <b>ColdStorageService</b> notifica al <b>Transport Trolley</b> di
+                        occuparsi di soddisfare il
+                        <b>Fridge Truck</b>. Non rimane ad aspettare una conferma, poichè mentre il <b>Transport
+                            Trolley</b> lavora il <b>ColdStorageService</b> deve
+                        essere in grado di accettare
+                        le richieste che arrivano nel frattempo.
+                    </td>
+                </tr>
+                <tr>
+                    <td>coldroomdata</td>
+                    <td>ColdStorageService</td>
+                    <td>ServiceAccessGUI</td>
+                    <td>Dispatch</td>
+                    <td>Il <b>ColdStorageService</b> comunica in maniera fire-and-forget alla
+                        <b>ServiceAccessGUI</b> il
+                        peso corrente della <b>ColdRoom</b> ogni volta che questo varia.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
         <h3>Architettura logica</h3>
+        <div class="remark">
+            Codice QAK per la modellazione del sistema: <a
+                href="./sprint1.coldstorageservice/src/ColdStorageService.qak"
+                target="_blank">ColdStorageService.qak</a>
+        </div>
+
         Il sistema da noi modellato, presenta la seguente architettura logica:
         <center>
             <div class="piccola">
-                <img src="./sprint0.coldstorageservice/coldstorageservice_sprint0arch.png" alt="architettura logica">
+                <img src="./sprint1/coldstorageservice_sprint1arch.png" alt="architettura logica">
             </div>
         </center>
         <h2>Test plans</h2>
-        <b>VERIFICARE CHE TUTTI I TEST RICOPRANO I REQUISITI DEL Problema</b>
-
         <table id="myTable1">
             <thead>
                 <tr>
@@ -1023,92 +491,190 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>MultipleRequestsHandling</td>
-                    <td>ColdStorageService</td>
-                    <td>Dalla <b>ServiceAccessGUI</b> vengono richieste alla <b>ColdStorageService</b> due richieste consecutive: un <b>insertticket</b> e successivamente,dopo aver
-                        ricevuto il messaggio <b>replyinsertticket</b> di validità del <b>ticket</b>,
-                    un <b>storerequest</b> con peso inferiore alla capacità massima del robot. Al fine di verificare se il sistema accetta richieste mentre si sta servendo una richiesta di un <b>Fridge Truck</b>.</td>
-                    <td>La <b>ServiceAccessGUI</b> alla seconda richiesta di <b>storerequest</b> riceve una risposta affermativa.</td>
-                </tr>
-                <tr>
-                    <td>TicketExpired</td>
-                    <td>ColdStorageService</td>
-                    <td>La <b>ServiceAccessGUI</b> richiede un <b>storerequest</b> e successivamente dopo <b>TICKETTIME</b> secondi invia la richiesta di <b>insertticket</b>.</td>
-                    <td>La <b>ServiceAccessGUI</b> riceve un messaggio <b>replyinsertticket</b> che dichiara l'invalidità del <b>ticket</b>.</td>
-                </tr>
-                <tr>
                     <td>UpdateWeight</td>
                     <td>ColdStorageService</td>
-                    <td>La <b>ServiceAccessGUI</b> richiede un <b>storerequest</b> con un carico di <b>FW</b> Kg e successivamente un <b>insertticket</b>.</td>
-                    <td>Quando la <b>ColdStorageService</b> riceve <b>chargedeposited</b> ci si aspetta che il suo contatore del peso presente nella <b>ColdRoom</b> sia stato aggiornato con <b>FW</b> Kg in più.</td>
+                    <td>La <b>ServiceAccessGUI</b> richiede un <b>storerequest</b> con un carico di <b>FW</b> Kg e
+                        successivamente un <b>insertticket</b>.</td>
+                    <td>Quando la <b>ColdStorageService</b> riceve <b>chargedeposited</b> ci si aspetta che il suo
+                        contatore del peso presente nella <b>ColdRoom</b> sia stato aggiornato con <b>FW</b> Kg in più.
+                    </td>
                 </tr>
                 <tr>
                     <td>TransportTrolleyServiceTruck</td>
                     <td>ColdStorageService<br>TransportTrolley</td>
-                    <td>La <b>ColdStorageService</b> richiede tramite la <b>gotoindoor</b> al <b>Transport Trolley</b> di andare alla <b>INDOOR</b> per soddisfare una richiesta
-                    di un <b>Fridge Truck</b>.</td>
-                    <td>La <b>ColdStorageService</b> dopo un lasso di tempo non troppo lungo riceve un messaggio di <b>chargetaken</b> seguito,non immediatamente , da un messaggio <b>chargedeposited</b>.</td>
+                    <td>La <b>ColdStorageService</b> richiede tramite la <b>gotoindoor</b> al <b>Transport Trolley</b>
+                        di andare alla <b>INDOOR</b> per soddisfare una richiesta
+                        di un <b>Fridge Truck</b>.</td>
+                    <td>La <b>ColdStorageService</b> dopo un lasso di tempo non troppo lungo riceve un messaggio di
+                        <b>chargetaken</b> seguito, non immediatamente, da un messaggio <b>chargedeposited</b>.
+                    </td>
                 </tr>
                 <tr>
-                    <td>TransportTrolleyToIndoor</td>
-                    <td>TransportTrolley</td>
-                    <td>Si richiede al <b>Transport Trolley</b> di recarsi ad una delle coordinate che rappresentano una delle posizioni speciali: la <b>INDOOR</b>, <b>HOME</b> o <b>PORT</b>.</td>
-                    <td><b>NON VA BENE</b>Dopo un lasso ti tempo breve si riceve un messaggio <u>doplandone</u> da parte del <b>BasicRobot23</b></td>
+                    <td>MultipleRequestsHandling</td>
+                    <td>ColdStorageService</td>
+                    <td>Dalla <b>ServiceAccessGUI</b> vengono effettuate alla <b>ColdStorageService</b> due richieste
+                        consecutive: un <b>insertticket</b> e successivamente, dopo aver
+                        ricevuto il messaggio <b>replyinsertticket</b> di validità del <b>ticket</b>,
+                        un <b>storerequest</b> con peso inferiore alla capacità massima del robot. Questo test serve a verificare
+                        se il sistema accetta richieste mentre si sta servendo una richiesta di un <b>Fridge Truck</b>.
+                    </td>
+                    <td>La <b>ServiceAccessGUI</b> alla seconda richiesta di <b>storerequest</b> riceve una risposta
+                        affermativa ed entrambi i Ticket vengono serviti dal <b>TransportTrolley</b></td>
                 </tr>
-
-
+                <tr>
+                    <td>TicketInexistent</td>
+                    <td>ColdStorageService</td>
+                    <td>La <b>ServiceAccessGUI</b> inserisce un Ticket inesistente (sequenza randomica di caratteri).
+                    </td>
+                    <td>La <b>ServiceAccessGUI</b> riceve un messaggio <b>ticketrejected</b> che dichiara
+                        l'invalidità del <b>ticket</b>.</td>
+                </tr>
+                <tr>
+                    <td>TicketExpired</td>
+                    <td>ColdStorageService</td>
+                    <td>La <b>ServiceAccessGUI</b> richiede un <b>storerequest</b> e successivamente dopo
+                        <b>TICKETTIME</b> secondi invia la richiesta di <b>insertticket</b>.
+                    </td>
+                    <td>La <b>ServiceAccessGUI</b> riceve un messaggio <b>ticketrejected</b> che dichiara
+                        l'invalidità del <b>ticket</b>.</td>
+                </tr>
+                <tr>
+                    <td>StoreTooBig</td>
+                    <td>ColdStorageService</td>
+                    <td>La <b>ServiceAccessGUI</b> richiede un <b>storerequest</b> per un peso che eccede la capacità massima della ColdRoom.
+                    </td>
+                    <td>La <b>ServiceAccessGUI</b> riceve un messaggio <b>storerejected</b> che dichiara
+                        la negazione della richiesta.</td>
+                </tr>
+                <tr>
+                    <td>EcceedingDDRCapacity</td>
+                    <td>ColdStorageService</td>
+                    <td>La <b>ServiceAccessGUI</b> richiede un <b>storerequest</b> per un peso che eccede la capacità massima del DDR-Robot.
+                    </td>
+                    <td>La <b>ServiceAccessGUI</b> riceve un messaggio <b>storerejected</b> che dichiara
+                        la negazione della richiesta.</td>
+                </tr>
             </tbody>
         </table>
 
-
-
-        
         <h2>Project</h2>
-        <ul>
-            <li>Descrivere come abbiamo implementato i ticket</li>
-            <li>Può mostrare la struttura della architettura finale del sistema? In quale forma ritiene sia
-                 più opportuno presentare l’architettura (o in generale una architettura software) per poterne 
-                 discutere in modo pragmaticamente utile (cioè non solo in modo vago e discorsivo)?</li>
-                 <li>L’architettura finale è’ stata preceduta dalla definizione di una archittura logica 
-                    scaturita come deliverable della fase di analisi del problema?</li>
-            <li>Immagino che come linguaggio di codifica si sia usato principlamente Java e/o Kotlin, insieme 
-                a qualche parte scritta in C, C++, Python, JavaScript, etc). Nella fase di analisi del problema, 
-                è stato evidenziato qualche macroscopico gap rispetto queste tecnologie? Se sì’ come si è pensato 
-                di colmare questo ‘abstraction gap’?</li>
-            <li>L’architettura finale del sistema mostra qualche pattern architetturale riconoscibile (ad es. client-server, layer, clean …)
-                 e in quale fase dello sviluppo (analisi/progetto) è stato deciso di introdurlo? E perchè? Queste 
-                 motivazioni sono riportate/discusse in qualche documento?</li>
-            <li>Come viene rappresentato lo stato del sistema? E’ uno stato ‘concentrato’, cioè gestito da
-                 un solo componente o distribuito tra più componenti? Chi e quando ha preso una decisione 
-                 in merito a questo punto? => <b>DOBBIAMO DECIDERE COME RAPPRSENTARE GLI STATI MA SOPRATTUTTO COME RAPPRESENTARE LA COLDROOM</b></li>
-            <li>Il sistema finale e’ stato sviluppato tenendo conto dei principi SOLID? E’ possibile vederne qualche esempio?</li>
-            
-        </ul>
+        La struttura delineata nell'Analisi del Problema è ritenuta adeguata. La progettazione si concentra
+        principalmente sul sistema di prenotazione del carico, dato che le interazioni con il TransportTrolley sono già
+        coperte dal sistema a stati del QaK.<br>
+        La gestione della ColdRoom è responsabilità esclusiva di ColdStorageService, e per il momento si sceglie di
+        includere la logica operativa direttamente nell'attore senza creare un POJO (Plain Old Java Object) ad hoc.<br>
+        Per implementare la gestione dei Ticket ed in particolare i Keypoint 1, 2, 3, 5 e 6, si è deciso invece di
+        utilizzare un classe java <b>Ticket</b> che contenga le informazioni relative ai singoli <b>ticket</b> ed una
+        classe java <b>TicketManager</b> che li gestisca. Entrambe le classi sono modellate come POJO.<br>
+        <h4>Ticket.java</h4>
+        Questa classe rappresenta il Ticket stesso. Si occupa di mantenere il Timestamp di creazione del Ticket
+        (corrispondente ad un ID univoco) e il Timeout che rappresenta dopo quanto tempo il Ticket deve scadere.<br>
+        Il campo Timeout è passato al costruttore dell'oggetto, non hardcoded; in questa maniera, il tempo di scadenza
+        del Ticket non solo risulta personalizzabile secondo le indicazioni del Committente, ma è anche possibile
+        esprimere scadenze diverse per Ticket diversi.<br>
+        Questa classe presenta solo i metodi Getter, essendo entità di sola lettura dopo la loro creazione, e una
+        funzione <b>isValid</b> che restituisce Vero o Falso se il
+        Ticket è valido o scaduto, ovvero se la differenza tra il Timestamp attuale e quello generato al momento di
+        creazione del Ticket è maggiore o minore del tempo di scadenza.<br>
+        Il timestamp è generato dalla classe SimpleDateFormat, che permette anche la conversione da String a Date e
+        viceversa.<br>
+        Anche il formato del timestamp è modificabile esternamente, in attesa della conferma da parte del committente
+        del modello scelto.<br>
+        <h5>Dettaglio funzione isValid</h5>
+        <center>
+            <div class="piccolo">
+                <img src="./sprint1/Ticket.png" alt="TicketSimpleDateFormat">
+            </div>
+        </center>
+        <h5>UML Ticket</h5>
+        <center>
+            <div class="piccolo">
+                <img src="./sprint1/tickuml.png" alt="TicketUML">
+            </div>
+        </center>
+        <h4>TicketManager.java</h4>
+        Il TicketManager è la classe che gestisce i Ticket. L'attore ColdStorageService ne crea una istanza, in modo
+        tale da averne esclusivamente accesso.
+        Si è scelto di estrarre la logica relativa alla gestione dei Ticket per poter avere più flessibilità, sia per
+        eventuali modifiche alla logica operativa che eventualmente nel caso si decida in un futuro di creare più
+        istanze Manager.<br>
+        Il TicketManager in particolare si occupa di creare i Ticket, di verificare la loro validità e di eliminarli una
+        volta scaduti. Per fare ciò il TicketManager contiene l'insieme dei Ticket come Map con chiave il timestamp del
+        Ticket stesso, oltre ai relativi metodi per crearne o eliminarne.<br>
+        <center>
+            <div class="piccolo">
+                <img src="./sprint1/Ticketmanager_list.png" alt="TicketManager">
+            </div>
+        </center>
+        Per realizzare quanto descritto dal <b>Keypoint-2</b>, due campi vengono distinti: i timestamp del ticket in
+        stato
+        Working e di quello in stato Waiting. Per implementare la logica espressa nel <b>Keypoint-3</b>, viene definito
+        il
+        metodo waitingNowWorking per gestire la transizione del biglietto in attesa a quello in lavorazione. <br>
+        Questi due tipi di Ticket hanno a corredo una serie di metodi per ottenerli (sia come timestamp che come
+        oggetto) e verificarne lo stato.
+        <center>
+            <div class="piccolo">
+                <img src="./sprint1/TicketManager_waiwork.png" alt="TicketManager2">
+            </div>
+        </center>
 
-        Ticket come POJO
-        TicketMananager è classe che gestisce i ticket è un POJO è l'utility che gestisce i ticket, va istanziato dal service, in questo modo è l'unico che ha accesso ai ticket
-        TicketManager ha un metodo che genera un ticket, un metodo che controlla se il ticket è valido e un metodo che invalida il ticket
-        
-<!--
-        <h2>Testing</h2>
+        <h5>UML TicketManager</h5>
+        <center>
+            <div class="piccolo">
+                <img src="./sprint1/tmuml.png" alt="TicketUML">
+            </div>
+        </center>
 
+        <h4>Istruzioni per l'utilizzo del software</h4>
+        Posizionarsi alla radice della cartella <u>ColdStorageService</u> ed effettuare tutte le operazioni necessarie
+        per avviare il BasicRobot insieme
+        all'ambiente di simulazione.<br>
+        Effettuare dunque i seguenti passaggi:<br><br>
+        Per fare partire i container Docker che contengono il BasicRobot effettuare da riga di comando:<br>
+        <div class="remark">docker-compose -f webbasicrobot23.yaml up</div>
+        Una volta che il Basicrobot è in ascolto accedere al virtualRobot tramite Browser a:
+        <div class="remark">localhost:8020</div>
+        Dopo aver fatto questi preparativi, avendo l'accortezza di non fare andare la schermata del virtualRobot in
+        background, posizionarsi dentro alla cartella <u>sprint1.coldstorageservice</u> e da riga di comando eseguire:
+        <div class="remark">gradle run</div>
 
-        <h2>Deployment</h2>
+        <h2>Conclusioni</h2>
+        Il Core Business del sistema, composto dal <b>ColdStorageService</b> e <b>Transport Trolley</b>, è stato
+        realizzato e testato, grazie alla introduzione di un simulatore della <b>ServiceAccessGUI</b> necessario per
+        imitare le interazioni dell'utente con il servizio.
 
+        <div class="remark">
+            Gli output dello sprint1 sono:<br>
+            <ul>
+                <li>ColdStorageService</li>
+                <li>TransportTrolley</li>
+                <li>MockServiceAccessGUI</li>
+            </ul>
+        </div>
 
-        <h2>Maintenance</h2>
--->
+        <h4>Goals Sprint 2</h4>
+        Si possono definire in seguito i goal relativi allo Sprint2:<br>
+        <ol>
+            <li>Identificare ed analizzare tutti i problemi relativi ai requisiti che coinvolgono la
+                <b>ServiceAccessGUI</b>
+            </li>
+            <li>Integrare al sistema realizzato nello Sprint1 la <b>ServiceAccessGUI</b>, che permette l'interazione tra
+                il conducente del <b>Fridge Truck</b> ed il servizio <b>ColdStorageService</b></li>
+            <li>Realizzare l'interfaccia grafica</li>
+            <li>Testare il sistema</li>
+        </ol>
+
         <br /><br />
 
-        <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
-            By <br>Tassinari Gabriele, email: gabriele.tassinari2@studio.unibo.it ,<br>
-            Baraldi Leonardo, email: leonardo.baraldi@studio.unibo.it ,<br>
+        <div style="background-color:rgba(86, 56, 253, 0.9); text-align:left;color:white">
+            By <br>Tassinari Gabriele, email: gabriele.tassinari2@studio.unibo.it<br>
+            Baraldi Leonardo, email: leonardo.baraldi@studio.unibo.it<br>
             Koss Krystian, email: krystian.koss@studio.unibo.it<br>
             <div class="foto">
                 <img src="./gabriele.jpeg" alt="mbot" width="15%" height="15%">
                 <img src="./Baraldi.jpeg" alt="mbot" width="15%" height="15%">
                 <img src="./kriss.jpeg" alt="mbot" width="15%" height="15%">
-                
             </div>
             <br>
             GIT repo: https://github.com/4utotune/ColdStorageService/ <br>
