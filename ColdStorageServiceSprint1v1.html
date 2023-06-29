@@ -913,6 +913,17 @@
             </div>
         </center>
 
+        <h4>Istruzioni per l'utilizzo del software</h4>
+        Posizionarsi alla radice della cartella <u>ColdStorageService</u> ed effettuare tutte le operazioni necessarie per avviare il BasicRobot insieme
+        all'ambiente di simulazione.<br>
+        Effettuare dunque i seguenti passaggi:<br><br>
+        Per fare partire i container Docker che contengono il BasicRobot effettuare da riga di comando:<br>
+        <div class="remark">docker-compose -f webbasicrobot23.yaml up</div>
+        Una volta che il Basicrobot è in ascolto accedere al virtualRobot tramite Browser a:
+        <div class="remark">localhost:8020</div>
+        Dopo aver fatto questi preparativi, avendo l'accortezza di non fare andare la schermata del virtualRobot in background, posizionarsi dentro alla cartella <u>sprint1.coldstorageservice</u> e da riga di comando eseguire:
+        <div class="remark">gradle run</div>
+
         <h2>Conclusioni</h2>
         Durante lo Sprint1 i requisiti 1 e 2 sono stati analizzati e soddisfatti.<br>
         Il Core Business del sistema, composto dal <b>ColdStorageService</b> e <b>Transport Trolley</b>, è stato
