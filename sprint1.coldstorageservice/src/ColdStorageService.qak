@@ -165,9 +165,10 @@ QActor test_suite context ctx_coldstorage {
 	Goto idle
 	
 	State test6 {
-		println("$name | Test 6 - Requesting store exceeding DDR capacity")
+		println("$name | Test 6 - Requesting store exceeding DDR capacity") color yellow
 		forward accessguimock -m mock_store_request: mock_store_request(60)
 		delay 2000
+		forward test_suite -m next_test: next_test(_)
 	}
 	Goto idle
 }
@@ -411,7 +412,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	
 	State movetocoldroom {
 		discardMsg On
-		println("$name | vado a verso la cold room") color magenta
+		println("$name | vado verso la cold room") color magenta
 		request basicrobot -m moverobot: moverobot (4,3) 
 	}
 	Transition t0 whenReply moverobotdone -> storethecharge
