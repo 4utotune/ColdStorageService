@@ -51,22 +51,15 @@
         <h4>Chiarimenti del committente</h4>
         L'interazione con il committente ha permesso di chiarire alcuni aspetti del progetto:
         <ul>
-            <li></li>
+            <li>Cosa significa GUI unica?</li>
+            <li>I conducenti dei <b>Fridge Truck</b> inseriscono i <b>ticket</b> solo quando si trovano davanti alla <b>INDOOR</b></li>
         </ul>
 
         <h4>Chiarimenti con il committente</h4>
         <ul>
             <li></li>
         </ul>
-
-        <h4>Sistema</h4>
-        Lo Sprint1 prevede l'interazione tra due componenti principali: <b>ServiceAccessGUI</b> e
-        <b>ColdStorageService</b>. Il <b>TransportTrolley</b> può essere sostituito da un componente mock, per
-        velocizzare i test. Essendo la parte di interazione ColdStorageService-TransportTrolley già stata realizzata
-        durante lo Sprint1, sarà immediato sostituire il componente reale una volta terminato questo Sprint2.
-        <center>
-            <img src="./sprint2/sistema.jpg" alt="sistema">
-        </center>
+        
 
         <h3>Analisi</h3>
         Dai requisiti espressi nel <a target="_blank" href="http://calendar.altervista.org/TemaFinale23.pdf">Tema
@@ -76,11 +69,56 @@
             <li><b>ServiceAccessGUI</b>, che è una interfaccia grafica per interagire con il servizio</li>
             <li><b>ColdStorageService</b>, per verificare che sia pienamente compatibile con il workflow una volta introdotta la GUI</li>
         </ul>
+        <br>
+        <br>
+        Dopo un confronto con il committente si è giunti alla conculsione che la <b>ServiceAccessGUI</b> è ... TEMATICA GUI UNICA<br>
+        Tra i requisiti specificati vi è che la <b>ServiceAccessGUI</b> deve essere in grado di interagire con il servizio <b>ColdStorageService</b>
+        effettuando due richieste possibili<br>
+        <ul>
+            <li>Richiesta di emissione di un <b>ticket</b></li>
+            <li>Richiesta di scarico</li>
+        </ul>
+        In particolare quando un conducente vuole chiedere un <b>ticket</b> specifica anche il peso del carico che è intenzionato a scaricare.<br>
+        <br>
+        La <b>ServiceAccessGUI</b> deve anche mostrare il peso corrente presente nella <b>ColdRoom</b>.
 
         <h2>Analisi del Problema</h2>
         Il corpo di questo sprint è il componente <b>ServiceAccessGUI</b>.
         
         <h3>ServiceAccessGUI</h3>
+        Svolgendo il ruolo da intermediario tra i conducenti ed il <b>ColdStorageService</b> mostra una interfaccia grafica che permette l'invio di 
+        richieste al servizio. Le richieste come da requisiti,utilizzando la terminologia coniata nello sprint1, sono due:<br>
+        <ul>
+            <li><b>storerequest</b>: richiesta di erogazione di un <b>ticket</b>. Contiene l'informazione del peso <b>FW</b> del carico.</li>
+            <li><b>insertticket</b>: richiesta di servizio di scarico presso l'<b>INDOOR</b>. Contiene l'informazione del numero del <b>ticket</b> corrispondente.</li>
+        </ul>
+        Analizzando tali informazioni si deduce che la <b>ServiceAccessGUI</b> deve essere fornita di:
+        <ul>
+            <li>un campo per inserire il peso ed un pulsante per effettuare la richiesta <u>storerequest</u>.</li>
+            <li>un campo per inserire il <b>ticket</b> ed un pulsante per effettuare la richiesta <u>insertticket</u>.</li>
+            <li>un componente che mostri il peso corrente presente nella <b>ColdRoom</b>.</li>
+        </ul>
+        <div class="remark">
+            <div class="keypoint">La <b>ServiceAccessGUI</b> deve essere fornita di un campo per inserire dati ed un pulsante per ognuna delle due richieste
+            effettuabili.</div>
+        </div>
+        QUI DEFINIRE LA TEMATICA DEL "CHI VEDE IL CHARGETAKEN,replystorerequest,replyinsertticket"<br>
+        Per il peso della <b>ColdRoom</b> mostrato: la <b>ServiceAccessGUI</b> si impegna solamente a mostrare il peso che riceve dalla <b>ColdStorageService</b> 
+        ogni qualvolta ci sia un cambiamento del peso. <br>
+        Considerando come si è modellata la politica di prenotazione dei <b>ticket</b> nel <b>ColdStorageService</b>
+        potrebbe capitare che un conducente che accede alla <b>ServiceAccessGUI</b> veda solo il peso effettivamente presente nella <b>ColdRoom</b>, e 
+        non anche quello prenotato. Ciò potrebbe portare a scenari dove un conducente vede attraverso la <b>ServiceAccessGUI</b> che il suo carico ci 
+        sta dentro alla <b>ColdRoom</b> ma la sua richiesta <u>storerequest</u> viene rifiutata per spazio insufficiente. Questo è dovuto al fatto che non
+        mostrando anche il peso prenotato si potrebbe "illudere" un conducente sul fatto che ci sia posto, ma in realtà tutto qul posto è stato già riservato.<br>
+        Per ovviare a questa problematica è sufficiente mostrare il peso complessivo, sommando al peso effettivamente presente all'interno della <b>ColdRoom</b> il 
+        peso prenotato. A questo proposito andrebbe modificando l'informazione contenuta dentro <u>coldroomdata</u> che fino ad ora conteneva solo il peso corrente
+        della <b>ColdRoom</b>.
+
+        <div class="remark">
+            <div class="keypoint">La <b>ServiceAccessGUI</b> deve mostrare il peso della <b>ColdRoom</b> come somma del peso effettivo presente con il peso prenotato.</div>
+        </div>
+        -come passare la capacità massima alla ServiceAccessGUI?<br>
+        -ServiceAccessGUI come observer? Pensando leggerementein futuro(per la statusgui) è bene usare observer.
         
         <h3>ColdStorageService</h3>
         
@@ -97,10 +135,49 @@
             </thead>
             <tbody>
                 <tr>
+                    <td>storerequest</td>
+                    <td>ServiceAccessGUI</td>
+                    <td>ColdStorageService</td>
+                    <td>Request</td>
+                    <td>Semantica <u>Request</u> perchè il conducente deve sapere immediatamente se il suo <b>ticket</b> è stato accettato o meno. 
+                        Contiene la quantità del peso <b>FW</b> che si vuole scaricare.</td>
+                </tr>
+                <tr>
+                    <td>replystorerequest</td>
+                    <td>ColdStorageService</td>
+                    <td>ServiceAccessGUI</td>
+                    <td>Reply</td>
+                    <td>Semantica <u>Reply</u></td>
+                </tr>
+
+                <tr>
+                    <td>insertticket</td>
+                    <td>ServiceAccessGUI</td>
+                    <td>ColdStorageService</td>
+                    <td>Request</td>
                     <td></td>
+                </tr>
+                <tr>
+                    <td>replyinsertticket</td>
+                    <td>ColdStorageService</td>
+                    <td>ServiceAccessGUI</td>
+                    <td>Reply</td>
                     <td></td>
+                </tr>
+
+                <tr>
+                    <td>chargetaken</td>
+                    <td>ColdStorageService</td>
+                    <td>ServiceAccessGUI</td>
+                    <td>Dispatch</td>
                     <td></td>
-                    <td></td>
+                </tr>
+
+                <tr>
+                    <td>coldroomdata</td>
+                    <td>ColdStorageService</td>
+                    <td>ServiceAccessGUI</td>
+                    <td>Dispatch</td>
                     <td></td>
                 </tr>
             </tbody>
