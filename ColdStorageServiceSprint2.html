@@ -54,6 +54,24 @@
             <li>Cosa significa GUI unica?</li>
             <li>I conducenti dei <b>Fridge Truck</b> inseriscono i <b>ticket</b> solo quando si trovano davanti alla <b>INDOOR</b></li>
         </ul>
+        I <b>Ticket</b>, nel mondo odierno, vengono utilizzati come metodo di autenticazione e validazione; esattamente come nel caso di questo progetto. <br>
+        Per prevenire l'utilizzo non autorizzato di un ticket da parte di un'altra persona, sono adottate diverse misure di sicurezza, tra cui:
+        <ul>
+            <li>Crittografia: I ticket possono essere crittografati per proteggere le informazioni contenute al loro interno e impedire la loro alterazione o contraffazione.</li>
+            <li>Protezione dei canali di comunicazione: I canali di comunicazione utilizzati per trasmettere i ticket devono essere protetti tramite cifratura e altri meccanismi di sicurezza per prevenire il furto o l'intercettazione dei ticket.</li>
+            <li>Controllo delle autorizzazioni: I server o i sistemi che ricevono i ticket devono verificare che il ticket contenga le autorizzazioni necessarie per accedere alle risorse o ai servizi richiesti.</li>
+            <li>Firma digitale: I ticket possono essere firmati digitalmente per garantire l'autenticità e l'integrità delle informazioni contenute al loro interno.</li>
+            <li>Validità limitata nel tempo: I ticket possono avere una scadenza dopo la quale non sono più validi. Questo limita il periodo in cui possono essere utilizzati in modo sicuro.</li>
+            <li>Gestione delle sessioni: I ticket possono essere associati a una sessione utente. Il server tiene traccia dello stato della sessione e invalida il ticket quando la sessione termina o viene disconnessa.</li>
+            <li>Token a un solo uso (One-Time Token): I ticket possono essere generati come token a un solo uso, che diventa invalido dopo essere stato utilizzato una volta. Questo riduce il rischio di riproduzione o riutilizzo dei ticket.</li>
+            <li>Controllo dell'IP di origine: I server possono verificare che l'IP di origine delle richieste corrisponda all'IP registrato nel ticket. Se l'IP non corrisponde, il ticket potrebbe essere considerato non valido.</li>
+            <li>Controllo dell'User-Agent: I server possono verificare che l'User-Agent del client corrisponda a quello registrato nel ticket. Se l'User-Agent non corrisponde, il ticket potrebbe essere considerato non valido.</li>
+            <li>Token di accesso a lunga durata e token di aggiornamento: In alcuni casi, possono essere utilizzati token di accesso a lunga durata o token di aggiornamento per ottenere nuovi ticket o estendere la validità dei ticket esistenti. Questi token richiedono un processo di autenticazione aggiuntivo per ottenere un nuovo ticket.</li>
+            <li>Monitoraggio delle attività: I sistemi possono monitorare le attività associate a un ticket, inclusi gli accessi, le richieste e le operazioni eseguite. Questo consente di rilevare comportamenti anomali o sospetti e prendere le misure necessarie.</li>
+            <li>Revoca dei ticket: In caso di compromissione o sospetto di utilizzo non autorizzato, i ticket possono essere revocati in modo proattivo per impedire ulteriori accessi non autorizzati. Ciò richiede un sistema di gestione dei ticket che consenta la revoca e la disattivazione dei ticket in modo tempestivo.</li>
+            <li>Protezione fisica e sicurezza dei server: I server che gestiscono i ticket devono essere adeguatamente protetti fisicamente e devono seguire le migliori pratiche di sicurezza informatica per prevenire accessi non autorizzati o compromissioni dei ticket.</li>
+        </ul>
+        Avendo questo scenario, si è deciso di procedere con la Firma digitale del Ticket, che risulta facile da implementare e sicura. <br>
 
         <h4>Chiarimenti con il committente</h4>
         <ul>
