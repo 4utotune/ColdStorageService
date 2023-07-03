@@ -133,8 +133,8 @@
             <li>Arriva uno stop <u>prima</u> <b>MINT</b> millisecondi ed in quel momento il <b>Transport trolley</b> è in movimento</li>
             <li>Arriva uno stop <u>prima</u> <b>MINT</b> millisecondi ed in quel momento il <b>Transport trolley</b> è ancora fermo dallo stop precedente</li>
         </ol>
-        Lo scenario <b>1</b> è quello che non introduce alcun problema perché gli eventi succedono in momenti che soddifano tutti i requisiti.<br>
-        Gli scnenari <b>3</b> e <b>4</b> presentano uno stop prima del tempo conscesso. Andrebbe valutato come si vuole agire:
+        Lo scenario <b>1</b> è quello che non introduce alcun problema perché gli eventi succedono in momenti che soddisfano tutti i requisiti.<br>
+        Gli scnenari <b>3</b> e <b>4</b> presentano uno stop prima del tempo concesso. Andrebbe valutato come si vuole agire:
         <ul>
             <li>se ignorare le richieste che arrivano prima del dovuto</li>
             <li>se prendere in considerazione una coda di eventi che sono arrivati ma non ancora considerabili perché gli <b>Alarm Requirements</b> non lo permettono</li>
@@ -142,16 +142,43 @@
         Valutando prima lo scenario <b>4</b>: pensando da un punto di vista di user experience si valuta valida la soluzione di ignorare le richieste di stop che arrivano prima del dovuto solo se queste sono già
         state seguite da un resume prima ancora che il tempo <b>MINT</b> sia trascorso. Questo perché non ci sarebbe bisogno di fermare il <b>Transport Trolley</b>
         se al momento corrente il <b>Sonar</b> rileva una distanza maggiore di <b>DLIMT</b>, anche se non si è fermato allo stop precedente, siccome nel momento in cui 
-        il <b>Transport Trolley</b> si sarebbe dovuto fermare in realtà era già fermo.[DA RIVEDERE]
+        il <b>Transport Trolley</b> si sarebbe dovuto fermare in realtà era già fermo.<br>
+        Se invece di quanto riportato sopra, arriva uno stop prima di <b>MINT</b> millisecondi ed il <b>Transport trolley</b> è in movimento(scenario <b>3</b>) allora
+        bisogna aspettare, mettendo in coda l'evento, l'intervallo minimo prima di fermare il <b>Transport Trolley</b>. Se entro a <b>MINT</b> oltre allo stop, arriva 
+        anche la resume allora non si dovrà fermare.<br>
+        Infine per lo scenario <b>2</b>: se il <b>Transport Trolley</b> riceve uno stop dopo <b>MINT</b> millisecondi ed è ancora fermo dallo stop precedente
+        allora si dovrà semplicemente ignorare l'evento in quanto il <b>Transport Trolley</b> è già fermo.
+        In seguito viene riportato il riassunto con un grafo degli eventi <u>numerato per scenario</u>:
 
+        <center>
+            <div class="piccola">
+                <img src="./sprint3/diagrammaeventi.png" alt="architettura logica">
+            </div>
+        </center>
 
-        Il led sarà controllato dal TT
-        mentre il sonar comunica al TT
+        <div class="remark">
+            <div class="keypoint">Gestire gli <b>stop/resume</b> del <b>Transport Trolley</b> secondo la politica esplicitata nel grafo degli eventi sopra riportato</div>
+        </div>
 
+        Siccome il <b>Led</b> è relativo esclusivamente allo stato del singolo <b>Transport Trolley</b> si ritiene lecito lasciare a lui il controllo del <b>Led</b>.
+        <div class="remark">
+            <div class="keypoint">Il <b>Transport Trolley</b> è l'incaricato di gestire il <b>Led</b></div>
+        </div>
 
-        il sonar manda un evento, evento perché rileva la distanza violata e lo notifica a chi è interessato, in questo caso il tt
-        
-        
+        Il <b>Sonar</b>, invece, emetterà un evento e che il <b>Transport trolley</b> capterà e valuterà. La scelta di emettere un evento per il <b>Sonar</b> è motivata
+        dal pensiero lungimirante, a favore dell'estendibilità, di avere in futuro molteplici <b>Transport Trolley</b> e dal fatto che la nostra software house sia già
+        in possesso di materiale utilizzabile per questo scopo tramite il protocollo <a href="https://mqtt.org/">MQTT</a>. Un protocollo adatto per contesti IoT dove sono coinvolti sensori, attuatori
+        e microcontrollori di potenza ridotta.
+        <br><br>
+        In particolare si valuta di adottare più attori, ognuno con uno scopo ben preciso:
+        <ul>
+            <li>Un attore per il <b>Sonar</b> che si occupa di misurare le distanze e comunicarle tutte sul canale</li>
+            <li>Un attore che filtra tutte le misurazioni prodotte dal <b>Sonar</b> e filtrare solo quelle che superano una soglia <b>DLIMT</b></li>
+            <li>Un attore che ha come compito quello di notificare al <b>Transport Trolley</b> quando una distanza minore di <b>DLIMT</b> viene misurata</li>
+        </ul>
+        <div class="remark">
+            <div class="keypoint">Gestione delle misurazioni ripartita tra più attori</div>
+        </div>
 
         <h3>Interazioni</h3>
         <table id="myTable">
@@ -167,8 +194,8 @@
             <tbody>
                 <tr>
                     <td>storerequest</td>
-                    <td>ServiceAccessGUI</td>
-                    <td>ColdStorageService</td>
+                    <td>AlarmDevice</td>
+                    <td>TransportTrolley</td>
                     <td>Request</td>
                     <td>Semantica <u>Request</u> perchè il conducente deve sapere immediatamente se il suo <b>ticket</b> è stato accettato o meno. 
                         Contiene la quantità del peso <b>FW</b> che si vuole scaricare.</td>
@@ -253,15 +280,11 @@
         <h2>Conclusioni</h2>
         
         <div class="remark">
-            Gli output dello sprint2 sono:<br>
-            <ul>
-                <li>ServiceAccessGUI</li>
-                <li>Versione aggiornata ColdStorageService</li>
-                <li>MockTransportTrolley</li>
-            </ul>
+            Gli output dello sprint3 sono:<br>
+            <ul></ul>
         </div>
 
-        <h4>Goals Sprint 3</h4>
+        <h4>Goals Sprint 4</h4>
         Si possono definire in seguito i goal relativi allo Sprint3:<br>
         <ol>
             <li>Testare il sistema</li>
