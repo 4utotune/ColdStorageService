@@ -1,6 +1,8 @@
 package rx
 
 import it.unibo.kactor.ActorBasic
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.MqttCallback
@@ -40,7 +42,9 @@ class SonarMQTTReceiver(name: String) : ActorBasic(name) {
                     val data = String(message.payload, charset("UTF-8"))
                     val event = CommUtils.buildEvent(name, "sonardistance", data)
 
-                    emitLocalStreamEvent(event)
+                    GlobalScope.launch {
+                        emitLocalStreamEvent(event)
+                    }
                 } catch (e: Exception) {
                     // Give your callback on error here
                 }
