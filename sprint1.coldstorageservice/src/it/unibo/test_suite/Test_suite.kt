@@ -195,9 +195,10 @@ class Test_suite ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name,
 				}	 
 				state("test6") { //this:State
 					action { //it:State
-						CommUtils.outblack("$name | Test 6 - Requesting store exceeding DDR capacity")
+						CommUtils.outyellow("$name | Test 6 - Requesting store exceeding DDR capacity")
 						forward("mock_store_request", "mock_store_request(60)" ,"accessguimock" ) 
 						delay(2000) 
+						forward("next_test", "next_test(_)" ,"test_suite" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

@@ -79,7 +79,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("movetocoldroom") { //this:State
 					action { //it:State
 						discardMessages = true
-						CommUtils.outmagenta("$name | vado a verso la cold room")
+						CommUtils.outmagenta("$name | vado verso la cold room")
 						request("moverobot", "moverobot(4,3)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}

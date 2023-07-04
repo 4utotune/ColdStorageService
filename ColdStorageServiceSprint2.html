@@ -90,7 +90,8 @@
         </ul>
         <br>
         <br>
-        Dopo un confronto con il committente si è giunti alla conculsione che la <b>ServiceAccessGUI</b> è ... TEMATICA GUI UNICA<br>
+        
+
         Tra i requisiti specificati vi è che la <b>ServiceAccessGUI</b> deve essere in grado di interagire con il servizio <b>ColdStorageService</b>
         effettuando due richieste possibili<br>
         <ul>
@@ -120,6 +121,41 @@
         <div class="remark">
             <div class="keypoint">La <b>ServiceAccessGUI</b> deve essere fornita di un campo per inserire dati ed un pulsante per ognuna delle due richieste
             effettuabili.</div>
+        </div>
+        Dopo un confronto con il committente lo scenario che si presenta per intergaire con il nostro servizio è scomponibile in due parti:<br>
+        <ol>
+            <li>I conducenti dei <b>Fridge Truck</b> che si stanno direzionando verso il nostro <b>ColdStorageService</b> sono interessati a capire se 
+            c'è posto per scaricare il loro carico, per questo motivo tramite il loro dispositivo mobile accedono ad una GUI che li peremtterà solo di:
+            <ul>
+                <li>Vedere il peso presente nella <b>ColdRoom</b></li>
+                <li>Richiedere l'erogazione di un <b>ticket</b></li>
+            </ul>
+            </li>
+            <li>Una volta che il conducente è arrivato presso il nostro servizio procede all'inserimento del <b>ticket</b>. 
+            Inserito il <b>ticket</b> il conducente si mette in coda dove vi sono i conducenti che hanno inserito il <b>ticket</b> prima di lui. 
+            Si presuppone che il <b>Fridge Truck</b> impieghi tempo nullo per arrivare alla <b>INDOOR</b> dopo aver inserito il <b>ticket</b>.
+            La coda tra l'inserimento del 
+            <b>ticket</b> e lo scarico presso la <b>INDOOR</b> è necessaria per evitare che dei <b>ticket</b> scadano per colpa dei ritardi introdotti dal nostro servizio, che 
+            forzano il conducente a non poter inserire il <b>ticket</b>, rischiando così di invalidarlo ingiustamente.</li>
+        </ol>
+
+        <div class="remark">
+            <div class="keypoint">La <b>ServiceAccessGUI</b> verrà visualizzata sui dispositivi mobili dei conducenti</div>
+        </div>
+
+        Per evitare che un conducente inserisca il <b>ticket</b> e debba aspettare per un tempo potenzialmente infinito si deve cercare di prevenire una situazione del genere.
+        Per farlo vi sono tre proposte:
+        <ol>
+            <li>Il <b>coldstorageservice</b> deve rifiutare le richieste di <u>storage</u> non solo guardando lo spazio disponibile, ma anche guardando la quantità di <b>ticket</b>
+                erogati ancora facenti parte del sistema, e che quindi non hanno ricevuto il relativo <u>chargetaken</u>.</li>
+            <li>Quando viene erogato il <b>ticket</b> viene comunicato al conducente anche quanti potenziali altri conducenti si trovino davanti a lui. Ricordiamo che 
+            si tratta di "potenziali" perché non è assicurato che tutti raggiungano il nostro servizio entro <b>TICKETTIME</b>.</li>
+            <li>Simile alla precedente ma, invece di inviare il numero di persone che si trovano davanti, si mostra l'informazione direttamente sulla <b>ServiceAccessGUI</b>.</li>
+        </ol>
+        [SCRIVERE CONSIDERAZIONI FATTE E QUALE SOLUZIONE SI E' SCELTA]
+       
+        <div class="remark">
+            <div class="keypoint">SCRIVERE QUI LA SOLUZIONE ADOTTATA</div>
         </div>
         QUI DEFINIRE LA TEMATICA DEL "CHI VEDE IL CHARGETAKEN,replystorerequest,replyinsertticket"<br>
         Per il peso della <b>ColdRoom</b> mostrato: la <b>ServiceAccessGUI</b> si impegna solamente a mostrare il peso che riceve dalla <b>ColdStorageService</b> 
