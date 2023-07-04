@@ -168,7 +168,8 @@
         Il <b>Sonar</b>, invece, emetterà un evento e che il <b>Transport trolley</b> capterà e valuterà. La scelta di emettere un evento per il <b>Sonar</b> è motivata
         dal pensiero lungimirante, a favore dell'estendibilità, di avere in futuro molteplici <b>Transport Trolley</b> e dal fatto che la nostra software house sia già
         in possesso di materiale utilizzabile per questo scopo tramite il protocollo <a href="https://mqtt.org/">MQTT</a>. Un protocollo adatto per contesti IoT dove sono coinvolti sensori, attuatori
-        e microcontrollori di potenza ridotta.
+        e microcontrollori di potenza ridotta. Così facendo si fa in modo che il <b>Raspberry</b> invii esternamente tutti i valori che rileva ed il <b>ColdStorageService</b>
+        si occuperà di sfoltirli, evitando di appesantire il <b>Raspberry</b>.
         <br><br>
         In particolare si valuta di adottare più attori, ognuno con uno scopo ben preciso:
         <ul>
