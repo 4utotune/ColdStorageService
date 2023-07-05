@@ -1,14 +1,3 @@
-{"actor":"test_suite", "msgType":"dispatch", "curstate":"idle", "nextstate":"test1", "msgId":"next_test"}
-{"actor":"test_suite", "msgType":"dispatch", "curstate":"idle", "nextstate":"test2", "msgId":"next_test"}
-{"actor":"test_suite", "msgType":"dispatch", "curstate":"idle", "nextstate":"test3", "msgId":"next_test"}
-{"actor":"test_suite", "msgType":"dispatch", "curstate":"idle", "nextstate":"test4", "msgId":"next_test"}
-{"actor":"test_suite", "msgType":"dispatch", "curstate":"idle", "nextstate":"test5", "msgId":"next_test"}
-{"actor":"test_suite", "msgType":"dispatch", "curstate":"idle", "nextstate":"test6", "msgId":"next_test"}
-{"actor":"test_suite", "msgType":"dispatch", "curstate":"idle", "nextstate":"reset", "msgId":"next_test"}
-{"actor":"test_suite", "msgType":"dispatch", "curstate":"test1", "nextstate":"test1_b", "msgId":"test_gotticket"}
-{"actor":"test_suite", "msgType":"dispatch", "curstate":"test2_a", "nextstate":"test2_b", "msgId":"test_gotticket"}
-{"actor":"test_suite", "msgType":"dispatch", "curstate":"test2_b", "nextstate":"test2_c", "msgId":"test_gotticket"}
-{"actor":"test_suite", "msgType":"dispatch", "curstate":"test5", "nextstate":"test5_b", "msgId":"test_gotticket"}
 {"actor":"accessguimock", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_mock_store_request", "msgId":"mock_store_request"}
 {"actor":"accessguimock", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_mock_ticket_input", "msgId":"mock_ticket_input"}
 {"actor":"accessguimock", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}

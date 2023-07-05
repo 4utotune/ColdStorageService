@@ -28,8 +28,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t022",targetState="engaged",cond=whenReply("engagedone"))
-					transition(edgeName="t023",targetState="quit",cond=whenReply("engagerefused"))
+					 transition(edgeName="t011",targetState="engaged",cond=whenReply("engagedone"))
+					transition(edgeName="t012",targetState="quit",cond=whenReply("engagerefused"))
 				}	 
 				state("engaged") { //this:State
 					action { //it:State
@@ -49,7 +49,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t024",targetState="moveToIndoor",cond=whenDispatch("gotoindoor"))
+					 transition(edgeName="t013",targetState="moveToIndoor",cond=whenDispatch("gotoindoor"))
 				}	 
 				state("moveToIndoor") { //this:State
 					action { //it:State
@@ -61,7 +61,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t025",targetState="loadTheCharge",cond=whenReply("moverobotdone"))
+					 transition(edgeName="t014",targetState="loadTheCharge",cond=whenReply("moverobotdone"))
 				}	 
 				state("loadTheCharge") { //this:State
 					action { //it:State
@@ -86,7 +86,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t026",targetState="storethecharge",cond=whenReply("moverobotdone"))
+					 transition(edgeName="t015",targetState="storethecharge",cond=whenReply("moverobotdone"))
 				}	 
 				state("storethecharge") { //this:State
 					action { //it:State
@@ -99,8 +99,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t027",targetState="moveToIndoor",cond=whenReply("more"))
-					transition(edgeName="t028",targetState="movetohome",cond=whenReply("gohome"))
+					 transition(edgeName="t016",targetState="moveToIndoor",cond=whenReply("more"))
+					transition(edgeName="t017",targetState="movetohome",cond=whenReply("gohome"))
 				}	 
 				state("movetohome") { //this:State
 					action { //it:State
@@ -112,7 +112,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t029",targetState="trolleyathome",cond=whenReply("moverobotdone"))
+					 transition(edgeName="t018",targetState="trolleyathome",cond=whenReply("moverobotdone"))
 				}	 
 				state("trolleyathome") { //this:State
 					action { //it:State
@@ -120,7 +120,6 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 						CommUtils.outmagenta("$name | trolley at HOME")
 						forward("setdirection", "dir(down)" ,"basicrobot" ) 
 						delay(500) 
-						forward("next_test", "next_test(_)" ,"test_suite" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
