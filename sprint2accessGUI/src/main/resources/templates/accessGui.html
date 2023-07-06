@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <title>ServiceAccessGui</title>
+</head>
+
+<body>
+<h1>ServiceAccessGui</h1>
+<p>Welcome to
+  <b><span th:text="${arg}">Our Arg</span></b>.</p>
+<textarea id="messageArea"
+          name="messageArea" rows="10" cols="60">
+</textarea>
+
+<div>
+  <p>Inserisci peso:</p>
+  <label for="inputweight"></label><input id="inputweight"/>
+  <button id="store">Store Request</button>
+</div>
+<div>
+  <p>Inserisci ticket:</p>
+  <label for="inputticket"></label><input id="inputticket"/>
+  <button id="ticket">Send Ticket</button>
+</div>
+
+
+<script src="../wsminimal.js"></script>
+</body>
+</html>

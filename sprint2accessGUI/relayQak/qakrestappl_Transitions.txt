@@ -1,0 +1,6 @@
+{"actor":"gui_relay", "msgType":"dispatch", "curstate":"work", "nextstate":"handle_update", "msgId":"updatedata"}
+{"actor":"gui_relay", "msgType":"dispatch", "curstate":"work", "nextstate":"handle_ticket", "msgId":"ticket"}
+{"actor":"gui_relay", "msgType":"dispatch", "curstate":"work", "nextstate":"handle_error", "msgId":"error"}
+{"actor":"gui_relay", "msgType":"dispatch", "curstate":"work", "nextstate":"handle_notify", "msgId":"notify"}
+{"actor":"gui_relay", "msgType":"dispatch", "curstate":"work", "nextstate":"handle_storerequest", "msgId":"gui_storerequest"}
+{"actor":"gui_relay", "msgType":"dispatch", "curstate":"work", "nextstate":"handle_insertticket", "msgId":"gui_insertticket"}
