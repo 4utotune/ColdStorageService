@@ -160,6 +160,24 @@
             <div class="keypoint">Gestire gli <b>stop/resume</b> del <b>Transport Trolley</b> secondo la politica esplicitata nel grafo degli eventi sopra riportato</div>
         </div>
 
+        Sorge un problema quando introduciamo il concetto di <u>fermare il <b>Transport Trolley</b> e riattivarlo</u>, siccome dobbiamo fermarlo all'istante e alla resume
+        dovrebbe tornare a fare quello che stava facendo. Ricordiamo che per effettuare gli spostamenti del <b>Transport Trolley</b> si utilizza il <b>planner</b>
+        che adotta una semantica request-reply al <b>basicrobot23</b> e l'unico modo per interromperne l'esecuzione è tramite il comando <b>alarm</b>. Mentre per fare in modo
+        che il <b>Transport Trolley</b> riprenda quello ceh stava facendo bisogna avere cura di salvarsi l'ultima operazione non portata a termine e rieffettuare tale richiesta.
+        Ciò è possibile perchè il <b>Transport Trolley</b> comunica con <b>basicrobot23</b> tramite il solo comando <b>moverobot(coordinate)</b>, questa cosa ci agevola la 
+        risoluzione della casisitica siccome quando il <b>Transport Trolley</b> viene fermato da un <b>alarm</b> per riprendere ciò che stava facendo è sufficiente ripetere
+        lo stesso comando <b>moverobot(coordinate)</b> che non era andato a buon fine per via dell'evento straordinario. Questo è dovuto dal fatto che indipendentemente dalla
+        posizione del <b>Transport Trolley</b> comunicando a questo ultimo <b>moverobot(coordinate)</b> il risultato sarà il medesimo, ovvero raggiungere tale posizione richiesta.
+        Questo ci permette di non tenere traccia degli <b>step</b> per capire a che punto si era fermato il <b>Transport Trolley</b> per poter calcolare quelli che deve ancora fare,
+        ma di lasciare il compito all'infrastruttura che il <b>basicrobot23</b> offre.<br><br>
+        Nota importante: l'evento alarm viene recepito direttamente dal <b>basicrobot23</b>, quindi sarà solo lui a recepire il messaggio e non anche il <b>Transport Trolley</b>, 
+        siccome questo ultimo verrà a conoscenza dell'accaduto tramite il <b>basicrobot23</b>, che ricordiamo notifica sempre gli eventi a colui che ha fatto l'<b>engage</b>.
+        Per quanto riguarda invece la resume: il <b>Sonar</b> quando rileverà di nuovo una distanza che permetterà lo sblocco del <b>Transport Trolley</b> verrà emesso 
+        un evento che il <b>Transport Trolley</b> riceverà e si impegnerà a risbloccare il robot dall'operazione che si era fermato, riprendendo così la sua routine.
+
+        <br>
+        <br>
+
         Siccome il <b>Led</b> è relativo esclusivamente allo stato del singolo <b>Transport Trolley</b> si ritiene lecito lasciare a lui il controllo del <b>Led</b>.
         <div class="remark">
             <div class="keypoint">Il <b>Transport Trolley</b> è l'incaricato di gestire il <b>Led</b></div>
