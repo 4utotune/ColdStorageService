@@ -9,14 +9,6 @@ System coldstorageservice_sprint3
  */
 
 
-
-
-
-
-
-
-
-
 // MESSAGES
 
 // BasicRobot
@@ -472,9 +464,16 @@ QActor warningdevice context ctx_coldstorage {
 				println("$name | led off | ricevuto dal TT") color blue
 				[# state = 0 #]
 			} 
-			else {
-				println ("$name | led blink | ricevuto dal TT") color blue
+			if [# (stato1 == "ON") #] {
+				println("$name | led ON | ricevuto dal TT") color blue
+				[# state = 1 #]
+			} 
+			if [# (stato1 == "BLINK") #] {
+				println("$name | led BLINK | ricevuto dal TT") color blue
 				[# state = 2 #]
+			} 
+			else {
+				println ("$name | sconosciuto | ricevuto dal TT") color blue
 			}	 
 		}
 		onMsg( coapUpdate : coapUpdate(alarmdevice, ARG)){
@@ -505,7 +504,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	
 	State engaged {
 		println("$name | basicrobot engaged") color magenta
-		updateResource [# "$name(0)"#]
+		updateResource [# "$name(OFF)"#]
 	}
 	Goto idle
 	
@@ -513,7 +512,6 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 		
 	}
 	Transition t0 whenMsg gotoindoor -> moveToIndoor
-				  whenEvent obstacle -> allarme
 	
 	State moveToIndoor {
 		updateResource [# "$name(BLINK)"#]
@@ -522,10 +520,10 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 		request basicrobot -m moverobot : moverobot (0,4)
 	}
 	Transition t0 whenReply moverobotdone -> loadTheCharge
-				  whenEvent obstacle -> allarme
 	
 	State loadTheCharge{
 		discardMsg On
+		updateResource [# "$name(ON)"#]
 		println("$name | sto caricando il carico presso l'INDOOR") color magenta
 		// simulo azione di carico
 		delay 1000
@@ -568,15 +566,11 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 		delay 500
 		
 		forward test_suite -m next_test: next_test(_)
-		
 	}
 	Goto idle
 	
-	State allarme {
-		
-	}
-	
 	State quit {
+		updateResource [# "$name(OFF)"#]
 		forward basicrobot -m disengage : disengage(transporttrolley)
 		[# System.exit(0) #]
 	}
