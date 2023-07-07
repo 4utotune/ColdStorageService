@@ -78,7 +78,9 @@ Context ctx_basicrobot 	ip [host="127.0.0.1" port=8020]
 Context ctx_coldstorage ip [host="localhost" port=11802]
 // Context ctx_trolley 	ip [host="localhost" port=11801] 
 
-CodedQActor sonar  context ctx_coldstorage className "rx.SonarMQTTReceiver"
+CodedQActor sonar  context ctx_coldstorage className "sonarSimulator"           //IN LOCALE
+
+//CodedQActor sonar  context ctx_coldstorage className "rx.SonarMQTTReceiver"
 CodedQActor datacleaner    context ctx_coldstorage className "rx.DataCleaner"
 CodedQActor distancefilter context ctx_coldstorage className "rx.DistanceFilter"
 
@@ -398,7 +400,7 @@ QActor coldstorageservice context ctx_coldstorage {
 //sonar
 QActor alarmdevice context ctx_coldstorage {
 	[# 
-		val ostacolo: Int = 0
+		var ostacolo = 0
 	#]
 	State init initial {
 		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
@@ -414,7 +416,7 @@ QActor alarmdevice context ctx_coldstorage {
 				  whenEvent obstaclefree -> handleobstaclefree	               
 	
 	State handlesonardata{
-		printCurrentMessage
+		printCurrentMessage color black
 	}
 	Goto work 
 	
@@ -444,7 +446,7 @@ QActor alarmdevice context ctx_coldstorage {
 //Led
 QActor warningdevice context ctx_coldstorage {
 	[# 
-		val state: Int = 0
+		var state = 0
 	#]
 	State init initial {
 		println ("$name | init") color blue
@@ -493,7 +495,7 @@ QActor warningdevice context ctx_coldstorage {
 
 //da inserire updateResource [# "$name(0)"#]
 QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
-	[# val allarme: Int 0 #]
+	[# var allarme = 0 #]
 	State s0 initial {
 		println("$name | init e engage basicrobot") color magenta
 		// Il transporttrolley richiede l'impegno del basicrobot
