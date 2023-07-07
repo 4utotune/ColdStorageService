@@ -69,7 +69,7 @@ body {
     height: 20%;
     font-size: x-large;
     text-align: center;
-    padding-top: 1em;
+    padding-top: 0.5em;
 }
 
 .dati {
@@ -133,7 +133,7 @@ body {
 
 .submit {
     width: 100%;
-    height: 2em;
+    height: 3em;
     border-radius: 20px;
     border: 1px solid white;
     background-color: #3590F3;
@@ -262,4 +262,23 @@ body {
     font-family: Helvetica, Arial, sans-serif;
     font-size: calc(var(--size) / 5);
     color: var(--primary);
+}
+
+.info {
+    margin-top: 1.5rem;
+    width: 80%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+    border-radius: 20px;
+    justify-content: space-between;
+}
+
+.display-info {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
 }

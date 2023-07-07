@@ -59,6 +59,7 @@ Dispatch	coapUpdate			:	coapUpdate(SOURCE,ARG)
 //Sonar DistanceFilter e SonarCleaner
 Event sonardata : distance(D)   //emitted  by distancefilter
 Event obstacle  : obstacle(D)   //emitted as stream by distancefilter
+Event obstaclefree	:	obstaclefree(D)	//emitted as stream by distancefilter
 
 //Fermare il BasicRobot
 Event alarm           : alarm(X)
@@ -387,6 +388,9 @@ QActor coldstorageservice context ctx_coldstorage {
 
 //sonar
 QActor alarmdevice context ctx_coldstorage {
+	[# 
+		val ostacolo: Int = 0
+	#]
 	State init initial {
 		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
 		println ("$name | init") color black
@@ -398,6 +402,7 @@ QActor alarmdevice context ctx_coldstorage {
 	}
 	Transition t0 whenEvent sonardata -> handlesonardata
 	              whenEvent obstacle  -> handleobstacle
+				  whenEvent obstaclefree -> handleobstaclefree	               
 	
 	State handlesonardata{
 		printCurrentMessage
@@ -407,13 +412,24 @@ QActor alarmdevice context ctx_coldstorage {
 	State handleobstacle{
 		onMsg( obstacle : obstacle(D)){			
 			println("$name handleobstacle ALARM ${payloadArg(0)}") color magenta
-			emit alarm : alarm(obstacle)			
-		}
-		
-	}
+			if [# ostacolo == 0 #]{
+				emit alarm : alarm(obstacle)
+				updateResource [# "$name(ON)"#]	
+				[# ostacolo = 1 #]
+			}else {
+				
+			}
+					
+		}	
+	}Goto work
 	
-
-	// TODO stop the trolley
+	State handleobstaclefree {
+		onMsg( obstaclefree : obstaclefree(D)){			
+			println("$name handleobstacle ALARM ${payloadArg(0)}") color magenta
+			[# ostacolo = 0 #]
+			//resume basicrobot
+		}
+	}Goto work
 }
 
 //Led
@@ -427,21 +443,31 @@ QActor warningdevice context ctx_coldstorage {
 	Goto work
 	
 	State work {
-		println("$name | attendo stato del Transport Trolley") color blue
+		println("$name | attendo update") color blue
 	}
 	Transition t0 whenMsg coapUpdate -> doObserve
 	
 	State doObserve {
-		println("$name | messaggio ricevuto dal TT") color blue
+		discardMsg Off
 		onMsg ( coapUpdate : coapUpdate(transporttrolley, ARG)){
-			[# val stato = payloadArg(1) #]
-			if [# (stato == "OFF") #] {
-				println("$name | led off")
+			[# val stato1 = payloadArg(1) #]
+			if [# (stato1 == "OFF") #] {
+				println("$name | led off | ricevuto dal TT") color blue
+				[# state = 0 #]
 			} 
-			if [# (stato == "BLINK") #] {
-				
+			else {
+				println ("$name | led blink | ricevuto dal TT") color blue
+				[# state = 2 #]
+			}	 
+		}
+		onMsg( coapUpdate : coapUpdate(alarmdevice, ARG)){
+			[# val stato2 = payloadArg(1) #]
+			if [# (stato2 == "ON") #] {
+				println("$name | led on | ricevuto dal sonar") color blue
+				[# state = 1 #]
+			} else {
+				println ("$name | sconosciuto | ricevuto dal sonar") color blue
 			}
-			 
 		}
 	}
 	Goto work
@@ -451,6 +477,7 @@ QActor warningdevice context ctx_coldstorage {
 
 //da inserire updateResource [# "$name(0)"#]
 QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
+	[# val allarme: Int 0 #]
 	State s0 initial {
 		println("$name | init e engage basicrobot") color magenta
 		// Il transporttrolley richiede l'impegno del basicrobot
@@ -467,17 +494,18 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	
 	State idle{
 		
-		discardMsg On
 	}
 	Transition t0 whenMsg gotoindoor -> moveToIndoor
+				  whenEvent obstacle -> allarme
 	
 	State moveToIndoor {
-		updateResource [# "$name(1)"#]
+		updateResource [# "$name(BLINK)"#]
 		discardMsg On
 		println("$name | vado all'INDOOR") color magenta
 		request basicrobot -m moverobot : moverobot (0,4)
 	}
 	Transition t0 whenReply moverobotdone -> loadTheCharge
+				  whenEvent obstacle -> allarme
 	
 	State loadTheCharge{
 		discardMsg On
@@ -489,6 +517,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	Goto movetocoldroom
 	
 	State movetocoldroom {
+		updateResource [# "$name(BLINK)"#]
 		discardMsg On
 		println("$name | vado verso la cold room") color magenta
 		request basicrobot -m moverobot: moverobot (4,3) 
@@ -496,6 +525,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	Transition t0 whenReply moverobotdone -> storethecharge
 	
 	State storethecharge {
+		updateResource [# "$name(ON)"#]
 		discardMsg On
 		println("$name | scarico il carico presso la Cold Room") color magenta
 		// simulo azione di scarico
@@ -506,6 +536,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 				  whenReply gohome -> movetohome
 	
 	State movetohome{
+		updateResource [# "$name(BLINK)"#]
 		discardMsg On 
 		println("$name | vado alla posizione HOME") color magenta
 		request basicrobot -m moverobot : moverobot (0,0)
@@ -523,6 +554,10 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 		
 	}
 	Goto idle
+	
+	State allarme {
+		
+	}
 	
 	State quit {
 		forward basicrobot -m disengage : disengage(transporttrolley)
