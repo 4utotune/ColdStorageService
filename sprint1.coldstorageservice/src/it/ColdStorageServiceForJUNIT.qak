@@ -1,0 +1,340 @@
+System coldstorageservice_sprint1
+
+// MESSAGES
+
+// BasicRobot
+Request 	engage				: 	engage(OWNER,STEPTIME)
+Reply 		engagedone			:	engagedone(ARG)
+Reply 		engagerefused		: 	engagerefused(ARG)
+
+Dispatch 	disengage			: 	disengage(ARG)
+
+Dispatch 	cmd					:	cmd(MOVE)
+Dispatch 	end					: 	end(ARG)
+
+Request 	step				: 	step(TIME)
+Reply 		stepdone			: 	stepdone(V)
+Reply 		stepfailed			: 	stepfailed(DURATION, CAUSE)
+
+Request 	doplan				: 	doplan(PATH,OWNER,STEPTIME)
+Reply 		doplandone			: 	doplandone(ARG)
+Reply 		doplanfailed		:	doplanfailed(ARG)
+
+Request 	moverobot			:	moverobot(TARGETX, TARGETY)
+Reply 		moverobotdone		: 	moverobotok(ARG)
+Reply 		moverobotfailed		: 	moverobotfailed(PLANDONE,PLANTODO)
+
+Dispatch 	setrobotstate		: 	setpos(X,Y,D)
+Dispatch 	setdirection		: 	dir(D) // up, down, left, right
+
+Request 	getrobotstate		: 	getrobotstate(ARG)
+Reply 		robotstate			: 	robotstate(POS,DIR)
+
+// transport trolley -> coldstorageservice
+Dispatch	chargetaken			: 	chargetaken(_)
+Request 	chargedeposited		: 	chargedeposited(_)
+
+// coldstorageservice -> transporttrolley
+Reply 		more				:	more(_)
+Reply 		gohome				: 	gohome(_)
+Dispatch 	gotoindoor			: 	gotoindoor(_)
+
+// PER MOCK:
+Request 	storerequest		: 	storerequest(FW)
+Reply		storeaccepted		:	storeaccepted(TICKET)
+Reply		storerejected		: 	storerejected(_)
+
+Request		insertticket		: 	insertticket(TICKET)
+Reply		ticketaccepted		: 	ticketaccepted(_)
+Reply		ticketrejected		: 	ticketrejected(_)
+
+Dispatch 	mock_store_request 	: 	mock_store_request(FW)
+Dispatch 	mock_ticket_input 	:	mock_ticket_input(TICKET)
+Dispatch 	test_gotticket 		: 	test_gotticket(TICKET)
+Dispatch	next_test			:	next_test(_)
+
+
+// Context ctx_mockgui		ip [host="localhost" port=11800]
+Context ctx_basicrobot 	ip [host="127.0.0.1" port=8020]
+Context ctx_coldstorage ip [host="localhost" port=11802]
+// Context ctx_trolley 	ip [host="localhost" port=11801] 
+
+
+ExternalQActor basicrobot context ctx_basicrobot
+
+QActor accessguimock context ctx_coldstorage { 
+	[#
+		var currentWeight: Float = 0.0f	
+	#]
+	State init initial {
+		println("$name | Init") color cyan
+		[# currentWeight = 0.0f #]
+	}
+	Goto idle
+	
+	State idle{
+		
+	}
+	Transition t0 	whenMsg 	mock_store_request 	-> handle_mock_store_request
+					whenMsg 	mock_ticket_input	-> handle_mock_ticket_input
+					whenMsg		chargetaken 		-> handle_charge_taken	
+	
+	State handle_mock_store_request {
+		onMsg ( mock_store_request : mock_store_request(FW)){
+			println("$name | Sending store request") color cyan
+			request coldstorageservice -m storerequest: storerequest($payloadArg(0))
+		}
+	}
+	Transition 	t	whenReply 	storeaccepted 	-> handle_store_accepted
+					whenReply 	storerejected 	-> handle_store_rejected
+	
+	State handle_store_accepted {
+		onMsg(storeaccepted: storeaccepted(TICKET)) {
+			[# val TICKET = payloadArg(0) #]
+			println("$name | Store Accepted. Received ticket [ $TICKET ]") color cyan
+			//forward test_suite -m test_gotticket: test_gotticket($TICKET)
+		}
+	}
+	Goto idle
+	
+	State handle_store_rejected {
+		onMsg(storerejected: storerejected(REASON)) {
+			println("$name | Store Rejected: ${payloadArg(0)}") color cyan
+			// TODO show error message
+		}
+		
+	}
+	Goto idle
+	
+	State handle_mock_ticket_input {
+		onMsg ( mock_ticket_input : mock_ticket_input(TICKET)){
+			[# val TICKET = payloadArg(0) #]
+			println("$name | Sending ticket [ $TICKET ]") color cyan
+			request coldstorageservice -m insertticket: insertticket($TICKET)
+		}
+	}
+	Transition 	t	whenReply 	ticketaccepted 	-> handle_ticket_accepted
+					whenReply 	ticketrejected 	-> handle_ticket_rejected						
+	
+		
+	State handle_ticket_accepted {
+		println("$name | Ticket Accepted") color cyan
+	}
+	Goto idle
+	
+	State handle_ticket_rejected {
+		onMsg(ticketrejected: ticketrejected(REASON)) {
+			println("$name | Ticket Rejected: ${payloadArg(0)}") color cyan
+		}
+	}
+	Goto idle
+	
+	State handle_charge_taken {
+		// println("$name | Charge Taken") color cyan
+	}
+	Goto idle
+}
+
+
+QActor coldstorageservice context ctx_coldstorage {
+	[#	
+		val MaxWeightDDR = 50.0f
+		val MaxWeightcoldroom = 100.0f
+		val TicketTimeout = 20000
+		val TicketFormat = "yyyyMMddHHmmss"; // yyyy.MM.dd.HH.mm.ss
+		
+		var ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
+		
+		var CurrentWeight = 0.0f
+		var ReservedWeight = 0.0f
+		var RejectedRequests = 0 
+	#]
+	State s0 initial {
+		[# 
+			ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
+			CurrentWeight = 0.0f 
+			ReservedWeight = 0.0f
+			RejectedRequests = 0
+		#]
+		println("$name | init") color green
+	}
+	Goto idle
+	
+	State idle {
+		println("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight") color green
+	}
+	Transition t0 whenRequest storerequest		-> handle_store
+				  whenRequest insertticket		-> handle_ticket
+				  whenRequest chargedeposited	-> handle_deposited
+				  whenMsg	  chargetaken		-> handle_charge_taken
+					 
+	State handle_store {
+		onMsg(storerequest: storerequest(FW)) {
+			println("$name | Received store request for ${payloadArg(0)} kg") color green
+			[# val FW = payloadArg(0).toFloat() #]
+			
+			if [# (FW > MaxWeightDDR) #] {
+				[# RejectedRequests++ #]
+				replyTo storerequest with storerejected: storerejected(tooheavy)
+			} else {
+				if [# ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom) #] {
+					[# RejectedRequests++ #]
+					replyTo storerequest with storerejected: storerejected(full)
+				} else {
+					[#
+						val TICKET = ticketManager.newTicket(FW)
+					  	ReservedWeight += FW
+					  	val Timestamp = TICKET.timestamp
+					#]
+					replyTo storerequest with storeaccepted: storeaccepted($Timestamp)
+				}	
+			}
+		}
+	}
+	Goto idle
+	
+	State handle_ticket {
+		onMsg(insertticket: insertticket(TICKET)) {
+			[# 
+				val Received = payloadArg(0).toString()
+				val TICKET = ticketManager.getTicket(Received)
+			#]
+			if [# (TICKET != null && TICKET.isValid) #]{
+				if [# (ticketManager.isWaiting) #] {
+					// reject ticket if one is already waiting
+					replyTo insertticket with ticketrejected: ticketrejected(queuefull)
+				} else {
+					if [# (!ticketManager.isWorking) #] {
+						println("$name | Approved ticket [ $Received ]. Requesting charge") color green
+						forward transporttrolley -m gotoindoor: gotoindoor(_)
+					} else {
+						println("$name | Approved ticket [ $Received ]. Currenty working on [ ${ticketManager.working} ]. Please wait") color green
+					}
+						
+					[#  ticketManager.setWaiting(Received) #]
+					replyTo insertticket with ticketaccepted: ticketaccepted(_)
+				}
+			} else {
+				if [#(TICKET != null)#] {
+					[#
+						ticketManager.remove(TICKET)
+						ReservedWeight -= TICKET.weight
+					#]
+					println("$name | Rejected ticket [ $Received ] - timedout") color green
+					replyTo insertticket with ticketrejected: ticketrejected(timedout)
+				} else {
+					println("$name | Rejected ticket [ $Received ] - doesn't exist") color green
+					replyTo insertticket with ticketrejected: ticketrejected(invalid)	
+				}				
+			}
+		}
+	}
+	Goto idle
+	
+	State handle_charge_taken {
+		[# 			
+			val Timestamp = ticketManager.waitingNowWorking()
+		#]
+		println("$name | Charge taken for ticket [ $Timestamp ]") color green
+		forward accessguimock -m chargetaken: chargetaken(_)
+	}
+	Goto idle
+	
+	State handle_deposited {
+		onMsg(chargedeposited: chargedeposited(_)) {
+			[#
+				if (ticketManager.isWorking) {
+					CurrentWeight += ticketManager.workingTicket().weight
+					ReservedWeight -= ticketManager.workingTicket().weight
+				}
+				ticketManager.stopWorking()
+			#]
+			println("$name | Deposit confirmation received") color green
+			if [# (ticketManager.isWaiting) #] {
+				println("$name | Next ticket: [ ${ticketManager.waiting} ]") color green
+				replyTo chargedeposited with more: more(_)
+			} else {
+				replyTo chargedeposited with gohome: gohome(_)
+			}
+		}
+	}
+	Goto idle
+}
+
+
+QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
+	State s0 initial {
+		println("$name | init e engage basicrobot") color magenta
+		// Il transporttrolley richiede l'impegno del basicrobot
+		request basicrobot -m engage : engage(transporttrolley,330)
+	}
+	Transition 	t0	whenReply engagedone -> engaged
+					whenReply engagerefused -> quit
+	
+	State engaged {
+		println("$name | basicrobot engaged") color magenta
+	}
+	Goto idle
+	
+	State idle{
+		
+		discardMsg On
+	}
+	Transition t0 whenMsg gotoindoor -> moveToIndoor
+	
+	State moveToIndoor {
+		discardMsg On
+		println("$name | vado all'INDOOR") color magenta
+		request basicrobot -m moverobot : moverobot (0,4)
+	}
+	Transition t0 whenReply moverobotdone -> loadTheCharge
+	
+	State loadTheCharge{
+		discardMsg On
+		println("$name | sto caricando il carico presso l'INDOOR") color magenta
+		// simulo azione di carico
+		delay 1000
+		forward coldstorageservice -m chargetaken : chargetaken(_)
+	}
+	Goto movetocoldroom
+	
+	State movetocoldroom {
+		discardMsg On
+		println("$name | vado verso la cold room") color magenta
+		request basicrobot -m moverobot: moverobot (4,3) 
+	}
+	Transition t0 whenReply moverobotdone -> storethecharge
+	
+	State storethecharge {
+		discardMsg On
+		println("$name | scarico il carico presso la Cold Room") color magenta
+		// simulo azione di scarico
+		delay 1000
+		request coldstorageservice -m chargedeposited : chargedeposited(_)
+	}
+	Transition t0 whenReply more -> moveToIndoor
+				  whenReply gohome -> movetohome
+	
+	State movetohome{
+		discardMsg On
+		println("$name | vado alla posizione HOME") color magenta
+		request basicrobot -m moverobot : moverobot (0,0)
+	}
+	Transition t0 whenReply moverobotdone -> trolleyathome
+	
+	State trolleyathome {   
+		discardMsg On
+		println("$name | trolley at HOME") color magenta
+		forward basicrobot -m setdirection : dir(down)
+		delay 500
+		
+		//forward test_suite -m next_test: next_test(_)
+		
+	}
+	Goto idle
+	
+	State quit {
+		forward basicrobot -m disengage : disengage(transporttrolley)
+		[# System.exit(0) #]
+	}
+}
