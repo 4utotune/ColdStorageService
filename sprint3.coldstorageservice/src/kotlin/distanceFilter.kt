@@ -27,7 +27,9 @@ class DistanceFilter(name: String) : ActorBasic(name) {
             CommUtils.outgreen("$tt $name |  emitLocalStreamEvent m1= $m1")
             emitLocalStreamEvent(m1) //propagate event obstacle
         } else {
-            //println("$tt $name | DISCARDS $Distance ")
+            val m2 = MsgUtil.buildEvent(name, "obstaclefree", "obstaclefree($data)")
+            CommUtils.outgreen("$tt $name |  emitLocalStreamEvent m2= $m2")
+            emitLocalStreamEvent(m2) //propagate event obstacle
         }
     }
 }
