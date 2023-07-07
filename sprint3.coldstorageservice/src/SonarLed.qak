@@ -77,13 +77,13 @@ Event alarm           : alarm(X)
 Context ctx_basicrobot 	ip [host="127.0.0.1" port=8020]
 Context ctx_coldstorage ip [host="localhost" port=11802]
 // Context ctx_trolley 	ip [host="localhost" port=11801] 
-
+/* 
 CodedQActor sonar  context ctx_coldstorage className "sonarSimulator"           //IN LOCALE
 
 //CodedQActor sonar  context ctx_coldstorage className "rx.SonarMQTTReceiver"
 CodedQActor datacleaner    context ctx_coldstorage className "rx.DataCleaner"
 CodedQActor distancefilter context ctx_coldstorage className "rx.DistanceFilter"
-
+*/
 ExternalQActor basicrobot context ctx_basicrobot
 
 QActor test_suite context ctx_coldstorage {
@@ -396,7 +396,7 @@ QActor coldstorageservice context ctx_coldstorage {
 	}
 	Goto idle
 }
-
+/* 
 //sonar
 QActor alarmdevice context ctx_coldstorage {
 	[# 
@@ -442,14 +442,17 @@ QActor alarmdevice context ctx_coldstorage {
 		}
 	}Goto work
 }
+*/
 
 //Led
 QActor warningdevice context ctx_coldstorage {
 	[# 
 		var state = 0
+		var stato1 = "0"
 	#]
 	State init initial {
 		println ("$name | init") color blue
+		observeResource transporttrolley
 	}
 	Goto work
 	
@@ -461,25 +464,25 @@ QActor warningdevice context ctx_coldstorage {
 	State doObserve {
 		discardMsg Off
 		onMsg ( coapUpdate : coapUpdate(transporttrolley, ARG)){
-			[# val stato1 = payloadArg(1) #]
-			if [# (stato1 == "OFF") #] {
+			[# var stato1 = payloadArg(1) #]
+			if [# (stato1 == "transporttrolley(OFF)") #] {
 				println("$name | led off | ricevuto dal TT") color blue
 				[# state = 0 #]
 			} 
-			if [# (stato1 == "ON") #] {
+			if [# (stato1 == "transporttrolley(ON)") #] {
 				println("$name | led ON | ricevuto dal TT") color blue
 				[# state = 1 #]
 			} 
-			if [# (stato1 == "BLINK") #] {
+			if [# (stato1 == "transporttrolley(BLINK)") #] {
 				println("$name | led BLINK | ricevuto dal TT") color blue
 				[# state = 2 #]
 			} 
 			else {
-				println ("$name | sconosciuto | ricevuto dal TT") color blue
+				println ("$name | $stato1 | sconosciuto | ricevuto dal TT") color blue
 			}	 
 		}
 		onMsg( coapUpdate : coapUpdate(alarmdevice, ARG)){
-			[# val stato2 = payloadArg(1) #]
+			[# var stato2 = payloadArg(1) #]
 			if [# (stato2 == "ON") #] {
 				println("$name | led on | ricevuto dal sonar") color blue
 				[# state = 1 #]
@@ -493,7 +496,6 @@ QActor warningdevice context ctx_coldstorage {
 }
 
 
-//da inserire updateResource [# "$name(0)"#]
 QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	[# var allarme = 0 #]
 	State s0 initial {
