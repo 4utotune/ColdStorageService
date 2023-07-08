@@ -413,7 +413,6 @@ QActor alarmdevice context ctx_coldstorage {
 	}
 	Transition t0 whenEvent sonardata -> handlesonardata
 	              whenEvent obstacle  -> handleobstacle
-				  whenEvent obstaclefree -> handleobstaclefree	               
 	
 	State handlesonardata{
 		printCurrentMessage color black
@@ -422,22 +421,17 @@ QActor alarmdevice context ctx_coldstorage {
 	
 	State handleobstacle{
 		onMsg( obstacle : obstacle(D)){			
-			println("$name handleobstacle ALARM ${payloadArg(0)}") color magenta
-			if [# ostacolo == 0 #]{
-				emit alarm : alarm(obstacle)
-				updateResource [# "$name(ON)"#]	
-				[# ostacolo = 1 #]
-			}else {
-				
-			}
-					
+			println("$name handleobstacle ALARM ${payloadArg(0)}") color black
+			emit alarm : alarm(obstacle)
+			//updateResource [# "$name(ON)"#]		
 		}	
-	}Goto work
+	}
+	Transition t0 whenEvent obstaclefree -> handleobstaclefree	               
+	
 	
 	State handleobstaclefree {
 		onMsg( obstaclefree : obstaclefree(D)){			
-			println("$name handleobstacle ALARM ${payloadArg(0)}") color magenta
-			[# ostacolo = 0 #]
+			println("$name handleobstacle ALARM ${payloadArg(0)}") color black
 			//resume basicrobot
 		}
 	}Goto work
@@ -487,7 +481,6 @@ QActor warningdevice context ctx_coldstorage {
 			}
 			}	 
 		}
-		/* 
 		onMsg( coapUpdate : coapUpdate(alarmdevice, ARG)){
 			[# var stato2 = payloadArg(1) #]
 			if [# (stato2 == "ON") #] {
@@ -497,7 +490,7 @@ QActor warningdevice context ctx_coldstorage {
 				println ("$name | sconosciuto | ricevuto dal sonar") color blue
 			}
 		}
-		*/
+		
 	}
 	Goto work
 	
@@ -508,11 +501,13 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	[# var allarme = 0 #]
 	State s0 initial {
 		println("$name | init e engage basicrobot") color magenta
+		//delegate "obstacle" to sonarobstacle
 		// Il transporttrolley richiede l'impegno del basicrobot
 		request basicrobot -m engage : engage(transporttrolley,330)
 	}
 	Transition 	t0	whenReply engagedone -> engaged
 					whenReply engagerefused -> quit
+					whenEvent obstacle -> sonarobstacle
 	
 	State engaged {
 		println("$name | basicrobot engaged") color magenta
@@ -524,6 +519,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 		
 	}
 	Transition t0 whenMsg gotoindoor -> moveToIndoor
+				  whenEvent obstacle -> sonarobstacle
 	
 	State moveToIndoor {
 		updateResource [# "$name(BLINK)"#]
@@ -533,6 +529,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	}
 	Transition t0 whenReply moverobotdone -> loadTheCharge
 				  whenReply moverobotfailed -> pathfailed
+				  whenEvent obstacle -> sonarobstacle
 	
 	State loadTheCharge{
 		//discardMsg On
@@ -552,6 +549,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	}
 	Transition t0 whenReply moverobotdone -> storethecharge
 			      whenReply moverobotfailed -> pathfailed1
+			      whenEvent obstacle -> sonarobstacle
 	
 	State storethecharge {
 		updateResource [# "$name(ON)"#]
@@ -563,6 +561,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	}
 	Transition t0 whenReply more -> moveToIndoor
 				  whenReply gohome -> movetohome
+				  whenEvent obstacle -> sonarobstacle
 	
 	State movetohome{
 		updateResource [# "$name(BLINK)"#]
@@ -572,6 +571,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	}
 	Transition t0 whenReply moverobotdone -> trolleyathome
 				  whenReply moverobotfailed -> pathfailed2
+				  whenEvent obstacle -> sonarobstacle
 	
 	State trolleyathome {
 		updateResource [# "$name(OFF)"#]
@@ -595,6 +595,10 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	State pathfailed2 {
 		println("$name | Errore | PATH FAILED | RITENTO") color magenta
 	}Goto movetohome
+	
+	State sonarobstacle {
+		println("$name | Sono fermo per ostacolo sonar") color magenta
+	}
 	
 	State quit {
 		updateResource [# "$name(OFF)"#]
