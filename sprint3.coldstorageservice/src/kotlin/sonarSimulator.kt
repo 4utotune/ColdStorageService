@@ -26,7 +26,7 @@ class sonarSimulator ( name : String ) : ActorBasic( name ) {
 
 	suspend fun startDataReadSimulation(    ){
 		val data = sequence<Int>{
-			var v0 = 80
+			var v0 = 75
 			yield(v0)
 			while(true){
 				v0 = v0 - 5
@@ -34,8 +34,8 @@ class sonarSimulator ( name : String ) : ActorBasic( name ) {
 			}
 		}
 		var i = 0
-			while( i < 20 ){
- 	 			val m1 = "distance( ${data.elementAt(i)} )"
+			while( true ){
+ 	 			val m1 = "sonardata( ${data.elementAt(i)} )"
 				i++
  				val event = CommUtils.buildEvent( name,"sonardata",m1)
   				emitLocalStreamEvent( event )

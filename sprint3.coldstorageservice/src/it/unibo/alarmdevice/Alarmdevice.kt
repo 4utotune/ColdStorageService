@@ -22,11 +22,52 @@ class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 				state("init") { //this:State
 					action { //it:State
 						 subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar")  
+						CommUtils.outblack("$name | init")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
+				}	 
+				state("work") { //this:State
+					action { //it:State
+						CommUtils.outblack("$name | attendo...")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t022",targetState="handleobstacle",cond=whenEvent("obstacle"))
+				}	 
+				state("handleobstacle") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("obstacle(D)"), Term.createTerm("obstacle(D)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								emit("alarm", "alarm(_)" ) 
+								CommUtils.outblack("$name handleobstacle ALARM ${payloadArg(0)}")
+								updateResourceRep( "$name(ON)" 
+								)
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t023",targetState="handleobstaclefree",cond=whenEvent("obstaclefree"))
+				}	 
+				state("handleobstaclefree") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("obstaclefree(D)"), Term.createTerm("obstaclefree(D)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								CommUtils.outblack("$name handleobstacle ALARM ${payloadArg(0)}")
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
 			}
 		}

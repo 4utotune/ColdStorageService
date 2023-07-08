@@ -13,4 +13,5 @@
 {"actor":"accessguimock", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_mock_ticket_input", "msgId":"mock_ticket_input"}
 {"actor":"accessguimock", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}
 {"actor":"coldstorageservice", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}
+{"actor":"warningdevice", "msgType":"dispatch", "curstate":"work", "nextstate":"doObserve", "msgId":"coapUpdate"}
 {"actor":"transporttrolley", "msgType":"dispatch", "curstate":"idle", "nextstate":"moveToIndoor", "msgId":"gotoindoor"}

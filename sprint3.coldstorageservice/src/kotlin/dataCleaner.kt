@@ -13,7 +13,7 @@ class DataCleaner(name: String) : ActorBasic(name) {
     private val LimitHigh = 150
 
     override suspend fun actorBody(msg: IApplMessage) {
-        if (msg.msgId() != "sonardistance") return
+        if (msg.msgId() != "sonardata") return
         if (msg.msgSender() == name) return //AVOID to handle the event emitted by itself
         elabData(msg)
     }
