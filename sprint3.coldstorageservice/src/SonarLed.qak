@@ -453,6 +453,7 @@ QActor warningdevice context ctx_coldstorage {
 	State init initial {
 		println ("$name | init") color blue
 		observeResource transporttrolley
+		println("$name | LED IS OFF")
 	}
 	Goto work
 	
@@ -481,6 +482,7 @@ QActor warningdevice context ctx_coldstorage {
 				println ("$name | $stato1 | sconosciuto | ricevuto dal TT") color blue
 			}	 
 		}
+		/* 
 		onMsg( coapUpdate : coapUpdate(alarmdevice, ARG)){
 			[# var stato2 = payloadArg(1) #]
 			if [# (stato2 == "ON") #] {
@@ -490,6 +492,7 @@ QActor warningdevice context ctx_coldstorage {
 				println ("$name | sconosciuto | ricevuto dal sonar") color blue
 			}
 		}
+		*/
 	}
 	Goto work
 	
@@ -519,14 +522,15 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	
 	State moveToIndoor {
 		updateResource [# "$name(BLINK)"#]
-		discardMsg On
+		//discardMsg On
 		println("$name | vado all'INDOOR") color magenta
 		request basicrobot -m moverobot : moverobot (0,4)
 	}
 	Transition t0 whenReply moverobotdone -> loadTheCharge
+				  whenReply moverobotfailed -> pathfailed
 	
 	State loadTheCharge{
-		discardMsg On
+		//discardMsg On
 		updateResource [# "$name(ON)"#]
 		println("$name | sto caricando il carico presso l'INDOOR") color magenta
 		// simulo azione di carico
@@ -537,15 +541,16 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	
 	State movetocoldroom {
 		updateResource [# "$name(BLINK)"#]
-		discardMsg On
+		//discardMsg On
 		println("$name | vado verso la cold room") color magenta
 		request basicrobot -m moverobot: moverobot (4,3) 
 	}
 	Transition t0 whenReply moverobotdone -> storethecharge
+			      whenReply moverobotfailed -> pathfailed
 	
 	State storethecharge {
 		updateResource [# "$name(ON)"#]
-		discardMsg On
+		//discardMsg On
 		println("$name | scarico il carico presso la Cold Room") color magenta
 		// simulo azione di scarico
 		delay 1000
@@ -556,15 +561,16 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	
 	State movetohome{
 		updateResource [# "$name(BLINK)"#]
-		discardMsg On 
+		//discardMsg On 
 		println("$name | vado alla posizione HOME") color magenta
 		request basicrobot -m moverobot : moverobot (0,0)
 	}
 	Transition t0 whenReply moverobotdone -> trolleyathome
+				  whenReply moverobotfailed -> pathfailed
 	
 	State trolleyathome {
 		updateResource [# "$name(OFF)"#]
-		discardMsg On
+		//discardMsg On
 		println("$name | trolley at HOME") color magenta
 		forward basicrobot -m setdirection : dir(down)
 		delay 500
@@ -572,6 +578,10 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 		forward test_suite -m next_test: next_test(_)
 	}
 	Goto idle
+	
+	State pathfailed {
+		println("$name | Errore | PATH FAILED ") color magenta
+	}
 	
 	State quit {
 		updateResource [# "$name(OFF)"#]
