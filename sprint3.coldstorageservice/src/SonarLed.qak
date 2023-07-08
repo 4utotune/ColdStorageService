@@ -469,17 +469,22 @@ QActor warningdevice context ctx_coldstorage {
 			if [# (stato1 == "transporttrolley(OFF)") #] {
 				println("$name | led off | ricevuto dal TT") color blue
 				[# state = 0 #]
-			} 
+			} else {
 			if [# (stato1 == "transporttrolley(ON)") #] {
 				println("$name | led ON | ricevuto dal TT") color blue
 				[# state = 1 #]
-			} 
+			} else {
 			if [# (stato1 == "transporttrolley(BLINK)") #] {
 				println("$name | led BLINK | ricevuto dal TT") color blue
 				[# state = 2 #]
 			} 
 			else {
 				println ("$name | $stato1 | sconosciuto | ricevuto dal TT") color blue
+			}
+			
+			
+			
+			}
 			}	 
 		}
 		/* 
@@ -546,7 +551,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 		request basicrobot -m moverobot: moverobot (4,3) 
 	}
 	Transition t0 whenReply moverobotdone -> storethecharge
-			      whenReply moverobotfailed -> pathfailed
+			      whenReply moverobotfailed -> pathfailed1
 	
 	State storethecharge {
 		updateResource [# "$name(ON)"#]
@@ -566,7 +571,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 		request basicrobot -m moverobot : moverobot (0,0)
 	}
 	Transition t0 whenReply moverobotdone -> trolleyathome
-				  whenReply moverobotfailed -> pathfailed
+				  whenReply moverobotfailed -> pathfailed2
 	
 	State trolleyathome {
 		updateResource [# "$name(OFF)"#]
@@ -580,8 +585,16 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	Goto idle
 	
 	State pathfailed {
-		println("$name | Errore | PATH FAILED ") color magenta
-	}
+		println("$name | Errore | PATH FAILED | RITENTO") color magenta
+	}Goto moveToIndoor
+	
+	State pathfailed1 {
+		println("$name | Errore | PATH FAILED | RITENTO") color magenta
+	}Goto movetocoldroom
+	
+	State pathfailed2 {
+		println("$name | Errore | PATH FAILED | RITENTO") color magenta
+	}Goto movetohome
 	
 	State quit {
 		updateResource [# "$name(OFF)"#]
