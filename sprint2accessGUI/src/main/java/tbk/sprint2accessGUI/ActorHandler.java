@@ -31,9 +31,9 @@ public class ActorHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         sessions.add(session);
-        System.out.println("Added coldstorage session: " + session.getUri());
+        System.out.println("AC | Added coldstorage session: " + session.getUri());
         relay_tcp = TcpClientSupport.connect("127.0.0.1", 11802, 10);
-        System.out.println("Connessione tcp: " + relay_tcp);
+        System.out.println("AC | Stabilita connessione tcp: " + relay_tcp);
         super.afterConnectionEstablished(session);
     }
 
@@ -41,7 +41,7 @@ public class ActorHandler extends AbstractWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session,
                                       CloseStatus status) throws Exception {
         sessions.remove(session);
-        System.out.println("CS | Removed " + session);
+        System.out.println("AC | Removed " + session);
         super.afterConnectionClosed(session, status);
     }
 
@@ -50,15 +50,15 @@ public class ActorHandler extends AbstractWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session,
                                      TextMessage message) throws IOException {
         String msg = message.getPayload();
-        System.out.println("CS | Received: " + msg);
+        System.out.println("AC | Received: " + msg);
 
         this.guiManager.messageFromActor(msg);
     }
 
     private void sendToActor(IApplMessage message) {
-        System.out.println("CS | Sending " + message);
         try {
             relay_tcp.forward(message.toString());
+            System.out.println("AC | Sending " + message);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -258,7 +258,7 @@ body {
 
 [role="progressbar"]::after {
     counter-reset: percentage var(--value);
-    content: counter(percentage) "Kg";
+    content: counter(percentage) "%";
     font-family: Helvetica, Arial, sans-serif;
     font-size: calc(var(--size) / 5);
     color: var(--primary);
@@ -281,4 +281,5 @@ body {
     display: flex;
     flex-direction: column;
     padding: 1rem;
+    flex-wrap: nowrap;
 }

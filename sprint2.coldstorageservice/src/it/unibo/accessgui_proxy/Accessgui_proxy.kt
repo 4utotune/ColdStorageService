@@ -67,7 +67,7 @@ class Accessgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 val TICKET = payloadArg(0)  
 								CommUtils.outcyan("$name | Store Accepted. Received ticket [ $TICKET ]")
-								 server.forward("ticket-" + payloadArg(0))  
+								 server.forward("ticket/" + payloadArg(0))  
 						}
 						//genTimer( actor, state )
 					}
@@ -80,7 +80,7 @@ class Accessgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("storerejected(_)"), Term.createTerm("storerejected(REASON)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 server.forward("error-storerejected: " + payloadArg(0))  
+								 server.forward("error/storerejected: " + payloadArg(0))  
 						}
 						//genTimer( actor, state )
 					}
@@ -108,7 +108,7 @@ class Accessgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 				}	 
 				state("handle_ticket_accepted") { //this:State
 					action { //it:State
-						 server.forward("notify-" + payloadArg(0) + " accepted")  
+						 server.forward("notify/" + payloadArg(0) + " accepted")  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -120,7 +120,7 @@ class Accessgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("ticketrejected(_)"), Term.createTerm("ticketrejected(REASON)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 server.forward("error-ticketrejected: " + payloadArg(0))  
+								 server.forward("error/ticketrejected: " + payloadArg(0))  
 						}
 						//genTimer( actor, state )
 					}
@@ -131,7 +131,7 @@ class Accessgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 				}	 
 				state("handle_charge_taken") { //this:State
 					action { //it:State
-						 server.forward("notify-chargetaken")  
+						 server.forward("notify/chargetaken")  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -146,7 +146,7 @@ class Accessgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 								 val RES = payloadArg(0)  
 								 val VAL = payloadArg(1)  
 								if(  RES == "coldstorageservice"  
-								 ){ server.forward("update-" + VAL)  
+								 ){ server.forward("update/" + VAL)  
 								}
 						}
 						//genTimer( actor, state )

@@ -18,7 +18,7 @@ public class ClientHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         sessions.add(session);
-        System.out.println("AG | Added accessgui session: " + session.getUri());
+        System.out.println("CL | Added client session: " + session.getUri());
 
         super.afterConnectionEstablished(session);
     }
@@ -27,7 +27,7 @@ public class ClientHandler extends AbstractWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session,
                                       CloseStatus status) throws Exception {
         sessions.remove(session);
-        System.out.println("AG | Removed " + session);
+        System.out.println("CL | Removed " + session);
         super.afterConnectionClosed(session, status);
     }
 
@@ -36,7 +36,7 @@ public class ClientHandler extends AbstractWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session,
                                      TextMessage message) {
         String msg = message.getPayload();
-        System.out.println("AG | Received: " + msg);
+        System.out.println("CL | Received: " + msg);
 
         this.guiManager.clientRequest(msg);
     }

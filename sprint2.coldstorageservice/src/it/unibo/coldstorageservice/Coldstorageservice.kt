@@ -20,7 +20,7 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 		val interruptedStateTransitions = mutableListOf<Transition>()
 			
 				val MaxWeightDDR = 50.0f
-				val MaxWeightcoldroom = 100.0f
+				val MaxWeightcoldroom = 200.0f
 				val TicketTimeout = 20000
 				val TicketFormat = "yyyyMMddHHmmss"; // yyyy.MM.dd.HH.mm.ss
 				
@@ -105,7 +105,7 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 								else
 								 {if(  (!ticketManager.isWorking)  
 								  ){CommUtils.outgreen("$name | Approved ticket [ $Received ]. Requesting charge")
-								 forward("gotoindoor", "gotoindoor(_)" ,"transporttrolley" ) 
+								 forward("gotoindoor", "gotoindoor(_)" ,"transporttrolley_mock" ) 
 								 }
 								 else
 								  {CommUtils.outgreen("$name | Approved ticket [ $Received ]. Currenty working on [ ${ticketManager.working} ]. Please wait")

@@ -14,6 +14,6 @@ public class AccessGuiController {
     @GetMapping("/")
     public String homePage(Model model) {
         model.addAttribute("arg", appName);
-        return "accessGui";
+        return "serviceAccessGUI";
     }
 }

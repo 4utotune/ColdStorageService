@@ -7,7 +7,7 @@ Dispatch coapUpdate: coapUpdate(RESOURCE, VALUE)
 Dispatch	chargetaken			: 	chargetaken(_)
 Request 	chargedeposited		: 	chargedeposited(_)
 
-// coldstorageservice -> transporttrolley
+// coldstorageservice -> transporttrolley_mock
 Reply 		more				:	more(_)
 Reply 		gohome				: 	gohome(_)
 Dispatch 	gotoindoor			: 	gotoindoor(_)
@@ -20,14 +20,6 @@ Reply		storerejected		: 	storerejected(_)
 Request		proxy_insertticket	: 	proxy_insertticket(TICKET)
 Reply		ticketaccepted		: 	ticketaccepted(_)
 Reply		ticketrejected		: 	ticketrejected(_)
-
-// proxy -> spring
-/*  
-Dispatch updatedata	: updatedata(ARG)
-Dispatch ticket		: ticket(TICKET)
-Dispatch error		: error(REASON)
-Dispatch notify		: notify(ARG)
-*/
 
 // spring -> proxy
 Dispatch gui_storerequest : gui_storerequest(FW)
@@ -71,14 +63,14 @@ QActor accessgui_proxy context ctx_coldstorage {
 		onMsg(storeaccepted: storeaccepted(TICKET)) {
 			[# val TICKET = payloadArg(0) #]
 			println("$name | Store Accepted. Received ticket [ $TICKET ]") color cyan
-			[# server.forward("ticket-" + payloadArg(0)) #]
+			[# server.forward("ticket/" + payloadArg(0)) #]
 		}
 	}
 	Goto observing
 	
 	State handle_store_rejected {
 		onMsg(storerejected: storerejected(REASON)) {
-			[# server.forward("error-storerejected: " + payloadArg(0)) #]
+			[# server.forward("error/storerejected: " + payloadArg(0)) #]
 		}
 		
 	}
@@ -96,19 +88,19 @@ QActor accessgui_proxy context ctx_coldstorage {
 	
 		
 	State handle_ticket_accepted {
-		[# server.forward("notify-" + payloadArg(0) + " accepted") #]
+		[# server.forward("notify/" + payloadArg(0) + " accepted") #]
 	}
 	Goto observing
 	
 	State handle_ticket_rejected {
 		onMsg(ticketrejected: ticketrejected(REASON)) {
-			[# server.forward("error-ticketrejected: " + payloadArg(0)) #]
+			[# server.forward("error/ticketrejected: " + payloadArg(0)) #]
 		}
 	}
 	Goto observing
   	
 	State handle_charge_taken {
-		[# server.forward("notify-chargetaken") #]
+		[# server.forward("notify/chargetaken") #]
 	}
 	Goto observing
 	
@@ -117,7 +109,7 @@ QActor accessgui_proxy context ctx_coldstorage {
 			[# val RES = payloadArg(0) #]
 			[# val VAL = payloadArg(1) #]
 			if [# RES == "coldstorageservice" #] {
-				[# server.forward("update-" + VAL) #]	
+				[# server.forward("update/" + VAL) #]	
 			} 
 		}
 	}
@@ -133,7 +125,7 @@ QActor accessgui_proxy context ctx_coldstorage {
 QActor coldstorageservice context ctx_coldstorage {
 	[#	
 		val MaxWeightDDR = 50.0f
-		val MaxWeightcoldroom = 100.0f
+		val MaxWeightcoldroom = 200.0f
 		val TicketTimeout = 20000
 		val TicketFormat = "yyyyMMddHHmmss"; // yyyy.MM.dd.HH.mm.ss
 		
@@ -202,7 +194,7 @@ QActor coldstorageservice context ctx_coldstorage {
 				} else {
 					if [# (!ticketManager.isWorking) #] {
 						println("$name | Approved ticket [ $Received ]. Requesting charge") color green
-						forward transporttrolley -m gotoindoor: gotoindoor(_)
+						forward transporttrolley_mock -m gotoindoor: gotoindoor(_)
 					} else {
 						println("$name | Approved ticket [ $Received ]. Currenty working on [ ${ticketManager.working} ]. Please wait") color green
 					}
@@ -257,6 +249,63 @@ QActor coldstorageservice context ctx_coldstorage {
 	Goto idle
 }
 
-QActor transporttrolley context ctx_coldstorage {
-	State init initial {}
+QActor transporttrolley_mock context ctx_coldstorage {
+	State s0 initial {
+		println("$name | init") color magenta
+	}
+	Goto engaged
+	
+	State engaged {
+		println("$name | basicrobot engaged") color magenta
+	}
+	Goto idle
+	
+	State idle{
+		discardMsg On
+	}
+	Transition t0 whenMsg gotoindoor -> moveToIndoor
+	
+	State moveToIndoor {
+		discardMsg On
+		println("$name | vado all'INDOOR") color magenta
+		delay 5000 // request moverobot (0,4)
+	}
+	Goto loadTheCharge
+	
+	State loadTheCharge{
+		discardMsg On
+		println("$name | sto caricando il carico presso l'INDOOR") color magenta
+		delay 1000 // simulo azione di carico
+		forward coldstorageservice -m chargetaken : chargetaken(_)
+	}
+	Goto movetocoldroom
+	
+	State movetocoldroom {
+		discardMsg On
+		println("$name | vado verso la cold room") color magenta
+		delay 5000 // request moverobot (4,3) 
+	}
+	Goto storethecharge
+	
+	State storethecharge {
+		discardMsg On
+		println("$name | scarico il carico presso la Cold Room") color magenta
+		delay 1000 // simulo azione di scarico
+		request coldstorageservice -m chargedeposited : chargedeposited(_)
+	}
+	Transition t0 whenReply more -> moveToIndoor
+				  whenReply gohome -> movetohome
+	
+	State movetohome{
+		discardMsg On
+		println("$name | vado alla posizione HOME") color magenta
+		delay 5000 // request moverobot (0,0)
+	}
+	Goto trolleyathome
+	
+	State trolleyathome {
+		discardMsg On
+		println("$name | trolley at HOME") color magenta		
+	}
+	Goto idle
 }
