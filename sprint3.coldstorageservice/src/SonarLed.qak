@@ -77,13 +77,13 @@ Event alarm           : alarm(X)
 Context ctx_basicrobot 	ip [host="127.0.0.1" port=8020]
 Context ctx_coldstorage ip [host="localhost" port=11802]
 // Context ctx_trolley 	ip [host="localhost" port=11801] 
-/* 
+
 CodedQActor sonar  context ctx_coldstorage className "sonarSimulator"           //IN LOCALE
 
 //CodedQActor sonar  context ctx_coldstorage className "rx.SonarMQTTReceiver"
 CodedQActor datacleaner    context ctx_coldstorage className "rx.DataCleaner"
 CodedQActor distancefilter context ctx_coldstorage className "rx.DistanceFilter"
-*/
+
 ExternalQActor basicrobot context ctx_basicrobot
 
 QActor test_suite context ctx_coldstorage {
@@ -396,7 +396,7 @@ QActor coldstorageservice context ctx_coldstorage {
 	}
 	Goto idle
 }
-/* 
+
 //sonar
 QActor alarmdevice context ctx_coldstorage {
 	[# 
@@ -442,7 +442,7 @@ QActor alarmdevice context ctx_coldstorage {
 		}
 	}Goto work
 }
-*/
+
 
 //Led
 QActor warningdevice context ctx_coldstorage {
