@@ -163,15 +163,15 @@
         Sorge un problema quando introduciamo il concetto di <u>fermare il <b>Transport Trolley</b> e riattivarlo</u>, siccome dobbiamo fermarlo all'istante e alla resume
         dovrebbe tornare a fare quello che stava facendo. Ricordiamo che per effettuare gli spostamenti del <b>Transport Trolley</b> si utilizza il <b>planner</b>
         che adotta una semantica request-reply al <b>basicrobot23</b> e l'unico modo per interromperne l'esecuzione è tramite il comando <b>alarm</b>. Mentre per fare in modo
-        che il <b>Transport Trolley</b> riprenda quello ceh stava facendo bisogna avere cura di salvarsi l'ultima operazione non portata a termine e rieffettuare tale richiesta.
+        che il <b>Transport Trolley</b> riprenda quello che stava facendo bisogna avere cura di salvarsi l'ultima operazione non portata a termine e rieffettuare tale richiesta.
         Ciò è possibile perchè il <b>Transport Trolley</b> comunica con <b>basicrobot23</b> tramite il solo comando <b>moverobot(coordinate)</b>, questa cosa ci agevola la 
         risoluzione della casisitica siccome quando il <b>Transport Trolley</b> viene fermato da un <b>alarm</b> per riprendere ciò che stava facendo è sufficiente ripetere
         lo stesso comando <b>moverobot(coordinate)</b> che non era andato a buon fine per via dell'evento straordinario. Questo è dovuto dal fatto che indipendentemente dalla
-        posizione del <b>Transport Trolley</b> comunicando a questo ultimo <b>moverobot(coordinate)</b> il risultato sarà il medesimo, ovvero raggiungere tale posizione richiesta.
+        posizione del <b>Transport Trolley</b>, comunicando a questo ultimo <b>moverobot(coordinate)</b> il risultato sarà il medesimo, ovvero raggiungere tale posizione richiesta.
         Questo ci permette di non tenere traccia degli <b>step</b> per capire a che punto si era fermato il <b>Transport Trolley</b> per poter calcolare quelli che deve ancora fare,
         ma di lasciare il compito all'infrastruttura che il <b>basicrobot23</b> offre.<br><br>
-        Nota importante: l'evento alarm viene recepito direttamente dal <b>basicrobot23</b>, quindi sarà solo lui a recepire il messaggio e non anche il <b>Transport Trolley</b>, 
-        siccome questo ultimo verrà a conoscenza dell'accaduto tramite il <b>basicrobot23</b>, che ricordiamo notifica sempre gli eventi a colui che ha fatto l'<b>engage</b>.
+        Nota importante: l'evento alarm viene recepito direttamente dal <b>basicrobot23</b> ma bisogna occuparsi comunque di inviare al <b>Transport Trolley</b> tale informazione per 
+        informarlo dell'accaduto, siccome la reply del <b>moverobot(coordinate)</b> in casi di fallimento non restituisce la loro causa.
         Per quanto riguarda invece la resume: il <b>Sonar</b> quando rileverà di nuovo una distanza che permetterà lo sblocco del <b>Transport Trolley</b> verrà emesso 
         un evento che il <b>Transport Trolley</b> riceverà e si impegnerà a risbloccare il robot dall'operazione che si era fermato, riprendendo così la sua routine.
 
@@ -192,11 +192,12 @@
         In particolare si valuta di adottare più attori, ognuno con uno scopo ben preciso:
         <ul>
             <li>Un attore per il <b>Sonar</b> che si occupa di misurare le distanze e comunicarle tutte sul canale</li>
-            <li>Un attore che filtra tutte le misurazioni prodotte dal <b>Sonar</b> e filtrare solo quelle che superano una soglia <b>DLIMT</b></li>
+            <li>Un attore che filtra tutte le misurazioni prodotte dal <b>Sonar</b> e filtrare solo quelle che no appartengono al range che il <b>sonar</b> è in grado di rilevare</li>
             <li>Un attore che ha come compito quello di notificare al <b>Transport Trolley</b> quando una distanza minore di <b>DLIMT</b> viene misurata</li>
         </ul>
+        Questi tre attori messi assieme adottano il pattren pipeline, dove l'attore successivo consuma l'output di quello precedente.
         <div class="remark">
-            <div class="keypoint">Gestione delle misurazioni ripartita tra più attori</div>
+            <div class="keypoint">Gestione delle misurazioni ripartita tra tre attori</div>
         </div>
 
         <h3>Interazioni</h3>
@@ -300,13 +301,17 @@
         
         <div class="remark">
             Gli output dello sprint3 sono:<br>
-            <ul></ul>
+            <ul>
+                <li>warning device</li>
+                <li>alarm device</li>
+            </ul>
+            Implementati all'interno di una scheda Raspberry Pi.
         </div>
 
         <h4>Goals Sprint 4</h4>
-        Si possono definire in seguito i goal relativi allo Sprint3:<br>
+        Si possono definire in seguito i goal relativi allo Sprint4:<br>
         <ol>
-            <li>Testare il sistema</li>
+            <li></li>
         </ol>
 
         <br /><br />
