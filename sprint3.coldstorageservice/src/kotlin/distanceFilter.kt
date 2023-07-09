@@ -9,7 +9,7 @@ import unibo.basicomm23.utils.CommUtils
 
 
 class DistanceFilter(name: String) : ActorBasic(name) {
-    private val DLIMIT = 25
+    private val DLIMIT = 10
 
     override suspend fun actorBody(msg: IApplMessage) {
         if (msg.msgId() != "sonardata") return

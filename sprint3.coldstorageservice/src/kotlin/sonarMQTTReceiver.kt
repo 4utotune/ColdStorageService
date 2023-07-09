@@ -13,8 +13,8 @@ import unibo.basicomm23.utils.CommUtils
 
 
 class SonarMQTTReceiver(name: String) : ActorBasic(name) {
-    val brokerip = "broker.hivemq.com"
-    val sonartopic = "sonar"
+    val brokerip = "tcp://mqtt.eclipseprojects.io"
+    val sonartopic = "unibo/sonar/events"
     val clientId = "sonarReceiver"
     private lateinit var client: MqttClient
 

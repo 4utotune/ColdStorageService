@@ -4,7 +4,7 @@ import paho.mqtt.client as paho
 
 duration = 60
 d        = []
-brokerAddr="mqtt.eclipseprojects.io"  #"mqtt.eclipseprojects.io"  #"broker.hivemq.com"    
+brokerAddr="mqtt.eclipseprojects.io"  #"mqtt.eclipseprojects.io"  #"broker.hivemq.com"
 #msg      = "msg(sonardata,event,sonar,none,distance(10),1)"
 
 

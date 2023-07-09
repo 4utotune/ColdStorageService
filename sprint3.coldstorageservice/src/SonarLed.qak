@@ -1,5 +1,7 @@
 System coldstorageservice_sprint3
 
+
+mqttBroker "mqtt.eclipseprojects.io" : 1883 eventTopic "unibo/sonar/events"
 /*
  * To do:
  * resume
@@ -79,9 +81,9 @@ Context ctx_basicrobot 	ip [host="127.0.0.1" port=8020]
 Context ctx_coldstorage ip [host="localhost" port=11802]
 // Context ctx_trolley 	ip [host="localhost" port=11801] 
 
-CodedQActor sonar  context ctx_coldstorage className "sonarSimulator"           //IN LOCALE
-
-//CodedQActor sonar  context ctx_coldstorage className "rx.SonarMQTTReceiver"
+//CodedQActor sonar  context ctx_coldstorage className "sonarSimulator"           //IN LOCALE
+  
+CodedQActor sonar  context ctx_coldstorage className "rx.SonarMQTTReceiver"
 CodedQActor datacleaner    context ctx_coldstorage className "rx.DataCleaner"
 CodedQActor distancefilter context ctx_coldstorage className "rx.DistanceFilter"
 
