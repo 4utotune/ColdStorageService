@@ -178,9 +178,15 @@
         <br>
         <br>
 
-        Siccome il <b>Led</b> è relativo esclusivamente allo stato del singolo <b>Transport Trolley</b> si ritiene lecito lasciare a lui il controllo del <b>Led</b>.
+        Siccome il <b>Led</b> è relativo esclusivamente allo stato del singolo <b>Transport Trolley</b> si ritiene lecito lasciare a lui il controllo del <b>Led</b>, utilizzando
+        il pattern Observer che permette al <b>led</b> di venire notificato ogni volta che un cambio di stato a lui interessante succede. Il <b>led</b> deve considerare anche quando
+        il robot è fermo perché sta caricando/scaricando il carico. Quindi il <b>led</b> deve rimanere aggiornato sia dal <b>transport trolley</b> che dal <b>warningdevice</b>, 
+        proprio per questo fatto di aver bisogno di ascoltare più attori si è deciso di adottare questo pattern. Utilizzando coap come protocollo di invio messaggi per il nostro
+        <b>pattern Observer</b>, siccome facente parte integrante del QAK, c'è il rischio remoto che qualche messaggio vada perso dato che si utilizza il protocollo di trasporto 
+        UDP. Non si valuta questo problema come critico in quanto la perdita di notifica di uno stato comprometterebbe il comportamento del <b>led</b> solo per breve tempo(indicativamente 3 secondi data la stanza presa in analisi), cioè fino 
+        a quando non viene ricevuta un altra notifica
         <div class="remark">
-            <div class="keypoint">Il <b>Transport Trolley</b> è l'incaricato di gestire il <b>Led</b></div>
+            <div class="keypoint">Il <b>Transport Trolley</b> è l'incaricato di gestire il <b>Led</b> adottando il pattern Observer</div>
         </div>
 
         Il <b>Sonar</b>, invece, emetterà un evento e che il <b>Transport trolley</b> capterà e valuterà. La scelta di emettere un evento per il <b>Sonar</b> è motivata
@@ -195,7 +201,7 @@
             <li>Un attore che filtra tutte le misurazioni prodotte dal <b>Sonar</b> e filtrare solo quelle che no appartengono al range che il <b>sonar</b> è in grado di rilevare</li>
             <li>Un attore che ha come compito quello di notificare al <b>Transport Trolley</b> quando una distanza minore di <b>DLIMT</b> viene misurata</li>
         </ul>
-        Questi tre attori messi assieme adottano il pattren pipeline, dove l'attore successivo consuma l'output di quello precedente.
+        Questi tre attori messi assieme adottano il <b>pattern pipeline</b>, dove l'attore successivo consuma l'output di quello precedente.
         <div class="remark">
             <div class="keypoint">Gestione delle misurazioni ripartita tra tre attori</div>
         </div>
@@ -213,50 +219,48 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>storerequest</td>
-                    <td>AlarmDevice</td>
-                    <td>TransportTrolley</td>
-                    <td>Request</td>
-                    <td>Semantica <u>Request</u> perchè il conducente deve sapere immediatamente se il suo <b>ticket</b> è stato accettato o meno. 
-                        Contiene la quantità del peso <b>FW</b> che si vuole scaricare.</td>
-                </tr>
-                <tr>
-                    <td>replystorerequest</td>
-                    <td>ColdStorageService</td>
-                    <td>ServiceAccessGUI</td>
-                    <td>Reply</td>
-                    <td>Semantica <u>Reply</u></td>
-                </tr>
-
-                <tr>
-                    <td>insertticket</td>
-                    <td>ServiceAccessGUI</td>
-                    <td>ColdStorageService</td>
-                    <td>Request</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>replyinsertticket</td>
-                    <td>ColdStorageService</td>
-                    <td>ServiceAccessGUI</td>
-                    <td>Reply</td>
-                    <td></td>
-                </tr>
-
-                <tr>
-                    <td>chargetaken</td>
-                    <td>ColdStorageService</td>
-                    <td>ServiceAccessGUI</td>
+                    <td>coapUpdate</td>
+                    <td>transportrolley</td>
+                    <td>warningdevice</td>
                     <td>Dispatch</td>
-                    <td></td>
+                    <td>Semantica <u>Dispatch</u> perchè informa al <b>warning device</b> lo stato che il 
+                    <b>led</b> deve assumere adottando il <b>pattern Observer</b>.</td>
+                </tr>
+                <tr>
+                    <td>alarm</td>
+                    <td>alarmdevice</td>
+                    <td>transportrolley <br> basicrobot
+                    </td>
+                    <td>Event</td>
+                    <td>Semantica <u>Event</u> perchè informa a chi interessato che il robot si deve fermare.</td>
                 </tr>
 
                 <tr>
-                    <td>coldroomdata</td>
-                    <td>ColdStorageService</td>
-                    <td>ServiceAccessGUI</td>
-                    <td>Dispatch</td>
-                    <td></td>
+                    <td>obstacle</td>
+                    <td>distancefilter</td>
+                    <td>alarmdevice</td>
+                    <td>Event</td>
+                    <td>Semantica <u>Event</u> che fa parte della pipeline dei gestori delle misurazioni del <b>sonar</b>
+                    che in questo caso notifica ad <b>alarmdevice</b> che la distanza misurata ed inferiore alla soglia
+                    prestabilita <b>DLIMT</b>.</td>
+                </tr>
+                <tr>
+                    <td>obstaclefree</td>
+                    <td>distancefilter</td>
+                    <td>alarmdevice</td>
+                    <td>Event</td>
+                    <td>Semantica <u>Event</u> che fa parte della pipeline dei gestori delle misurazioni del <b>sonar</b>
+                        che in questo caso notifica ad <b>alarmdevice</b> che la distanza misurata ed superiore alla soglia
+                        prestabilita <b>DLIMT</b>.</td>
+                </tr>
+
+                <tr>
+                    <td>resume</td>
+                    <td>warningdevice</td>
+                    <td>transportrolley</td>
+                    <td>Event</td>
+                    <td>Semantica <u>Event</u> che serve al <b>transportrolley</b> per capire quando può far ripartire
+                    il robot.</td>
                 </tr>
             </tbody>
         </table>
@@ -264,16 +268,18 @@
         <h3>Architettura logica</h3>
         <div class="remark">
             Codice QAK per la modellazione del sistema: <a
-                href="./sprint2.coldstorageservice/src/ColdStorageService.qak"
-                target="_blank">ColdStorageService.qak</a>
+                href="./sprint3.coldstorageservice/src/SonarLed.qak"
+                target="_blank">SonarLed.qak</a>
         </div>
 
-        Il sistema da noi modellato, presenta la seguente architettura logica:
+        Il sistema da noi modellato, presenta la seguente architettura logica:[NON E' FINALE! MANCA LA GUI][manca anche il resume event]
         <center>
             <div class="piccola">
-                <img src="./sprint2/coldstorageservice_sprint2arch.png" alt="architettura logica">
+                <img src="./sprint3/coldstorageservice_sprint3arch.png" alt="architettura logica">
             </div>
         </center>
+        Siccome non compreso nell'immagine, si esplicita il fatto che l'evento alarm giunge anche al <b>basicrobot23</b>, il quale alla sua ricezione ferma il robot.<br>
+        Inoltre per il momento si può adottare un <b>sonar</b> simulatore che genera misure a scelta, e successivamente un <b>sonar</b> fisico.
 
         <h2>Test plans</h2>
         <table id="myTable1">

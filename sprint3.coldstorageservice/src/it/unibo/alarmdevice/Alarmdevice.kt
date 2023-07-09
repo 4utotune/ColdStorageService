@@ -61,6 +61,8 @@ class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 						if( checkMsgContent( Term.createTerm("obstaclefree(D)"), Term.createTerm("obstaclefree(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								CommUtils.outblack("$name handleobstacle ALARM ${payloadArg(0)}")
+								emit("resume", "resume(_)" ) 
+								delay(10000) 
 						}
 						//genTimer( actor, state )
 					}

@@ -18,7 +18,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
-		 var allarme = 0  
+		 var allarme: Int = 0  
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -31,7 +31,6 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					}	 	 
 					 transition(edgeName="t025",targetState="engaged",cond=whenReply("engagedone"))
 					transition(edgeName="t026",targetState="quit",cond=whenReply("engagerefused"))
-					transition(edgeName="t027",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
 				state("engaged") { //this:State
 					action { //it:State
@@ -47,16 +46,18 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("idle") { //this:State
 					action { //it:State
+						 allarme = 1  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t028",targetState="moveToIndoor",cond=whenDispatch("gotoindoor"))
-					transition(edgeName="t029",targetState="sonarobstacle",cond=whenEvent("alarm"))
+					 transition(edgeName="t027",targetState="moveToIndoor",cond=whenDispatch("gotoindoor"))
+					transition(edgeName="t028",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
 				state("moveToIndoor") { //this:State
 					action { //it:State
+						 allarme = 2  
 						updateResourceRep( "$name(BLINK)" 
 						)
 						CommUtils.outmagenta("$name | vado all'INDOOR")
@@ -66,11 +67,12 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t030",targetState="loadTheCharge",cond=whenReply("moverobotdone"))
-					transition(edgeName="t031",targetState="sonarobstacle",cond=whenEvent("alarm"))
+					 transition(edgeName="t029",targetState="loadTheCharge",cond=whenReply("moverobotdone"))
+					transition(edgeName="t030",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
 				state("loadTheCharge") { //this:State
 					action { //it:State
+						 allarme = 3  
 						updateResourceRep( "$name(ON)" 
 						)
 						CommUtils.outmagenta("$name | sto caricando il carico presso l'INDOOR")
@@ -84,11 +86,12 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t032",targetState="storethecharge",cond=whenReply("moverobotdone"))
-					transition(edgeName="t033",targetState="sonarobstacle",cond=whenEvent("alarm"))
+					 transition(edgeName="t031",targetState="storethecharge",cond=whenReply("moverobotdone"))
+					transition(edgeName="t032",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
 				state("storethecharge") { //this:State
 					action { //it:State
+						 allarme = 4  
 						updateResourceRep( "$name(ON)" 
 						)
 						CommUtils.outmagenta("$name | scarico il carico presso la Cold Room")
@@ -99,12 +102,13 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t034",targetState="moveToIndoor",cond=whenReply("more"))
-					transition(edgeName="t035",targetState="movetohome",cond=whenReply("gohome"))
-					transition(edgeName="t036",targetState="sonarobstacle",cond=whenEvent("alarm"))
+					 transition(edgeName="t033",targetState="moveToIndoor",cond=whenReply("more"))
+					transition(edgeName="t034",targetState="movetohome",cond=whenReply("gohome"))
+					transition(edgeName="t035",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
 				state("movetohome") { //this:State
 					action { //it:State
+						 allarme = 5  
 						updateResourceRep( "$name(BLINK)" 
 						)
 						CommUtils.outmagenta("$name | vado alla posizione HOME")
@@ -114,8 +118,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t037",targetState="trolleyathome",cond=whenReply("moverobotdone"))
-					transition(edgeName="t038",targetState="sonarobstacle",cond=whenEvent("alarm"))
+					 transition(edgeName="t036",targetState="trolleyathome",cond=whenReply("moverobotdone"))
+					transition(edgeName="t037",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
 				state("trolleyathome") { //this:State
 					action { //it:State
@@ -160,6 +164,16 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition(edgeName="t038",targetState="idle",cond=whenEventGuarded("resume",{ allarme == 1  
+					}))
+					transition(edgeName="t039",targetState="moveToIndoor",cond=whenEventGuarded("resume",{ allarme == 2  
+					}))
+					transition(edgeName="t040",targetState="loadTheCharge",cond=whenEventGuarded("resume",{ allarme == 3  
+					}))
+					transition(edgeName="t041",targetState="storethecharge",cond=whenEventGuarded("resume",{ allarme == 4  
+					}))
+					transition(edgeName="t042",targetState="movetohome",cond=whenEventGuarded("resume",{ allarme == 5  
+					}))
 				}	 
 				state("quit") { //this:State
 					action { //it:State

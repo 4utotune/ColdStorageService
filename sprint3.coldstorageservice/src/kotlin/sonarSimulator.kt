@@ -25,12 +25,36 @@ class sonarSimulator ( name : String ) : ActorBasic( name ) {
 //@kotlinx.coroutines.ObsoleteCoroutinesApi
 
 	suspend fun startDataReadSimulation(    ){
-		val data = sequence<Int>{
+		/*val data = sequence<Int>{
 			var v0 = 75
 			yield(v0)
+			var flag = false
 			while(true){
-				v0 = v0 - 5
+				if(v0==0) flag=true
+				if(v0==200) flag=false
+
+				if (flag){
+					v0 = v0 - 5
+				}else{
+					v0 = v0 + 5
+				}
 				yield( v0 )
+			}
+		}*/
+		val data = sequence<Int> {
+			var v0 = 110
+			yield(v0)
+
+			while (true) {
+				if (v0 > 0) {
+					v0 -= 5
+				} else if (v0 == 0) {
+					v0 = 90
+				} else {
+					v0 = 0
+				}
+
+				yield(v0)
 			}
 		}
 		var i = 0

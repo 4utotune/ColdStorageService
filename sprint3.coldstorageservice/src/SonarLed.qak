@@ -75,7 +75,7 @@ Event alarm           : alarm(X)
 Event resume		  : resume(X)
 
 // Context ctx_mockgui		ip [host="localhost" port=11800]
-Context ctx_basicrobot 	ip [host="127.0.0.1" port=8020]
+Context ctx_basicrobot 	ip [host="127.0.0.1" port=8020]  
 Context ctx_coldstorage ip [host="localhost" port=11802]
 // Context ctx_trolley 	ip [host="localhost" port=11801] 
 
@@ -504,7 +504,7 @@ QActor warningdevice context ctx_coldstorage {
 
 
 QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
-	[# var allarme = 0 #]
+	[# var allarme: Int = 0 #]
 	State s0 initial {
 		println("$name | init e engage basicrobot") color magenta
 		//delegate "obstacle" to sonarobstacle
@@ -605,11 +605,11 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	State sonarobstacle {
 		println("$name | Sono fermo per ostacolo sonar") color magenta
 	}
-	Transition t0 whenEvent resume and [# allarme = 1 #] -> idle
-				  whenEvent resume and [# allarme = 2 #] -> moveToIndoor
-				  whenEvent resume and [# allarme = 3 #] -> loadTheCharge
-				  whenEvent resume and [# allarme = 4 #] -> storethecharge
-				  whenEvent resume and [# allarme = 5 #] -> movetohome
+	Transition t0 whenEvent resume and [# allarme == 1 #] -> idle
+				  whenEvent resume and [# allarme == 2 #] -> moveToIndoor
+				  whenEvent resume and [# allarme == 3 #] -> loadTheCharge
+				  whenEvent resume and [# allarme == 4 #] -> storethecharge
+				  whenEvent resume and [# allarme == 5 #] -> movetohome
 	
 	State quit {
 		updateResource [# "$name(OFF)"#]
