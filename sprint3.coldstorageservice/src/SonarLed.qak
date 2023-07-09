@@ -2,10 +2,9 @@ System coldstorageservice_sprint3
 
 /*
  * To do:
- * controllo update led
- * fermare il TT
- * fermare il basic robot
  * resume
+ * il sonar funziona tuttavia se con il sonar simulator
+ * imposto 80 il basicrobot non funziona 
  */
 
 
@@ -72,6 +71,8 @@ Event obstaclefree	:	obstaclefree(D)	//emitted as stream by distancefilter
 
 //Fermare il BasicRobot
 Event alarm           : alarm(X)
+//Riprendere il TT 
+Event resume		  : resume(X)
 
 // Context ctx_mockgui		ip [host="localhost" port=11800]
 Context ctx_basicrobot 	ip [host="127.0.0.1" port=8020]
@@ -400,7 +401,7 @@ QActor coldstorageservice context ctx_coldstorage {
 	Goto idle
 }
 /*
- *Actor alarmino context ctx_coldstorage{
+ *QActor alarmino context ctx_coldstorage{
     State init initial {
         println("$name | Init") color blue
 
@@ -416,7 +417,7 @@ QActor coldstorageservice context ctx_coldstorage {
 
 //sonar
 QActor alarmdevice context ctx_coldstorage {
-	
+	//il prefixed amount of time lo consideriamo 10sec
 	State init initial { 
 		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
 		println ("$name | init") color black
@@ -432,18 +433,16 @@ QActor alarmdevice context ctx_coldstorage {
 		onMsg( obstacle : obstacle(D)){
 			emit alarm : alarm(_)			
 			println("$name handleobstacle ALARM ${payloadArg(0)}") color black
-			
-			//emit obstacle : obstacle(_)
 			updateResource [# "$name(ON)"#]		
 		}	
 	}
 	Transition t0 whenEvent obstaclefree -> handleobstaclefree	               
 	
-	
 	State handleobstaclefree {
 		onMsg( obstaclefree : obstaclefree(D)){			
 			println("$name handleobstacle ALARM ${payloadArg(0)}") color black
-			//resume basicrobot
+			emit resume : resume(_) //resume TT
+			delay 10000 //prefixed amout of time -> delay
 		}
 	}Goto work
 }
@@ -486,9 +485,6 @@ QActor warningdevice context ctx_coldstorage {
 			else {
 				println ("$name | $stato1 | sconosciuto | ricevuto dal TT") color blue
 			}
-			
-			
-			
 			}
 			}	 
 		}
@@ -501,7 +497,6 @@ QActor warningdevice context ctx_coldstorage {
 				println ("$name | sconosciuto | ricevuto dal sonar") color blue
 			}
 		}
-		
 	}
 	Goto work
 	
@@ -518,7 +513,6 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	}
 	Transition 	t0	whenReply engagedone -> engaged
 					whenReply engagerefused -> quit
-					whenEvent alarm -> sonarobstacle
 	
 	State engaged {
 		println("$name | basicrobot engaged") color magenta
@@ -527,12 +521,13 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	Goto idle
 	
 	State idle{
-		
+		[# allarme = 1 #]
 	}
 	Transition t0 whenMsg gotoindoor -> moveToIndoor
 				  whenEvent alarm -> sonarobstacle
 	
 	State moveToIndoor {
+		[# allarme = 2 #]
 		updateResource [# "$name(BLINK)"#]
 		//discardMsg On
 		println("$name | vado all'INDOOR") color magenta
@@ -544,6 +539,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	
 	State loadTheCharge{
 		//discardMsg On
+		[# allarme = 3 #]
 		updateResource [# "$name(ON)"#]
 		println("$name | sto caricando il carico presso l'INDOOR") color magenta
 		// simulo azione di carico
@@ -560,6 +556,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 			      whenEvent alarm -> sonarobstacle
 	
 	State storethecharge {
+		[# allarme = 4 #]
 		updateResource [# "$name(ON)"#]
 		//discardMsg On
 		println("$name | scarico il carico presso la Cold Room") color magenta
@@ -572,6 +569,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 				  whenEvent alarm -> sonarobstacle
 	
 	State movetohome{
+		[# allarme = 5 #]
 		updateResource [# "$name(BLINK)"#]
 		//discardMsg On 
 		println("$name | vado alla posizione HOME") color magenta
@@ -607,6 +605,11 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	State sonarobstacle {
 		println("$name | Sono fermo per ostacolo sonar") color magenta
 	}
+	Transition t0 whenEvent resume and [# allarme = 1 #] -> idle
+				  whenEvent resume and [# allarme = 2 #] -> moveToIndoor
+				  whenEvent resume and [# allarme = 3 #] -> loadTheCharge
+				  whenEvent resume and [# allarme = 4 #] -> storethecharge
+				  whenEvent resume and [# allarme = 5 #] -> movetohome
 	
 	State quit {
 		updateResource [# "$name(OFF)"#]
