@@ -40,7 +40,8 @@ class SonarMQTTReceiver(name: String) : ActorBasic(name) {
             override fun messageArrived(topic: String, message: MqttMessage) {
                 try {
                     val data = String(message.payload, charset("UTF-8"))
-                    val event = CommUtils.buildEvent(name, "sonardistance", data)
+                    val event = CommUtils.buildEvent(name, "sonardata", data)
+                    //System.out.println("creo:"+data)
 
                     GlobalScope.launch {
                         emitLocalStreamEvent(event)

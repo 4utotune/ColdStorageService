@@ -302,6 +302,48 @@
         </table>
 
         <h2>Project</h2>
+        Siccome nell'analisi del problema si è utilizzato un simulatore del <b>sonar</b> per creare il QAK, il passo successivo è quello di integrarne uno fisico.
+        Per fare ciò si adotta un borker gratuito e a disposizione di tutti come <u>tcp://mqtt.eclipseprojects.io</u> che permette l'invio e la ricezione di eventi
+        tra dispositivi fisicamente non collegati ma connessi alla rete internet.<br>
+        Per comunicare dati utilizzando <b>MQTT</b> bisogna definire un topic che definisce il canale di utilizzo, utile per organizzare canali logici al solo fine di 
+        poter distinguere categorie di eventi che vogliamo raggruppare o meno. Nel nostro caso si è adtootato <b>unibo/sonar/events</b> come topic per comunicare i dati
+        dal <b>Raspberry</b> al <b>ColdStorageService</b>, il quale si impegna a ricevere le misurazioni "grezze" del <b>sonar</b> e prima di considerarle vengono 
+        un po lavorate da:
+        <ul>
+            <li><b>SonarMQTTReceiver</b>: si impegna a ricevere i dati "grezzi" del <b>sonar</b> tramite MQTT e poi propaga l'evento all'interno del contesto ctx_coldstorage</li>
+            <li><b>DataCleaner</b>: pulisce i valori scartando le misurazioni che non sono comprese in un range che va da 2 a 150 cm</li>
+            <li><b>DistanceFilter</b>: riceve i dati puliti dal <b>DataCleaner</b> e invia un evento <b>obstacle</b> o <b>obstaclefree</b> qualora le misurazioni rispettivamente siano inferiori di <b>DLIMT</b> 
+            oppure maggiori</li>
+        </ul>
+        Per finire la catena: gli eventi <b>obstacle</b> e <b>obstaclefree</b> sono eventi che l'<b>alarm device</b> è in grado di captare e, qualora le condizioni riguardanti 
+        il tempo <b>MINT</b> tra uno stop e l'altro siano soddisfatte, emette un evento alarm che verrà ricevuto sia da <b>basicrobot23</b> sia dal <b>transportrolley</b>.
+        <br><br>
+        Anche per comunicare con il <b>led</b> si utilizza MQTT, mandando un messaggio con l'ausilio di un <b>UN ATTORE SCRITTO IN KOTLIN??</b> ed utilizzando 
+        <b>unibo/led/events</b> come topic.
+        <br><br>
+        Per la fase di prototipazione il <b>sonar</b> e <b>led</b> saranno collegati ad un <b>Raspberry</b> tramite dei cavetti jumper femmina-femmina.
+        <br>
+        Il Software lato <b>Raspberry</b> sarà organizzato nella seguente maniera:
+        <ul>
+            <li>Un programma python che si occupa di utilizzare il <b>sonar</b> per estrapolare le distanze misurate</li>
+            <li>Un programma python che cattura tali dati da standard input e scatena degli eventi al borker e topic citati nei paragrafi precedenti</li>
+        </ul>
+        Per definizione i due programmi devono essere eseguiti in pipe, es. : <u>python sonar.py | python controllerMQTT.py</u> 
+        <br><br>
+        Qui vengono riportati i file che definiscono il software necessario per il <b>Raspberry</b>: <a href="./sprint3/sonar.py">sonar.py</a> <a href="./sprint3/ControllerMqtt.py">controllerMQTT</a>
+        <br><br>
+        La scelta di Python è motivata dal fatto che si presenta un linbguaggio ideale per la prototipazione: rapido, con molte librerie di supporto e ben documentato.
+        Successivamente se si desiderano performace migliori si può pensare di ottimizzare scrivendo codice di più basso livello.
+        <br><br>
+        I pin del <b>Raspberry</b> coinvolti sono:
+        <ul>
+            <li><b>GPIO 4</b>: pin TRIG sonar</li>
+            <li><b>GPIO 27</b>: pin ECHO sonar</li>
+            <li><b>GPIO 25</b>: pin led</li>
+        </ul>
+
+
+
         
         <h2>Conclusioni</h2>
         

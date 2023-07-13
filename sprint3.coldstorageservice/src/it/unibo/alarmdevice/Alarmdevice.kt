@@ -18,6 +18,9 @@ class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
+		 var LastStop = 0L
+			   var MINT = 10000L
+			   var Delta = 0L
 		return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
@@ -48,6 +51,7 @@ class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 								CommUtils.outblack("$name handleobstacle ALARM ${payloadArg(0)}")
 								updateResourceRep( "$name(ON)" 
 								)
+								 LastStop = System.currentTimeMillis() 
 						}
 						//genTimer( actor, state )
 					}
@@ -62,7 +66,10 @@ class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								CommUtils.outblack("$name handleobstacle ALARM ${payloadArg(0)}")
 								emit("resume", "resume(_)" ) 
-								delay(10000) 
+								CommUtils.outblack("$name aspetto DLMIT prima di poter gestire un successivo stop")
+								 Delta=MINT-(System.currentTimeMillis()-LastStop) 
+											   delay(Delta)			
+								CommUtils.outblack("$name sono di nuovo pronto per poter gestire uno stop")
 						}
 						//genTimer( actor, state )
 					}

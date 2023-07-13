@@ -53,16 +53,19 @@ class Warningdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 								if(  (stato1 == "transporttrolley(OFF)")  
 								 ){CommUtils.outblue("$name | led off | ricevuto dal TT")
 								 state = 0  
+								emit("ledoff", "ledoff(_)" ) 
 								}
 								else
 								 {if(  (stato1 == "transporttrolley(ON)")  
 								  ){CommUtils.outblue("$name | led ON | ricevuto dal TT")
 								  state = 1  
+								 emit("ledon", "ledon(_)" ) 
 								 }
 								 else
 								  {if(  (stato1 == "transporttrolley(BLINK)")  
 								   ){CommUtils.outblue("$name | led BLINK | ricevuto dal TT")
 								   state = 2  
+								  emit("ledblink", "ledblink(_)" ) 
 								  }
 								  else
 								   {CommUtils.outblue("$name | $stato1 | sconosciuto | ricevuto dal TT")

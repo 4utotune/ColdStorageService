@@ -31,6 +31,7 @@ with Diagram('coldstorageservice_sprint3Arch', show=False, outformat='png', grap
           sonar=Custom('sonar(coded)','./qakicons/codedQActor.png')
           datacleaner=Custom('datacleaner(coded)','./qakicons/codedQActor.png')
           distancefilter=Custom('distancefilter(coded)','./qakicons/codedQActor.png')
+          ledMQTTSender=Custom('ledMQTTSender(coded)','./qakicons/codedQActor.png')
      test_suite >> Edge(color='blue', style='solid', xlabel='next_test', fontcolor='blue') >> test_suite
      test_suite >> Edge(color='blue', style='solid', xlabel='mock_store_request', fontcolor='blue') >> accessguimock
      test_suite >> Edge(color='blue', style='solid', xlabel='mock_ticket_input', fontcolor='blue') >> accessguimock
@@ -42,7 +43,11 @@ with Diagram('coldstorageservice_sprint3Arch', show=False, outformat='png', grap
      sys >> Edge(color='red', style='dashed', xlabel='obstacle', fontcolor='red') >> alarmdevice
      alarmdevice >> Edge( xlabel='alarm', **eventedgeattr, fontcolor='red') >> sys
      sys >> Edge(color='red', style='dashed', xlabel='obstaclefree', fontcolor='red') >> alarmdevice
+     alarmdevice >> Edge( xlabel='resume', **eventedgeattr, fontcolor='red') >> sys
      transporttrolley >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> warningdevice
+     warningdevice >> Edge( xlabel='ledoff', **eventedgeattr, fontcolor='red') >> sys
+     warningdevice >> Edge( xlabel='ledon', **eventedgeattr, fontcolor='red') >> sys
+     warningdevice >> Edge( xlabel='ledblink', **eventedgeattr, fontcolor='red') >> sys
      transporttrolley >> Edge(color='magenta', style='solid', xlabel='engage', fontcolor='magenta') >> basicrobot
      sys >> Edge(color='red', style='dashed', xlabel='alarm', fontcolor='red') >> transporttrolley
      transporttrolley >> Edge(color='magenta', style='solid', xlabel='moverobot', fontcolor='magenta') >> basicrobot
@@ -50,5 +55,6 @@ with Diagram('coldstorageservice_sprint3Arch', show=False, outformat='png', grap
      transporttrolley >> Edge(color='magenta', style='solid', xlabel='chargedeposited', fontcolor='magenta') >> coldstorageservice
      transporttrolley >> Edge(color='blue', style='solid', xlabel='setdirection', fontcolor='blue') >> basicrobot
      transporttrolley >> Edge(color='blue', style='solid', xlabel='next_test', fontcolor='blue') >> test_suite
+     sys >> Edge(color='red', style='dashed', xlabel='resume', fontcolor='red') >> transporttrolley
      transporttrolley >> Edge(color='blue', style='solid', xlabel='disengage', fontcolor='blue') >> basicrobot
 diag
