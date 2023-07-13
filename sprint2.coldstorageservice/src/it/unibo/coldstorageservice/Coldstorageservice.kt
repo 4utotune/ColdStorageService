@@ -79,8 +79,8 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 								  {
 								  						val TICKET = ticketManager.newTicket(FW)
 								  					  	ReservedWeight += FW
-								  					  	val Timestamp = TICKET.timestamp
-								  answer("proxy_storerequest", "storeaccepted", "storeaccepted($Timestamp)"   )  
+								  					  	val TicketId = TICKET.id
+								  answer("proxy_storerequest", "storeaccepted", "storeaccepted($TicketId)"   )  
 								  }
 								 }
 						}
@@ -138,8 +138,8 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				state("handle_charge_taken") { //this:State
 					action { //it:State
 						 			
-									val Timestamp = ticketManager.waitingNowWorking()
-						CommUtils.outgreen("$name | Charge taken for ticket [ $Timestamp ]")
+									val TicketId = ticketManager.waitingNowWorking()
+						CommUtils.outgreen("$name | Charge taken for ticket [ $TicketId ]")
 						forward("chargetaken", "chargetaken(_)" ,"accessgui_proxy" ) 
 						//genTimer( actor, state )
 					}

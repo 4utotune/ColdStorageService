@@ -25,8 +25,7 @@
         Lo <b>Sprint2</b> è il naturale proseguo di quanto realizzato nello Sprint1. Dopo aver delineato, realizzato e
         testato il Core
         Business del sistema, composto dal <b>ColdStorageService</b> e <b>Transport Trolley</b>, possiamo prosegurie
-        sostituendo il simulatore della <b>ServiceAccessGUI</b> con il componente
-        reale.
+        sostituendo il simulatore della <b>ServiceAccessGUI</b> con il componente reale.
 
         <h2>Requirements</h2>
 
@@ -51,34 +50,21 @@
         <h4>Chiarimenti del committente</h4>
         L'interazione con il committente ha permesso di chiarire alcuni aspetti del progetto:
         <ul>
-            <li>Cosa significa GUI unica?</li>
-            <li>I conducenti dei <b>Fridge Truck</b> inseriscono i <b>ticket</b> solo quando si trovano davanti alla <b>INDOOR</b></li>
+            <li>La ServiceAccessGUI deve essere unica e visualizzabile da qualunque dispositivo</li>
+            <li>I conducenti dei <b>Fridge Truck</b> inseriscono i <b>ticket</b> solo quando si trovano davanti alla
+                <b>INDOOR</b>
+            </li>
+            <li>L'analisi richiestaci in merito all'uso di Ticket in applicazioni già diffuse è presente nella <a
+                    href="#analisiticket">apposita sezione</a> dell'Analisi del Problema</li>
         </ul>
-        I <b>Ticket</b>, nel mondo odierno, vengono utilizzati come metodo di autenticazione e validazione; esattamente come nel caso di questo progetto. <br>
-        Per prevenire l'utilizzo non autorizzato di un ticket da parte di un'altra persona, sono adottate diverse misure di sicurezza, tra cui:
-        <ul>
-            <li>Crittografia: I ticket possono essere crittografati per proteggere le informazioni contenute al loro interno e impedire la loro alterazione o contraffazione.</li>
-            <li>Protezione dei canali di comunicazione: I canali di comunicazione utilizzati per trasmettere i ticket devono essere protetti tramite cifratura e altri meccanismi di sicurezza per prevenire il furto o l'intercettazione dei ticket.</li>
-            <li>Controllo delle autorizzazioni: I server o i sistemi che ricevono i ticket devono verificare che il ticket contenga le autorizzazioni necessarie per accedere alle risorse o ai servizi richiesti.</li>
-            <li>Firma digitale: I ticket possono essere firmati digitalmente per garantire l'autenticità e l'integrità delle informazioni contenute al loro interno.</li>
-            <li>Validità limitata nel tempo: I ticket possono avere una scadenza dopo la quale non sono più validi. Questo limita il periodo in cui possono essere utilizzati in modo sicuro.</li>
-            <li>Gestione delle sessioni: I ticket possono essere associati a una sessione utente. Il server tiene traccia dello stato della sessione e invalida il ticket quando la sessione termina o viene disconnessa.</li>
-            <li>Token a un solo uso (One-Time Token): I ticket possono essere generati come token a un solo uso, che diventa invalido dopo essere stato utilizzato una volta. Questo riduce il rischio di riproduzione o riutilizzo dei ticket.</li>
-            <li>Controllo dell'IP di origine: I server possono verificare che l'IP di origine delle richieste corrisponda all'IP registrato nel ticket. Se l'IP non corrisponde, il ticket potrebbe essere considerato non valido.</li>
-            <li>Controllo dell'User-Agent: I server possono verificare che l'User-Agent del client corrisponda a quello registrato nel ticket. Se l'User-Agent non corrisponde, il ticket potrebbe essere considerato non valido.</li>
-            <li>Token di accesso a lunga durata e token di aggiornamento: In alcuni casi, possono essere utilizzati token di accesso a lunga durata o token di aggiornamento per ottenere nuovi ticket o estendere la validità dei ticket esistenti. Questi token richiedono un processo di autenticazione aggiuntivo per ottenere un nuovo ticket.</li>
-            <li>Monitoraggio delle attività: I sistemi possono monitorare le attività associate a un ticket, inclusi gli accessi, le richieste e le operazioni eseguite. Questo consente di rilevare comportamenti anomali o sospetti e prendere le misure necessarie.</li>
-            <li>Revoca dei ticket: In caso di compromissione o sospetto di utilizzo non autorizzato, i ticket possono essere revocati in modo proattivo per impedire ulteriori accessi non autorizzati. Ciò richiede un sistema di gestione dei ticket che consenta la revoca e la disattivazione dei ticket in modo tempestivo.</li>
-            <li>Protezione fisica e sicurezza dei server: I server che gestiscono i ticket devono essere adeguatamente protetti fisicamente e devono seguire le migliori pratiche di sicurezza informatica per prevenire accessi non autorizzati o compromissioni dei ticket.</li>
-        </ul>
-        Non potendo fare supposizioni sui conducenti dei <b>Fridge Truck</b>, che possono avere più dispositivi, o ad esempio essere più di uno su uno stesso Fridge Truck, si è deciso di generare un Ticket come una sequenza randomica di numeri e lettere. <br>
-        In questa maniera anche con un errore di battitura, il conducente non rischia di utilizzare il <b>Ticket</b> di un altro conducente. 
 
         <h4>Chiarimenti con il committente</h4>
         <ul>
-            <li></li>
+            <li>Strategia da utilizzare in merito alla problematica di assenza di una coda di Truck e potenziale elevato
+                numero di Ticket emessi in attesa di essere serviti dal Servizio.<br>(Si veda la <a
+                    href="#strategiaticket">apposita sezione</a> dell'Analisi del Problema)</li>
         </ul>
-        
+
 
         <h3>Analisi</h3>
         Dai requisiti espressi nel <a target="_blank" href="http://calendar.altervista.org/TemaFinale23.pdf">Tema
@@ -86,157 +72,262 @@
         già effettuate negli Sprint0 e Sprint1, in questo Sprint occorre analizzare le entità:
         <ul>
             <li><b>ServiceAccessGUI</b>, che è una interfaccia grafica per interagire con il servizio</li>
-            <li><b>ColdStorageService</b>, per verificare che sia pienamente compatibile con il workflow una volta introdotta la GUI</li>
+            <li><b>ColdStorageService</b>, per verificare che sia pienamente compatibile con il workflow una volta
+                introdotta la GUI</li>
         </ul>
         <br>
-        <br>
-        
-
-        Tra i requisiti specificati vi è che la <b>ServiceAccessGUI</b> deve essere in grado di interagire con il servizio <b>ColdStorageService</b>
+        Tra i requisiti specificati vi è che la <b>ServiceAccessGUI</b> deve essere in grado di interagire con il
+        servizio <b>ColdStorageService</b>
         effettuando due richieste possibili<br>
         <ul>
-            <li>Richiesta di emissione di un <b>ticket</b></li>
-            <li>Richiesta di scarico</li>
+            <li>Richiesta di emissione di un <b>ticket</b> specificando il peso che si intende depositare</li>
+            <li>Richiesta di scarico (inserendo un ticket)</li>
         </ul>
-        In particolare quando un conducente vuole chiedere un <b>ticket</b> specifica anche il peso del carico che è intenzionato a scaricare.<br>
         <br>
         La <b>ServiceAccessGUI</b> deve anche mostrare il peso corrente presente nella <b>ColdRoom</b>.
 
         <h2>Analisi del Problema</h2>
-        Il corpo di questo sprint è il componente <b>ServiceAccessGUI</b>.
-        
-        <h3>ServiceAccessGUI</h3>
-        Svolgendo il ruolo da intermediario tra i conducenti ed il <b>ColdStorageService</b> mostra una interfaccia grafica che permette l'invio di 
-        richieste al servizio. Le richieste come da requisiti,utilizzando la terminologia coniata nello sprint1, sono due:<br>
+        Il corpo di questo sprint è il componente <b>ServiceAccessGUI</b>. Prima di dedicarsi alla sua analisi è
+        necessario però discutere in merito alla strategia da adottare per modellare i Ticket, effettuando una ricerca
+        richiesta del committente. <br>
+        In seguito, si discuterà anche degli eventuali aggiornamenti sul componente <b>ColdStorageService</b>
+
+        <h3 id="analisiticket">Strategia Ticket</h3>
+        I <b>Ticket</b>, nel mondo odierno, vengono utilizzati come metodo di autenticazione e validazione; esattamente
+        come nel caso di questo progetto. <br>
+        Per prevenire l'utilizzo non autorizzato di un ticket da parte di un'altra persona, sono adottate diverse misure
+        di sicurezza, tra cui:
         <ul>
-            <li><b>storerequest</b>: richiesta di erogazione di un <b>ticket</b>. Contiene l'informazione del peso <b>FW</b> del carico.</li>
-            <li><b>insertticket</b>: richiesta di servizio di scarico presso l'<b>INDOOR</b>. Contiene l'informazione del numero del <b>ticket</b> corrispondente.</li>
+            <li>Crittografia: I ticket possono essere crittografati per proteggere le informazioni contenute al loro
+                interno e impedire la loro alterazione o contraffazione.</li>
+            <li>Protezione dei canali di comunicazione: I canali di comunicazione utilizzati per trasmettere i ticket
+                devono essere protetti tramite cifratura e altri meccanismi di sicurezza per prevenire il furto o
+                l'intercettazione dei ticket.</li>
+            <li>Controllo delle autorizzazioni: I server o i sistemi che ricevono i ticket devono verificare che il
+                ticket contenga le autorizzazioni necessarie per accedere alle risorse o ai servizi richiesti.</li>
+            <li>Firma digitale: I ticket possono essere firmati digitalmente per garantire l'autenticità e l'integrità
+                delle informazioni contenute al loro interno.</li>
+            <li>Validità limitata nel tempo: I ticket possono avere una scadenza dopo la quale non sono più validi.
+                Questo limita il periodo in cui possono essere utilizzati in modo sicuro.</li>
+            <li>Gestione delle sessioni: I ticket possono essere associati a una sessione utente. Il server tiene
+                traccia dello stato della sessione e invalida il ticket quando la sessione termina o viene disconnessa.
+            </li>
+            <li>Token a un solo uso (One-Time Token): I ticket possono essere generati come token a un solo uso, che
+                diventa invalido dopo essere stato utilizzato una volta. Questo riduce il rischio di riproduzione o
+                riutilizzo dei ticket.</li>
+            <li>Controllo dell'IP di origine: I server possono verificare che l'IP di origine delle richieste
+                corrisponda all'IP registrato nel ticket. Se l'IP non corrisponde, il ticket potrebbe essere considerato
+                non valido.</li>
+            <li>Controllo dell'User-Agent: I server possono verificare che l'User-Agent del client corrisponda a quello
+                registrato nel ticket. Se l'User-Agent non corrisponde, il ticket potrebbe essere considerato non
+                valido.</li>
+            <li>Token di accesso a lunga durata e token di aggiornamento: In alcuni casi, possono essere utilizzati
+                token di accesso a lunga durata o token di aggiornamento per ottenere nuovi ticket o estendere la
+                validità dei ticket esistenti. Questi token richiedono un processo di autenticazione aggiuntivo per
+                ottenere un nuovo ticket.</li>
+            <li>Monitoraggio delle attività: I sistemi possono monitorare le attività associate a un ticket, inclusi gli
+                accessi, le richieste e le operazioni eseguite. Questo consente di rilevare comportamenti anomali o
+                sospetti e prendere le misure necessarie.</li>
+            <li>Revoca dei ticket: In caso di compromissione o sospetto di utilizzo non autorizzato, i ticket possono
+                essere revocati in modo proattivo per impedire ulteriori accessi non autorizzati. Ciò richiede un
+                sistema di gestione dei ticket che consenta la revoca e la disattivazione dei ticket in modo tempestivo.
+            </li>
+            <li>Protezione fisica e sicurezza dei server: I server che gestiscono i ticket devono essere adeguatamente
+                protetti fisicamente e devono seguire le migliori pratiche di sicurezza informatica per prevenire
+                accessi non autorizzati o compromissioni dei ticket.</li>
         </ul>
+        Per semplicità massima, e non potendo fare supposizioni sui conducenti dei <b>Fridge Truck</b>, che potrebbero
+        ad esempio avere più dispositivi o utilizzare in maniera alternata il proprio e quello di collega, si è deciso
+        di generare un Ticket avendo come identificazione una sequenza randomica di numeri e lettere, mantenendo la
+        durata limitata e il singolo uso richiesti dai requisiti. <br>
+        In questa maniera anche con un errore di battitura, il conducente non rischia di utilizzare il <b>Ticket</b> di
+        un altro conducente.
+        <div class="remark keypoint">I <b>Ticket</b> sono identificati da una sequenza randomica di lettere e numeri
+        </div>
+
+        <h3>ServiceAccessGUI</h3>
+        Questo componente, che potremmo descrivere come esterno al sistema, svolge il ruolo da intermediario tra i
+        conducenti ed il <b>ColdStorageService</b>, mediante una interfaccia grafica che permette l'invio di
+        richieste al servizio. Queste richieste, come da requisiti, sono due:<br>
+        <ul>
+            <li><b>storerequest</b>: richiesta di erogazione di un <b>ticket</b>. Contiene l'informazione del peso
+                <b>FW</b> del carico.
+            </li>
+            <li><b>insertticket</b>: richiesta di servizio di scarico presso l'<b>INDOOR</b>. Contiene l'informazione
+                del numero del <b>ticket</b> corrispondente.</li>
+        </ul>
+        Oltre a permettere di interagire con il servizio la ServiceAccessGUI deve anche mostrarne lo stato. In
+        particolare, l'informazione relativa al peso corrente contenuto all'interno della ColdRoom. Questo dovrà essere
+        aggiornato in tempo reale.
+        <div class="remark keypoint">La ServiceAccessGUI è una interfaccia grafica per interagire con il Servizio e
+            ottenerne informazioni sullo stato</div>
+
         Analizzando tali informazioni si deduce che la <b>ServiceAccessGUI</b> deve essere fornita di:
         <ul>
             <li>un campo per inserire il peso ed un pulsante per effettuare la richiesta <u>storerequest</u>.</li>
-            <li>un campo per inserire il <b>ticket</b> ed un pulsante per effettuare la richiesta <u>insertticket</u>.</li>
-            <li>un componente che mostri il peso corrente presente nella <b>ColdRoom</b>.</li>
-        </ul>
-        <div class="remark">
-            <div class="keypoint">La <b>ServiceAccessGUI</b> deve essere fornita di un campo per inserire dati ed un pulsante per ognuna delle due richieste
-            effettuabili.</div>
-        </div>
-        Dopo un confronto con il committente lo scenario che si presenta per intergaire con il nostro servizio è scomponibile in due parti:<br>
-        <ol>
-            <li>I conducenti dei <b>Fridge Truck</b> che si stanno direzionando verso il nostro <b>ColdStorageService</b> sono interessati a capire se 
-            c'è posto per scaricare il loro carico, per questo motivo tramite il loro dispositivo mobile accedono ad una GUI che li peremtterà solo di:
-            <ul>
-                <li>Vedere il peso presente nella <b>ColdRoom</b></li>
-                <li>Richiedere l'erogazione di un <b>ticket</b></li>
-            </ul>
+            <li>un campo per inserire il <b>ticket</b> ed un pulsante per effettuare la richiesta <u>insertticket</u>.
             </li>
-            <li>Una volta che il conducente è arrivato presso il nostro servizio procede all'inserimento del <b>ticket</b>. 
-            Inserito il <b>ticket</b> il conducente si mette in coda dove vi sono i conducenti che hanno inserito il <b>ticket</b> prima di lui. 
-            Si presuppone che il <b>Fridge Truck</b> impieghi tempo nullo per arrivare alla <b>INDOOR</b> dopo aver inserito il <b>ticket</b>.
-            La coda tra l'inserimento del 
-            <b>ticket</b> e lo scarico presso la <b>INDOOR</b> è necessaria per evitare che dei <b>ticket</b> scadano per colpa dei ritardi introdotti dal nostro servizio, che 
-            forzano il conducente a non poter inserire il <b>ticket</b>, rischiando così di invalidarlo ingiustamente.</li>
-        </ol>
-
-        <div class="remark">
-            <div class="keypoint">La <b>ServiceAccessGUI</b> verrà visualizzata sui dispositivi mobili dei conducenti</div>
-        </div>
-
-        Per evitare che un conducente inserisca il <b>ticket</b> e debba aspettare per un tempo potenzialmente infinito si deve cercare di prevenire una situazione del genere.
-        Per farlo vi sono tre proposte:
+            <li>una finestra che mostri il peso corrente presente nella <b>ColdRoom</b>.</li>
+        </ul>
+        <div class="remark keypoint">La <b>ServiceAccessGUI</b> deve essere fornita di due campi di input per effettuare
+            le richieste e uno spazio dove mostrare le informazioni relative alla Coldroom</div>
+        Per avere un riscontro dal Servizio se le richieste vanno o meno a buon fine, è necessario che i messaggi
+        inviati
+        da ColdStorageService vengano visualizzati a schermo, opportunamente filtrati e formattati per mostrare solo
+        informazioni utili agli utenti finali.
+        <br><br>
+        Dopo un confronto con il committente lo scenario che si presenta per interagire con il nostro servizio è
+        scomponibile in due parti:<br>
         <ol>
-            <li>Il <b>coldstorageservice</b> deve rifiutare le richieste di <u>storage</u> non solo guardando lo spazio disponibile, ma anche guardando la quantità di <b>ticket</b>
-                erogati ancora facenti parte del sistema, e che quindi non hanno ricevuto il relativo <u>chargetaken</u>.</li>
-            <li>Quando viene erogato il <b>ticket</b> viene comunicato al conducente anche quanti potenziali altri conducenti si trovino davanti a lui. Ricordiamo che 
-            si tratta di "potenziali" perché non è assicurato che tutti raggiungano il nostro servizio entro <b>TICKETTIME</b>.</li>
-            <li>Simile alla precedente ma, invece di inviare il numero di persone che si trovano davanti, si mostra l'informazione direttamente sulla <b>ServiceAccessGUI</b>.</li>
+            <li>I conducenti dei <b>Fridge Truck</b> che si stanno direzionando verso il <b>ColdStorageService</b> sono
+                interessati a capire se
+                c'è posto per scaricare il loro carico, per questo motivo tramite il loro dispositivo mobile accedono
+                alla GUI che permetterà loro di:
+                <ul>
+                    <li>Vedere il peso presente nella <b>ColdRoom</b></li>
+                    <li>Richiedere l'erogazione di un <b>ticket</b>. Nel caso venga rifiutata, verrà mostrato opportuno
+                        messaggio di errore</li>
+                </ul>
+            </li>
+            <li>Una volta arrivato presso il servizio il conducente procederà all'inserimento del
+                <b>ticket</b>.
+                <br>Se è approvato, il conducente verrà informato dei vari step operativi del servizio. Se è rifiutato,
+                gli verrà comunicato il motivo.
+            </li>
         </ol>
-        [SCRIVERE CONSIDERAZIONI FATTE E QUALE SOLUZIONE SI E' SCELTA]
-       
-        <div class="remark">
-            <div class="keypoint">SCRIVERE QUI LA SOLUZIONE ADOTTATA</div>
-        </div>
-        QUI DEFINIRE LA TEMATICA DEL "CHI VEDE IL CHARGETAKEN,replystorerequest,replyinsertticket"<br>
-        Per il peso della <b>ColdRoom</b> mostrato: la <b>ServiceAccessGUI</b> si impegna solamente a mostrare il peso che riceve dalla <b>ColdStorageService</b> 
-        ogni qualvolta ci sia un cambiamento del peso. <br>
-        Considerando come si è modellata la politica di prenotazione dei <b>ticket</b> nel <b>ColdStorageService</b>
-        potrebbe capitare che un conducente che accede alla <b>ServiceAccessGUI</b> veda solo il peso effettivamente presente nella <b>ColdRoom</b>, e 
-        non anche quello prenotato. Ciò potrebbe portare a scenari dove un conducente vede attraverso la <b>ServiceAccessGUI</b> che il suo carico ci 
-        sta dentro alla <b>ColdRoom</b> ma la sua richiesta <u>storerequest</u> viene rifiutata per spazio insufficiente. Questo è dovuto al fatto che non
-        mostrando anche il peso prenotato si potrebbe "illudere" un conducente sul fatto che ci sia posto, ma in realtà tutto qul posto è stato già riservato.<br>
-        Per ovviare a questa problematica è sufficiente mostrare il peso complessivo, sommando al peso effettivamente presente all'interno della <b>ColdRoom</b> il 
-        peso prenotato. A questo proposito andrebbe modificando l'informazione contenuta dentro <u>coldroomdata</u> che fino ad ora conteneva solo il peso corrente
-        della <b>ColdRoom</b>.
 
-        <div class="remark">
-            <div class="keypoint">La <b>ServiceAccessGUI</b> deve mostrare il peso della <b>ColdRoom</b> come somma del peso effettivo presente con il peso prenotato.</div>
+        <div class="remark keypoint">La <b>ServiceAccessGUI</b> verrà visualizzata sui dispositivi mobili dei conducenti
         </div>
-        -come passare la capacità massima alla ServiceAccessGUI?<br>
-        -ServiceAccessGUI come observer? Pensando leggerementein futuro(per la statusgui) è bene usare observer.
-        
-        <h3>ColdStorageService</h3>
-        
-        <h3>Interazioni</h3>
-        <table id="myTable">
+
+        <h4 id="strategiaticket">Politica esubero Ticket non gestiti</h4>
+        Durante l'analisi compiuta nello Sprint 1 si è deciso di permettere a un solo Truck per volta di interagire con
+        il servizio, dando al massimo la possibilità di inserire il proprio Ticket quando ancora il DDR Robot sta
+        completando le operazioni del precedente. Questa scelta di non gestire una coda di Truck che hanno inserito il
+        proprio ticket e aspettano di scaricare porta alla conseguenza che i Ticket potrebbero scadere in attesa che la
+        zona INDOOR del servizio sia vuota.<br>
+        Per non cambiare drasticamente il Servizio (operazione che può essere rimandata a un aggiornamento futuro nel
+        caso in cui l'esperienza pratica porti a conclusioni diverse in merito alle necessità del committente)
+        indichiamo tre possibilità per alleviare il problema:
+        <ol>
+            <li>Il <b>coldstorageservice</b> deve rifiutare le richieste di <u>storage</u> non solo guardando alo spazio
+                disponibile, ma anche guardando la quantità di <b>ticket</b>
+                erogati ancora facenti parte del sistema (che cioè non hanno ricevuto il messaggio
+                <u>chargetaken</u>). In questo caso andrebbe stabilito un numero massimo di Ticket disponibili
+                contemporaneamente.
+            </li>
+            <li>Quando viene erogato il <b>ticket</b> viene comunicato al conducente anche quanti potenziali altri
+                conducenti si trovano davanti a lui. Si tratta di "potenziali" perché non è assicurato che tutti
+                raggiungano il servizio entro
+                <b>TICKETTIME</b>.
+            </li>
+            <li>Simile alla precedente ma, invece di inviare il numero di persone che si trovano davanti, si mostra
+                l'informazione direttamente sulla <b>ServiceAccessGUI</b>. In questo modo si responsabilizza il
+                conducente dandogli una scelta informata.</li>
+        </ol>
+        Per il momento rimandiamo la decisione in merito, attendendo di confermare con il committente la scelta da
+        prendere. Il costo in termini di tempo di implementazione è identico e non elevato per tutte e tre le opzioni
+        (e, ovviamente, nullo nel caso si scelga di non gestire questa problematica).<br>Nel caso invece si richieda un
+        cambiamento di politica di accettazione Ticket, introducendo ad esempio una coda, il costo sarebbe maggiore
+        in quanto sarebbe necessaria una operazione di correzione dell'intero ColdStorageService.
+
+        <h4>Considerazioni in merito alle informazioni mostrate nella GUI</h4>
+        <h5>Stato ColdStorageService e ColdRoom</h5>
+        Per quanto riguarda il peso della <b>ColdRoom</b> mostrato, la <b>ServiceAccessGUI</b> si impegna solamente a
+        mostrare il peso
+        che riceve dalla <b>ColdStorageService</b> ogni qualvolta avviene un cambiamento. <br>
+        Considerando come si è modellata la politica di prenotazione dei <b>ticket</b> nel <b>ColdStorageService</b>
+        potrebbe capitare che un conducente che accede alla <b>ServiceAccessGUI</b> veda solo il peso effettivamente
+        presente nella <b>ColdRoom</b>, e non anche quello prenotato. Ciò potrebbe portare a scenari dove un conducente
+        vede attraverso la
+        <b>ServiceAccessGUI</b> che il suo carico è ideoneo ma la sua richiesta <u>storerequest</u> viene rifiutata per
+        spazio
+        insufficiente. Questo è dovuto al fatto che non mostrando anche il peso prenotato c'è l'illusione che ci sia
+        posto quando in realtà
+        è stato già riservato.<br>
+        Per ovviare a questa problematica è sufficiente mostrare il peso complessivo, sommando al peso effettivamente
+        presente all'interno della <b>ColdRoom</b> il peso prenotato. A questo proposito andrebbe modificata
+        l'informazione contenuta dentro il messaggio <u>coldroomdata</u> precedentemente delineato nello Sprint1, che
+        fino ad ora conteneva solo il peso corrente della <b>ColdRoom</b>.<br>
+        La GUI è sufficiente mostri il totale, in quanto vedere il peso prenotato potrebbe considerarsi una informazione
+        sensibile che espone il fuzionamento del Servizio a un utente che non ne ha interesse.
+        <div class="remark keypoint">La <b>ServiceAccessGUI</b> deve mostrare il peso della <b>ColdRoom</b> come somma
+            del peso effettivamente presente con quello prenotato.</div>
+
+        <h5>Policy invio messaggi a client connessi</h5>
+        Un certo numero di Truck Driver può essere connesso al sistema nello stesso momento, ognuno con la propria
+        sessione ServiceAccessGUI. Non tutte le informazioni che il Servizio manda sono di interesse per tutti i Driver.
+        Ad esempio, chi effettua una richiesta di scarico vorrà essere l'unico a vedere il Ticket corrispondente, in
+        maniera tale da evitare che qualcun'altro usi il suo codice. Allo stesso modo, eventuali messaggi di successo o
+        errore sono di interesse esclusivo di chi ha effettuato le richieste, anche per non creare confusione.<br>
+        D'altro canto, tutto ciò che è controllato direttamente dal Servizio potrebbe essere mostrato a tutti i client
+        connessi senza problemi; ad esempio, quali Ticket sono "chargetaken" e quali hanno il proprio carico
+        correttamente scaricato nella ColdRoom. Questo lascerebbe la possibilità, nel caso si volesse scorporare il
+        componente di
+        visualizzazione messaggi, di creare un monitor che mostri lo stato di tutti i ticket presenti nel Servizio in un
+        dato momento, come nei Fast Food è visibile da tutti lo stato degli ordini man mano che vengono processati.
+        <br>
+        Per riassumere:
+        <table>
             <thead>
                 <tr>
-                    <th>Messaggio</th>
-                    <th>Mittente</th>
-                    <th>Destinatario</th>
-                    <th>Semantica messaggio</th>
-                    <th>Descrizione</th>
+                    <th>Informazione</th>
+                    <th>Visibilità</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>storerequest</td>
-                    <td>ServiceAccessGUI</td>
-                    <td>ColdStorageService</td>
-                    <td>Request</td>
-                    <td>Semantica <u>Request</u> perchè il conducente deve sapere immediatamente se il suo <b>ticket</b> è stato accettato o meno. 
-                        Contiene la quantità del peso <b>FW</b> che si vuole scaricare.</td>
+                    <td>Conferma prenotazione / errore</td>
+                    <td>Richiedente</td>
                 </tr>
                 <tr>
-                    <td>replystorerequest</td>
-                    <td>ColdStorageService</td>
-                    <td>ServiceAccessGUI</td>
-                    <td>Reply</td>
-                    <td>Semantica <u>Reply</u></td>
-                </tr>
-
-                <tr>
-                    <td>insertticket</td>
-                    <td>ServiceAccessGUI</td>
-                    <td>ColdStorageService</td>
-                    <td>Request</td>
-                    <td></td>
+                    <td>Ticket / errore</td>
+                    <td>Richiedente</td>
                 </tr>
                 <tr>
-                    <td>replyinsertticket</td>
-                    <td>ColdStorageService</td>
-                    <td>ServiceAccessGUI</td>
-                    <td>Reply</td>
-                    <td></td>
+                    <td>Stato Cold Room</td>
+                    <td>Tutti</td>
                 </tr>
-
                 <tr>
-                    <td>chargetaken</td>
-                    <td>ColdStorageService</td>
-                    <td>ServiceAccessGUI</td>
-                    <td>Dispatch</td>
-                    <td></td>
+                    <td>Charge taken</td>
+                    <td>Tutti</td>
                 </tr>
-
                 <tr>
-                    <td>coldroomdata</td>
-                    <td>ColdStorageService</td>
-                    <td>ServiceAccessGUI</td>
-                    <td>Dispatch</td>
-                    <td></td>
+                    <td>Deposito avvenuto</td>
+                    <td>Tutti</td>
+                </tr>
+                <tr>
+                    <td><i>Altro</i></td>
+                    <td>Tutti</td>
                 </tr>
             </tbody>
         </table>
+        È quindi necessario che venga garantito l'invio al solo client interessato nel caso di informazioni "private".
+
+        <h3>ColdStorageService</h3>
+        Questo componente può rimanere invariato nella logica operativa, una volta aggiornato il metodo di generazione e
+        controllo Ticket introducendo una sequenza randomica di lettere e numeri come identificativo.<br>
+        Per quanto riguarda il dialogo con la ServiceAccessGUI, rendendo quest'ultimo un Observer del Service possiamo
+        aggiornare in maniera agevole l'informazione relativa al peso.
+
+
+        <h3>Interazioni</h3>
+        Dal punto di vista logico, non ci sono interazioni ulteriori da definire oltre a quelle già esposte nello Sprint
+        1.
+
+        <h3>Proxy ServiceAccessGUI</h3>
+        L'architettura logica del sistema vedrà l'introduzione di un attore non precedentemente citato: un componente
+        che si comporti da proxy per qualunque scelta tecnica venga presa in merito alla realizzazione della GUI.
+        Questo attore si dovrà porre tra il ColdStorageService e la GUI vera e propria gestendo la comunicazione da
+        entrambi i
+        lati, diventando un ponte tra le tecnologie: da una parte il sistema QaK e dall'altro il server che gestirà i
+        client ServiceAccess. L'utilità di questo componente sta infatti nell'adattare il modello a stati e a scambio di
+        messaggi utilizzato sinora
+        alla comunicazione con un server e potenzialmente estraneo a questi paradigmi.<br>
+
+        <h3>TransportTrolley</h3>
+        Ai fini di questo Sprint, il componente TransportTrolley può essere sostituito con un Mock che simuli il dialogo
+        con il DDR Robot. Così facendo, escludiamo momentaneamente le complessità tecniche e i tempi di attesa di questo
+        componente, che rallenterebbero lo sviluppo e i test.
 
         <h3>Architettura logica</h3>
         <div class="remark">
@@ -244,8 +335,7 @@
                 href="./sprint2.coldstorageservice/src/ColdStorageService.qak"
                 target="_blank">ColdStorageService.qak</a>
         </div>
-
-        Il sistema da noi modellato, presenta la seguente architettura logica:
+        Il sistema da noi modellato presenta la seguente architettura logica:
         <center>
             <div class="piccola">
                 <img src="./sprint2/coldstorageservice_sprint2arch.png" alt="architettura logica">
@@ -273,13 +363,52 @@
         </table>
 
         <h2>Project</h2>
-        
+        Per realizzare la ServiceAccessGUI scegliamo come tecnologia Spring, quanto la software house ne ha già
+        esperienza. Questo framework necessita di pochi componenti per funzionare e mantiene la comunicazione tra client
+        e server mediante Websocket.<br>
+        Delineiamo due tipi diversi di connessioni: quelle tra Client e Server Spring e quelle tra il Server Spring e
+        ColdStorageService (tramite il componente Proxy).<br>
+        Le classi che ci serviranno saranno quindi:<ul>
+            <li><b>Application</b>, il main del programma che istruirà Spring di avviare l'applicazione</li>
+            <li><b>WebSocketConfiguration</b>, dove definiremo due tipi di Handler: Client (comunicazione C/S) e Actor
+                (comunicazione Server/QaK)</li>
+            <li><b>ClientHandler</b>, che manterrà le sessioni con i Client connessi, intercettando le richieste e
+                inoltrando le risposte</li>
+            <li><b>ActorHandler</b>, che scambierà messaggi con il Proxy della GUI nel contesto del ColdStorageService
+            </li>
+            <li><b>Controller</b>, che gestirà le pagine web mostrate ai client (path degli url, eventuali variabili,
+                etc...)</li>
+        </ul>
+        In aggiunta a questi componenti che si occupano principalmente delle connessioni e della struttura imposta da
+        Spring, all'interno del Server avremo bisogno anche di un componente <b>ServiceAccessGUI</b> che gestisca la
+        logica operativa. <br>
+        Il seguente schema riassume il passaggio di messaggi tra i vari componenti:<br>
+        <center>
+            <div class="piccola"><img src="sprint2/Spring-QaK.png"></div>
+        </center>
+        Lo scambio di messaggi sia tra i componenti della GUI che con il Proxy avverrà sempre con dispatch. In questo
+        modo, non avremo richieste bloccanti e il sistema risulterà più permissivo. Ciò vuol però dire che è necessario
+        associare ai messaggi anche un identificativo di chi effettua la richiesta, in maniera tale da fornire la
+        risposta solo al client giusto. Questa informazione dovrà arrivare al Proxy, che invece gestisce Storerequest e
+        Insertticket come Request-Reply.<br>
+        A ogni richiesta effettuata dai Client verrà abbinato un RequestId, a sua volta associato alla sessione di
+        pertinenza.
+        <br><br>
+        L'attore Proxy manderà al Server i messaggi nella forma <i>tipo</i><b>/</b><i>contenuto</i>[<b>/</b><i>id
+            richiesta</i>]. Questo modello viene scelto anche per la comunicazione tra Server e Client.
+        <br><br>
+        Per quanto riguarda l'interfaccia, un semplice prototipo mostrerà i campi di input, una finestra per i messaggi e un componente per visualizzare lo stato della ColdRoom:
+        <center>
+            <div class="piccola"><img src="sprint2/interfaccia.png"></div>
+        </center>
+
+
         <h2>Conclusioni</h2>
-        
+
         <div class="remark">
             Gli output dello sprint2 sono:<br>
             <ul>
-                <li>ServiceAccessGUI</li>
+                <li>ServiceAccessGUI, composta da Attore Proxy e Applicazione Spring</li>
                 <li>Versione aggiornata ColdStorageService</li>
                 <li>MockTransportTrolley</li>
             </ul>
@@ -291,8 +420,9 @@
             <li>Identificare ed analizzare tutti i problemi relativi ai requisiti che coinvolgono la
                 <b>alarm device</b> e il <b>warning device</b>
             </li>
-            <li>Integrare al sistema realizzato nello Sprint2 la <b>alarm device</b> e il <b>warning device</b>, che esprimono
-            gli <u>Alarm Requirements</u></li>
+            <li>Integrare al sistema realizzato nello Sprint2 la <b>alarm device</b> e il <b>warning device</b>, che
+                esprimono
+                gli <u>Alarm Requirements</u></li>
             <li>Sviluppare il software ed eseguirlo su una scheda Raspberry Pi</li>
             <li>Testare il sistema</li>
         </ol>

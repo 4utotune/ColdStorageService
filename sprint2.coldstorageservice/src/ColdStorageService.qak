@@ -1,7 +1,7 @@
 System coldstorageservice_sprint2
 
-
-Dispatch coapUpdate: coapUpdate(RESOURCE, VALUE)
+// per observer
+Dispatch 	coapUpdate			: 	coapUpdate(RESOURCE, VALUE)
 
 // transport trolley -> coldstorageservice
 Dispatch	chargetaken			: 	chargetaken(_)
@@ -12,35 +12,40 @@ Reply 		more				:	more(_)
 Reply 		gohome				: 	gohome(_)
 Dispatch 	gotoindoor			: 	gotoindoor(_)
 
-// PER MOCK:
+// proxy <-> coldstorageservice:
 Request 	proxy_storerequest	: 	proxy_storerequest(FW)
 Reply		storeaccepted		:	storeaccepted(TICKET)
-Reply		storerejected		: 	storerejected(_)
+Reply		storerejected		: 	storerejected(REASON)
 
 Request		proxy_insertticket	: 	proxy_insertticket(TICKET)
 Reply		ticketaccepted		: 	ticketaccepted(_)
-Reply		ticketrejected		: 	ticketrejected(_)
+Reply		ticketrejected		: 	ticketrejected(REASON)
 
 // spring -> proxy
-Dispatch gui_storerequest : gui_storerequest(FW)
-Dispatch gui_insertticket : gui_insertticket(TICKET)
+Dispatch gui_storerequest 		: 	gui_storerequest(FW, ID)
+Dispatch gui_insertticket 		: 	gui_insertticket(TICKET, ID)
 
 
 Context	ctx_coldstorage ip	[host="localhost" port=11802]
 
 
 QActor accessgui_proxy context ctx_coldstorage {	
-	[# val server = unibo.basicomm23.ws.WsConnection.create("localhost:8086/coldstoragesocket") #]
+	[# 
+		val server = unibo.basicomm23.ws.WsConnection.create("localhost:8086/coldstoragesocket")
+		
+		var currentRequest = "" 
+	#]
+
 	State init initial {
 		observeResource coldstorageservice
 		
 		
-		println("$name | Init") color cyan
+		println("$name | Init") color yellow
 	}
 	Goto observing
 	
 	State observing{
-		println("$name | Idle...") color cyan
+		println("$name | Idle...") color yellow
   	}
 	Transition 	t0 	whenMsg		gui_storerequest 	-> handle_storerequest
   					whenMsg 	gui_insertticket 	-> handle_insertticket	
@@ -49,9 +54,9 @@ QActor accessgui_proxy context ctx_coldstorage {
 					
 
 	State handle_storerequest {
-		printCurrentMessage
-		onMsg ( gui_storerequest : gui_storerequest(FW)){
-			println("$name | Sending store request") color cyan
+		onMsg ( gui_storerequest : gui_storerequest(FW, ID)){
+			println("$name | Sending store request - FW:${payloadArg(0)}, ID:${payloadArg(1)} ") color yellow
+			[# currentRequest = payloadArg(1) #]
 			request coldstorageservice -m proxy_storerequest: proxy_storerequest($payloadArg(0))
 		}
 	}
@@ -62,25 +67,28 @@ QActor accessgui_proxy context ctx_coldstorage {
 	State handle_store_accepted {
 		onMsg(storeaccepted: storeaccepted(TICKET)) {
 			[# val TICKET = payloadArg(0) #]
-			println("$name | Store Accepted. Received ticket [ $TICKET ]") color cyan
-			[# server.forward("ticket/" + payloadArg(0)) #]
+			println("$name | Store Accepted. Received ticket [ $TICKET ] for ID:$currentRequest") color yellow
+			[# server.forward("ticket/" + TICKET + "/" + currentRequest) #]
+			[# currentRequest = "" #]
 		}
 	}
 	Goto observing
 	
 	State handle_store_rejected {
 		onMsg(storerejected: storerejected(REASON)) {
-			[# server.forward("error/storerejected: " + payloadArg(0)) #]
+			println("$name | Store Rejected for ID:$currentRequest") color yellow			
+			[# server.forward("error/storerejected: " + payloadArg(0) + "/" + currentRequest) #]
+			[# currentRequest = "" #]
 		}
 		
 	}
 	Goto observing
   	
   	State handle_insertticket {
-  		printCurrentMessage
-		onMsg ( gui_insertticket: gui_insertticket(TICKET)){
-			[# val TICKET = payloadArg(0) #]
-			request coldstorageservice -m proxy_insertticket: proxy_insertticket($TICKET)
+		onMsg ( gui_insertticket: gui_insertticket(TICKET, ID)){
+			println("$name | Sending insert ticket - TICKET:${payloadArg(0)}, ID:${payloadArg(1)} ") color yellow
+			[# currentRequest = payloadArg(1) #]
+			request coldstorageservice -m proxy_insertticket: proxy_insertticket($payloadArg(0))
 		}
 	}
 	Transition 	t	whenReply 	ticketaccepted 	-> handle_ticket_accepted
@@ -88,13 +96,17 @@ QActor accessgui_proxy context ctx_coldstorage {
 	
 		
 	State handle_ticket_accepted {
-		[# server.forward("notify/" + payloadArg(0) + " accepted") #]
+		println("$name | Ticket accepted for ID:$currentRequest") color yellow			
+		[# server.forward("notify/" + payloadArg(0) + " accepted" + "/" + currentRequest) #]
+			[# currentRequest = "" #]
 	}
 	Goto observing
 	
 	State handle_ticket_rejected {
 		onMsg(ticketrejected: ticketrejected(REASON)) {
-			[# server.forward("error/ticketrejected: " + payloadArg(0)) #]
+			println("$name | Ticket Rejected for ID:$currentRequest") color yellow			
+			[# server.forward("error/ticketrejected: " + payloadArg(0) + "/" + currentRequest) #]
+			[# currentRequest = "" #]
 		}
 	}
 	Goto observing
@@ -150,10 +162,10 @@ QActor coldstorageservice context ctx_coldstorage {
 		println("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight") color green
 		updateResource [# "'cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom'" #]
 	}
-	Transition t0 whenRequest proxy_storerequest		-> handle_store
-				  whenRequest proxy_insertticket		-> handle_ticket
-				  whenRequest chargedeposited	-> handle_deposited
-				  whenMsg	  chargetaken		-> handle_charge_taken
+	Transition t0 whenRequest proxy_storerequest	-> handle_store
+				  whenRequest proxy_insertticket	-> handle_ticket
+				  whenRequest chargedeposited		-> handle_deposited
+				  whenMsg	  chargetaken			-> handle_charge_taken
 					
 	State handle_store {
 		onMsg(proxy_storerequest: proxy_storerequest(FW)) {
@@ -172,9 +184,9 @@ QActor coldstorageservice context ctx_coldstorage {
 					[#
 						val TICKET = ticketManager.newTicket(FW)
 					  	ReservedWeight += FW
-					  	val Timestamp = TICKET.timestamp
+					  	val TicketId = TICKET.id
 					#]
-					replyTo proxy_storerequest with storeaccepted: storeaccepted($Timestamp)
+					replyTo proxy_storerequest with storeaccepted: storeaccepted($TicketId)
 				}	
 			}
 		}
@@ -221,9 +233,9 @@ QActor coldstorageservice context ctx_coldstorage {
 	
 	State handle_charge_taken {
 		[# 			
-			val Timestamp = ticketManager.waitingNowWorking()
+			val TicketId = ticketManager.waitingNowWorking()
 		#]
-		println("$name | Charge taken for ticket [ $Timestamp ]") color green
+		println("$name | Charge taken for ticket [ $TicketId ]") color green
 		forward accessgui_proxy -m chargetaken: chargetaken(_)
 	}
 	Goto idle

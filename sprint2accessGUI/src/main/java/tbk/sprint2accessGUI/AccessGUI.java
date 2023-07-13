@@ -21,19 +21,23 @@ public class AccessGUI {
         String[] parts = msg.split("/");
         String message = parts[0];
         String payload = parts[1];
+        String requestId = "";
+        if (parts.length > 2) {
+            requestId = parts[2];
+        }
 
         switch (message) {
             case "update":
                 updateMsg(payload);
                 break;
             case "ticket":
-                ticketMsg(payload);
+                ticketMsg(payload, requestId);
                 break;
             case "notify":
-                notifyMsg(payload);
+                notifyMsg(payload, requestId);
                 break;
             case "error":
-                errorMsg(payload);
+                errorMsg(payload, requestId);
                 break;
             default:
                 break;
@@ -50,40 +54,44 @@ public class AccessGUI {
         this.clientHandler.sendToAll("update/" + (CurrentWeight + ReservedWeight) + "," + MaxWeight);
     }
 
-    private void ticketMsg(String ticket) {
-        this.clientHandler.sendToAll("ticket/" + ticket);
+    private void ticketMsg(String ticket, String requestId) {
+        this.clientHandler.sendToClient("ticket/" + ticket, requestId);
     }
 
-    private void notifyMsg(String message) {
-        this.clientHandler.sendToAll("notify/" + message);
+    private void notifyMsg(String message, String requestId) {
+        if (requestId.equals("")) {
+            this.clientHandler.sendToAll("notify/" + message);
+        } else {
+            this.clientHandler.sendToClient("notify/" + message, requestId);
+        }
     }
 
-    private void errorMsg(String error) {
-        this.clientHandler.sendToAll("error/" + error);
+    private void errorMsg(String error, String requestId) {
+        this.clientHandler.sendToClient("error/" + error, requestId);
     }
 
-    public void clientRequest(String msg) {
+    public void clientRequest(String msg, String requestId) {
         String[] parts = msg.split("/");
         String message = parts[0];
         String payload = parts[1];
 
         switch (message) {
             case "storerequest":
-                storerequest(payload);
+                storerequest(payload, requestId);
                 break;
             case "insertticket":
-                insertticket(payload);
+                insertticket(payload, requestId);
                 break;
             default:
                 break;
         }
     }
 
-    private void storerequest(String weight) {
-        this.actorHandler.storerequest(weight);
+    private void storerequest(String weight, String requestId) {
+        this.actorHandler.storerequest(weight, requestId);
     }
 
-    private void insertticket(String ticket) {
-        this.actorHandler.insertticket(ticket);
+    private void insertticket(String ticket, String requestId) {
+        this.actorHandler.insertticket(ticket, requestId);
     }
 }

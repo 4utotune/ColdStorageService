@@ -18,12 +18,15 @@ class Accessgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
-		 val server = unibo.basicomm23.ws.WsConnection.create("localhost:8086/coldstoragesocket")  
+		 
+				val server = unibo.basicomm23.ws.WsConnection.create("localhost:8086/coldstoragesocket")
+				
+				var currentRequest = "" 
 		return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
 						CoapObserverSupport(myself, "localhost","11802","ctx_coldstorage","coldstorageservice")
-						CommUtils.outcyan("$name | Init")
+						CommUtils.outyellow("$name | Init")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -33,7 +36,7 @@ class Accessgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 				}	 
 				state("observing") { //this:State
 					action { //it:State
-						CommUtils.outcyan("$name | Idle...")
+						CommUtils.outyellow("$name | Idle...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -46,11 +49,10 @@ class Accessgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 				}	 
 				state("handle_storerequest") { //this:State
 					action { //it:State
-						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
-						if( checkMsgContent( Term.createTerm("gui_storerequest(FW)"), Term.createTerm("gui_storerequest(FW)"), 
+						if( checkMsgContent( Term.createTerm("gui_storerequest(FW,ID)"), Term.createTerm("gui_storerequest(FW,ID)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								CommUtils.outcyan("$name | Sending store request")
+								CommUtils.outyellow("$name | Sending store request - FW:${payloadArg(0)}, ID:${payloadArg(1)} ")
+								 currentRequest = payloadArg(1)  
 								request("proxy_storerequest", "proxy_storerequest(${payloadArg(0)})" ,"coldstorageservice" )  
 						}
 						//genTimer( actor, state )
@@ -66,8 +68,9 @@ class Accessgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 						if( checkMsgContent( Term.createTerm("storeaccepted(TICKET)"), Term.createTerm("storeaccepted(TICKET)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 val TICKET = payloadArg(0)  
-								CommUtils.outcyan("$name | Store Accepted. Received ticket [ $TICKET ]")
-								 server.forward("ticket/" + payloadArg(0))  
+								CommUtils.outyellow("$name | Store Accepted. Received ticket [ $TICKET ] for ID:$currentRequest")
+								 server.forward("ticket/" + TICKET + "/" + currentRequest)  
+								 currentRequest = ""  
 						}
 						//genTimer( actor, state )
 					}
@@ -78,9 +81,11 @@ class Accessgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 				}	 
 				state("handle_store_rejected") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("storerejected(_)"), Term.createTerm("storerejected(REASON)"), 
+						if( checkMsgContent( Term.createTerm("storerejected(REASON)"), Term.createTerm("storerejected(REASON)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 server.forward("error/storerejected: " + payloadArg(0))  
+								CommUtils.outyellow("$name | Store Rejected for ID:$currentRequest")
+								 server.forward("error/storerejected: " + payloadArg(0) + "/" + currentRequest)  
+								 currentRequest = ""  
 						}
 						//genTimer( actor, state )
 					}
@@ -91,12 +96,11 @@ class Accessgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 				}	 
 				state("handle_insertticket") { //this:State
 					action { //it:State
-						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
-						if( checkMsgContent( Term.createTerm("gui_insertticket(TICKET)"), Term.createTerm("gui_insertticket(TICKET)"), 
+						if( checkMsgContent( Term.createTerm("gui_insertticket(TICKET,ID)"), Term.createTerm("gui_insertticket(TICKET,ID)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 val TICKET = payloadArg(0)  
-								request("proxy_insertticket", "proxy_insertticket($TICKET)" ,"coldstorageservice" )  
+								CommUtils.outyellow("$name | Sending insert ticket - TICKET:${payloadArg(0)}, ID:${payloadArg(1)} ")
+								 currentRequest = payloadArg(1)  
+								request("proxy_insertticket", "proxy_insertticket(${payloadArg(0)})" ,"coldstorageservice" )  
 						}
 						//genTimer( actor, state )
 					}
@@ -108,7 +112,9 @@ class Accessgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 				}	 
 				state("handle_ticket_accepted") { //this:State
 					action { //it:State
-						 server.forward("notify/" + payloadArg(0) + " accepted")  
+						CommUtils.outyellow("$name | Ticket accepted for ID:$currentRequest")
+						 server.forward("notify/" + payloadArg(0) + " accepted" + "/" + currentRequest)  
+						 currentRequest = ""  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -118,9 +124,11 @@ class Accessgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 				}	 
 				state("handle_ticket_rejected") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("ticketrejected(_)"), Term.createTerm("ticketrejected(REASON)"), 
+						if( checkMsgContent( Term.createTerm("ticketrejected(REASON)"), Term.createTerm("ticketrejected(REASON)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 server.forward("error/ticketrejected: " + payloadArg(0))  
+								CommUtils.outyellow("$name | Ticket Rejected for ID:$currentRequest")
+								 server.forward("error/ticketrejected: " + payloadArg(0) + "/" + currentRequest)  
+								 currentRequest = ""  
 						}
 						//genTimer( actor, state )
 					}

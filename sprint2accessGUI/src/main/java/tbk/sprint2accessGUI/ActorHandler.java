@@ -64,13 +64,13 @@ public class ActorHandler extends AbstractWebSocketHandler {
         }
     }
 
-    protected void storerequest(String weight) {
-        IApplMessage message = CommUtils.buildDispatch(senderId, "gui_storerequest", "gui_storerequest(" + weight + ")", destActor);
+    protected void storerequest(String weight, String requestId) {
+        IApplMessage message = CommUtils.buildDispatch(senderId, "gui_storerequest", "gui_storerequest(" + weight + "," + requestId + ")", destActor);
         sendToActor(message);
     }
 
-    protected void insertticket(String ticket) {
-        IApplMessage message = CommUtils.buildDispatch(senderId, "gui_insertticket", "gui_insertticket(" + ticket + ")", destActor);
+    protected void insertticket(String ticket, String requestId) {
+        IApplMessage message = CommUtils.buildDispatch(senderId, "gui_insertticket", "gui_insertticket(" + ticket + "," + requestId + ")", destActor);
         sendToActor(message);
     }
 }

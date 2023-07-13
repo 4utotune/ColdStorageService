@@ -7,10 +7,13 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ClientHandler extends AbstractWebSocketHandler {
     private final List<WebSocketSession> sessions = new ArrayList<>();
+    private final Map<String, WebSocketSession> pendingRequests = new HashMap<>();
 
     private AccessGUI guiManager;
 
@@ -38,7 +41,7 @@ public class ClientHandler extends AbstractWebSocketHandler {
         String msg = message.getPayload();
         System.out.println("CL | Received: " + msg);
 
-        this.guiManager.clientRequest(msg);
+        this.guiManager.clientRequest(msg, newRequest(session));
     }
 
     protected void sendToAll(String message) {
@@ -51,7 +54,22 @@ public class ClientHandler extends AbstractWebSocketHandler {
         }
     }
 
+    protected void sendToClient(String message, String requestId) {
+        try {
+            this.pendingRequests.get(requestId).sendMessage(new TextMessage(message));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        this.pendingRequests.remove(requestId);
+    }
+
     protected void setManager(AccessGUI gui) {
         this.guiManager = gui;
+    }
+
+    protected String newRequest(WebSocketSession session) {
+        String requestId = "req" + session.getId().substring(session.getId().lastIndexOf('-') + 1);
+        pendingRequests.put(requestId, session);
+        return requestId;
     }
 }

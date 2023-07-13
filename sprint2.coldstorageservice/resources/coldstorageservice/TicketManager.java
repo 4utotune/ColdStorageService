@@ -27,16 +27,16 @@ public class TicketManager {
 
     public Ticket newTicket(Float weight) {
         Ticket ticket = new Ticket(weight, TIMEOUT, FORMAT);
-        Tickets.put(ticket.getTimestamp(), ticket);
+        Tickets.put(ticket.getId(), ticket);
         return ticket;
     }
 
-    public void remove(String timestamp) {
-        Tickets.remove(timestamp);
+    public void remove(String id) {
+        Tickets.remove(id);
     }
 
     public void remove(Ticket ticket) {
-        Tickets.remove(ticket.getTimestamp());
+        Tickets.remove(ticket.getId());
     }
 
     public String waitingNowWorking() {
