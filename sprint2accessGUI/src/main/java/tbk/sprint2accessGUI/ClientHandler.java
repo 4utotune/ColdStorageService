@@ -1,5 +1,6 @@
 package tbk.sprint2accessGUI;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
