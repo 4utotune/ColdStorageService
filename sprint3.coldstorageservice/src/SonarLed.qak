@@ -1,7 +1,7 @@
 System coldstorageservice_sprint3
 
 
-mqttBroker "mqtt.eclipseprojects.io" : 1883 eventTopic "unibo/sonar/events"
+//mqttBroker "mqtt.eclipseprojects.io" : 1883 eventTopic "unibo/sonar/events"
 /*
  * To do:
  * resume
@@ -9,7 +9,7 @@ mqttBroker "mqtt.eclipseprojects.io" : 1883 eventTopic "unibo/sonar/events"
  * imposto 80 il basicrobot non funziona 
  */
 
-
+ 
 // MESSAGES
 
 // BasicRobot
@@ -70,11 +70,16 @@ Dispatch	coapUpdate			:	coapUpdate(SOURCE,ARG)
 Event sonardata : distance(D)   //emitted  by distancefilter
 Event obstacle  : obstacle(D)   //emitted as stream by distancefilter
 Event obstaclefree	:	obstaclefree(D)	//emitted as stream by distancefilter
-
+ 
 //Fermare il BasicRobot
 Event alarm           : alarm(X)
 //Riprendere il TT 
 Event resume		  : resume(X)
+
+//comunicare al led lo stato
+Event ledoff		  : ledoff(_)
+Event ledon 		  : ledon(_)
+Event ledblink		  : ledblink(_)
 
 // Context ctx_mockgui		ip [host="localhost" port=11800]
 Context ctx_basicrobot 	ip [host="127.0.0.1" port=8020]  
@@ -86,6 +91,7 @@ Context ctx_coldstorage ip [host="localhost" port=11802]
 CodedQActor sonar  context ctx_coldstorage className "rx.SonarMQTTReceiver"
 CodedQActor datacleaner    context ctx_coldstorage className "rx.DataCleaner"
 CodedQActor distancefilter context ctx_coldstorage className "rx.DistanceFilter"
+CodedQActor ledMQTTSender  context ctx_coldstorage className "rx.ledMQTTSender"
 
 ExternalQActor basicrobot context ctx_basicrobot
 
@@ -420,6 +426,10 @@ QActor coldstorageservice context ctx_coldstorage {
 //sonar
 QActor alarmdevice context ctx_coldstorage {
 	//il prefixed amount of time lo consideriamo 10sec
+	[# var LastStop = 0L
+	   var MINT = 10000L
+	   var Delta = 0L
+	#]
 	State init initial { 
 		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
 		println ("$name | init") color black
@@ -435,7 +445,8 @@ QActor alarmdevice context ctx_coldstorage {
 		onMsg( obstacle : obstacle(D)){
 			emit alarm : alarm(_)			
 			println("$name handleobstacle ALARM ${payloadArg(0)}") color black
-			updateResource [# "$name(ON)"#]		
+			updateResource [# "$name(ON)"#]	
+			[# LastStop = System.currentTimeMillis()#]	
 		}	
 	}
 	Transition t0 whenEvent obstaclefree -> handleobstaclefree	               
@@ -444,7 +455,11 @@ QActor alarmdevice context ctx_coldstorage {
 		onMsg( obstaclefree : obstaclefree(D)){			
 			println("$name handleobstacle ALARM ${payloadArg(0)}") color black
 			emit resume : resume(_) //resume TT
-			delay 10000 //prefixed amout of time -> delay
+			println("$name aspetto DLMIT prima di poter gestire un successivo stop")
+			[# Delta=MINT-(System.currentTimeMillis()-LastStop) 
+			   delay(Delta)			
+			#]
+			println("$name sono di nuovo pronto per poter gestire uno stop")
 		}
 	}Goto work
 }
@@ -475,14 +490,17 @@ QActor warningdevice context ctx_coldstorage {
 			if [# (stato1 == "transporttrolley(OFF)") #] {
 				println("$name | led off | ricevuto dal TT") color blue
 				[# state = 0 #]
+				emit ledoff : ledoff(_)
 			} else {
 			if [# (stato1 == "transporttrolley(ON)") #] {
 				println("$name | led ON | ricevuto dal TT") color blue
 				[# state = 1 #]
+				emit ledon : ledon(_)
 			} else {
 			if [# (stato1 == "transporttrolley(BLINK)") #] {
 				println("$name | led BLINK | ricevuto dal TT") color blue
 				[# state = 2 #]
+				emit ledblink : ledblink(_)
 			} 
 			else {
 				println ("$name | $stato1 | sconosciuto | ricevuto dal TT") color blue

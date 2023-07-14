@@ -19,16 +19,23 @@ class DataCleaner(name: String) : ActorBasic(name) {
     }
 
     private suspend fun elabData(msg: IApplMessage) { //OPTIMISTIC
-        val data = (Term.createTerm(msg.msgContent()) as Struct).getArg(0).toString()
+        val data = (Term.createTerm(msg.msgContent()) as Struct).getArg(4).toString()
         CommUtils.outyellow("$tt $name |  data = $data ")
-        val distance = Integer.parseInt(data)
-        if (distance > LimitLow && distance < LimitHigh) {
+        val inizioParentesi = data.indexOf('(')
+        val fineParentesi = data.indexOf(')')
+        var distanza = "-1"
+        if (inizioParentesi != -1 && fineParentesi != -1 && inizioParentesi < fineParentesi) {
+            distanza = data.substring(inizioParentesi + 1, fineParentesi)
+        }
+        //System.out.println("[datacleaner] "+distanza)
+        val distanceint = Integer.parseInt(distanza)
+        if (distanceint > LimitLow && distanceint < LimitHigh) {
             emitLocalStreamEvent(msg) //propagate
-            val m0 = MsgUtil.buildEvent(name, "sonardata", "distance($data)")
+            val m0 = MsgUtil.buildEvent(name, "sonarcleaned", "distance($distanceint)")
             CommUtils.outgreen("$tt $name |  emits = $m0 ")
             emit(m0)
         } else {
-            CommUtils.outmagenta("$tt $name |  DISCARDS $distance ")
+            CommUtils.outmagenta("$tt $name |  DISCARDS $distanceint ")
         }
     }
 }
