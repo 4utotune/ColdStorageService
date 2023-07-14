@@ -95,7 +95,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 						updateResourceRep( "$name(ON)" 
 						)
 						CommUtils.outmagenta("$name | scarico il carico presso la Cold Room")
-						delay(1000) 
+						delay(4000) 
 						request("chargedeposited", "chargedeposited(_)" ,"coldstorageservice" )  
 						//genTimer( actor, state )
 					}

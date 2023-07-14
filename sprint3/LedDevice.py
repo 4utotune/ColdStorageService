@@ -28,8 +28,9 @@ def blink_led():
         while continua_blink:
             accendi_led()
             threading.Event().wait(0.5)  # Blink per 0.5 secondi acceso
-            spegni_led()
-            threading.Event().wait(0.5)  # Blink per 0.5 secondi spento
+            if continua_blink:
+                spegni_led()
+                threading.Event().wait(0.5)  # Blink per 0.5 secondi spento
     
 
 # Avvia il thread per il blink del LED

@@ -102,7 +102,7 @@ QActor test_suite context ctx_coldstorage {
 	[# var Current: Int = 1 #]
 	
 	State init initial {
-		println("$name | Init") color yellow
+		println("$name | Init") color yellow 
 		delay 2000
 	}
 	Goto test1
@@ -446,7 +446,7 @@ QActor alarmdevice context ctx_coldstorage {
 			emit alarm : alarm(_)			
 			println("$name handleobstacle ALARM ${payloadArg(0)}") color black
 			updateResource [# "$name(ON)"#]	
-			[# LastStop = System.currentTimeMillis()#]	
+			//[# LastStop = System.currentTimeMillis()#]	
 		}	
 	}
 	Transition t0 whenEvent obstaclefree -> handleobstaclefree	               
@@ -568,7 +568,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 		forward coldstorageservice -m chargetaken : chargetaken(_)
 
 		updateResource [# "$name(BLINK)"#]
-		//discardMsg On
+		//discardMsg On 
 		println("$name | vado verso la cold room") color magenta
 		request basicrobot -m moverobot: moverobot (4,3) 
 	}
@@ -582,7 +582,7 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 		//discardMsg On
 		println("$name | scarico il carico presso la Cold Room") color magenta
 		// simulo azione di scarico
-		delay 1000
+		delay 4000
 		request coldstorageservice -m chargedeposited : chargedeposited(_)
 	}
 	Transition t0 whenReply more -> moveToIndoor
