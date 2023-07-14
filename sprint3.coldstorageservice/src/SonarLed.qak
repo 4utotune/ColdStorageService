@@ -426,10 +426,10 @@ QActor coldstorageservice context ctx_coldstorage {
 //sonar
 QActor alarmdevice context ctx_coldstorage {
 	//il prefixed amount of time lo consideriamo 10sec
-	[# var LastStop = 0L
-	   var MINT = 10000L
-	   var Delta = 0L
-	#]
+	//[# var LastStop = 0L
+	//   var MINT = 10000L
+	//   var Delta = 0L
+	//#]
 	State init initial { 
 		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
 		println ("$name | init") color black
@@ -456,9 +456,10 @@ QActor alarmdevice context ctx_coldstorage {
 			println("$name handleobstacle ALARM ${payloadArg(0)}") color black
 			emit resume : resume(_) //resume TT
 			println("$name aspetto DLMIT prima di poter gestire un successivo stop")
-			[# Delta=MINT-(System.currentTimeMillis()-LastStop) 
-			   delay(Delta)			
-			#]
+			//[# Delta=MINT-(System.currentTimeMillis()-LastStop) 
+			//   delay(Delta)			
+			//#]
+			delay 10000
 			println("$name sono di nuovo pronto per poter gestire uno stop")
 		}
 	}Goto work
