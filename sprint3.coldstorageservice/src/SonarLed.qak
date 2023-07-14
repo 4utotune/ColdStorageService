@@ -470,7 +470,7 @@ QActor warningdevice context ctx_coldstorage {
 	[# 
 		var state = 0
 		var stato1 = "0"
-	#]
+	#]  
 	State init initial {
 		println ("$name | init") color blue
 		observeResource transporttrolley
