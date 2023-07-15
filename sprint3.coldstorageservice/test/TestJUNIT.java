@@ -18,8 +18,6 @@ public class TestJUNIT {
     int contatoreAlarm=0;
     @Test
     public void testObstacle() throws Exception {
-
-
         String hostAddr       = "localhost";
         int port              = 11802;
         ProtocolType protocol = ProtocolType.tcp;
@@ -30,7 +28,7 @@ public class TestJUNIT {
         System.out.println("Client creato");
 
         System.out.println("ostacolo!");
-        IApplMessage mess1 = c.request(buildEvent("TESTJUNIT","sonarcleaned","9"));
+        c.forward(buildEvent("TESTJUNIT","sonarcleaned","9"));
 
         try {
             Thread.sleep(1000); // Mette in pausa il thread per 1000 millisecondi (1 secondo)
@@ -39,7 +37,6 @@ public class TestJUNIT {
         }
         System.out.println("libero!");
         IApplMessage mess2 = c.request(buildEvent("TESTJUNIT","sonarcleaned","11"));
-
 
     }
     @OnMessage

@@ -29,7 +29,7 @@ class ledMQTTSender(name: String) : ActorBasic(name) {
 
     private suspend fun elabData(msg: IApplMessage) { //OPTIMISTIC
 
-        System.out.println("[LedSenderMQTT] mando: "+ msg.msgContent())
+        System.out.println("$name | mando: "+ msg.msgContent())
         var status = -1
         if(msg.msgContent().contains("ledoff"))  status = 0
         else if(msg.msgContent().contains("ledon")) status = 1

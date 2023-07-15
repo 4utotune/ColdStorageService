@@ -26,7 +26,7 @@ class Warningdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 					action { //it:State
 						CommUtils.outblue("$name | init")
 						CoapObserverSupport(myself, "localhost","11802","ctx_coldstorage","transporttrolley")
-						CommUtils.outblack("$name | LED IS OFF")
+						CommUtils.outblue("$name | LED IS OFF")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -42,12 +42,12 @@ class Warningdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t024",targetState="doObserve",cond=whenDispatch("coapUpdate"))
+					 transition(edgeName="t014",targetState="doObserve",cond=whenDispatch("coapUpdate"))
 				}	 
 				state("doObserve") { //this:State
 					action { //it:State
 						discardMessages = false
-						if( checkMsgContent( Term.createTerm("coapUpdate(SOURCE,ARG)"), Term.createTerm("coapUpdate(transporttrolley,ARG)"), 
+						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(transporttrolley,ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 var stato1 = payloadArg(1)  
 								if(  (stato1 == "transporttrolley(OFF)")  
@@ -73,7 +73,7 @@ class Warningdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 								  }
 								 }
 						}
-						if( checkMsgContent( Term.createTerm("coapUpdate(SOURCE,ARG)"), Term.createTerm("coapUpdate(alarmdevice,ARG)"), 
+						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(alarmdevice,ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 var stato2 = payloadArg(1)  
 								if(  (stato2 == "ON")  

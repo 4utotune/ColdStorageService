@@ -1,0 +1,523 @@
+System coldstorageservice_sprint3
+
+// MESSAGES
+
+// BasicRobot
+Request 	engage				: 	engage(OWNER,STEPTIME)
+Reply 		engagedone			:	engagedone(ARG)
+Reply 		engagerefused		: 	engagerefused(ARG)
+
+Dispatch 	disengage			: 	disengage(ARG)
+
+Dispatch 	cmd					:	cmd(MOVE)
+Dispatch 	end					: 	end(ARG)
+
+Request 	step				: 	step(TIME)
+Reply 		stepdone			: 	stepdone(V)
+Reply 		stepfailed			: 	stepfailed(DURATION, CAUSE)
+
+Request 	doplan				: 	doplan(PATH,OWNER,STEPTIME)
+Reply 		doplandone			: 	doplandone(ARG)
+Reply 		doplanfailed		:	doplanfailed(ARG)
+
+Request 	moverobot			:	moverobot(TARGETX, TARGETY)
+Reply 		moverobotdone		: 	moverobotok(ARG)
+Reply 		moverobotfailed		: 	moverobotfailed(PLANDONE,PLANTODO)
+
+Dispatch 	setrobotstate		: 	setpos(X,Y,D)
+Dispatch 	setdirection		: 	dir(D) // up, down, left, right
+
+Request 	getrobotstate		: 	getrobotstate(ARG)
+Reply 		robotstate			: 	robotstate(POS,DIR)
+
+
+// per observer
+Dispatch 	coapUpdate			: 	coapUpdate(RESOURCE, VALUE)
+
+// transport trolley -> coldstorageservice
+Dispatch	chargetaken			: 	chargetaken(_)
+Request 	chargedeposited		: 	chargedeposited(_)
+
+// coldstorageservice -> transporttrolley_mock
+Reply 		more				:	more(_)
+Reply 		gohome				: 	gohome(_)
+Dispatch 	gotoindoor			: 	gotoindoor(_)
+
+// proxy <-> coldstorageservice:
+Request 	proxy_storerequest	: 	proxy_storerequest(FW)
+Reply		storeaccepted		:	storeaccepted(TICKET)
+Reply		storerejected		: 	storerejected(REASON)
+
+Request		proxy_insertticket	: 	proxy_insertticket(TICKET)
+Reply		ticketaccepted		: 	ticketaccepted(_)
+Reply		ticketrejected		: 	ticketrejected(REASON)
+
+// spring -> proxy
+Dispatch 	gui_storerequest 	: 	gui_storerequest(FW, ID)
+Dispatch 	gui_insertticket 	: 	gui_insertticket(TICKET, ID)
+
+//Observer TT -> Led
+Dispatch	coapUpdate			:	coapUpdate(SOURCE,ARG)
+
+//Sonar DistanceFilter e SonarCleaner
+Event 		sonardata 			: 	distance(D)   	//emitted  by distancefilter
+Event 		obstacle  			: 	obstacle(D)   	//emitted as stream by distancefilter
+Event 		obstaclefree		:	obstaclefree(D)	//emitted as stream by distancefilter
+ 
+//Fermare il BasicRobot
+Event 		alarm           	:	alarm(X)
+//Riprendere il TT 
+Event 		resume		  		: 	resume(X)
+
+//comunicare al led lo stato
+Event 		ledoff		  		: 	ledoff(_)
+Event 		ledon 		  		: 	ledon(_)
+Event 		ledblink		  	: 	ledblink(_)
+
+
+// CONTEXTS
+
+Context ctx_basicrobot 	ip 	[host="127.0.0.1" port=8020]  
+Context	ctx_coldstorage ip	[host="localhost" port=11802]
+
+//ACTORS
+
+ExternalQActor basicrobot 	context ctx_basicrobot
+
+//CodedQActor sonar  context ctx_coldstorage className "sonarSimulator"           //IN LOCALE
+CodedQActor sonar  			context ctx_coldstorage className "rx.SonarMQTTReceiver"
+CodedQActor datacleaner    	context ctx_coldstorage className "rx.DataCleaner"
+CodedQActor distancefilter 	context ctx_coldstorage className "rx.DistanceFilter"
+CodedQActor ledMQTTSender  	context ctx_coldstorage className "rx.ledMQTTSender"
+
+QActor accessgui_proxy context ctx_coldstorage {	
+	[# 
+		val server = unibo.basicomm23.ws.WsConnection.create("localhost:8086/coldstoragesocket")
+		
+		var currentRequest = "" 
+	#]
+
+	State init initial {
+		observeResource coldstorageservice
+		
+		
+		println("$name | Init") color yellow
+	}
+	Goto observing
+	
+	State observing{
+		println("$name | Idle...") color yellow
+  	}
+	Transition 	t0 	whenMsg		gui_storerequest 	-> handle_storerequest
+  					whenMsg 	gui_insertticket 	-> handle_insertticket	
+  					whenMsg	 	coapUpdate 			-> handle_update
+  					whenMsg		chargetaken 		-> handle_charge_taken
+					
+
+	State handle_storerequest {
+		onMsg ( gui_storerequest : gui_storerequest(FW, ID)){
+			println("$name | Sending store request - FW:${payloadArg(0)}, ID:${payloadArg(1)} ") color yellow
+			[# currentRequest = payloadArg(1) #]
+			request coldstorageservice -m proxy_storerequest: proxy_storerequest($payloadArg(0))
+		}
+	}
+	Transition 	t	whenReply 	storeaccepted 	-> handle_store_accepted
+					whenReply 	storerejected 	-> handle_store_rejected
+					
+  	
+	State handle_store_accepted {
+		onMsg(storeaccepted: storeaccepted(TICKET)) {
+			[# val TICKET = payloadArg(0) #]
+			println("$name | Store Accepted. Received ticket [ $TICKET ] for ID:$currentRequest") color yellow
+			[# server.forward("ticket/" + TICKET + "/" + currentRequest) #]
+			[# currentRequest = "" #]
+		}
+	}
+	Goto observing
+	
+	State handle_store_rejected {
+		onMsg(storerejected: storerejected(REASON)) {
+			println("$name | Store Rejected for ID:$currentRequest") color yellow			
+			[# server.forward("error/storerejected: " + payloadArg(0) + "/" + currentRequest) #]
+			[# currentRequest = "" #]
+		}
+		
+	}
+	Goto observing
+  	
+  	State handle_insertticket {
+		onMsg ( gui_insertticket: gui_insertticket(TICKET, ID)){
+			println("$name | Sending insert ticket - TICKET:${payloadArg(0)}, ID:${payloadArg(1)} ") color yellow
+			[# currentRequest = payloadArg(1) #]
+			request coldstorageservice -m proxy_insertticket: proxy_insertticket($payloadArg(0))
+		}
+	}
+	Transition 	t	whenReply 	ticketaccepted 	-> handle_ticket_accepted
+					whenReply 	ticketrejected 	-> handle_ticket_rejected						
+	
+		
+	State handle_ticket_accepted {
+		println("$name | Ticket accepted for ID:$currentRequest") color yellow			
+		[# server.forward("notify/" + payloadArg(0) + " accepted" + "/" + currentRequest) #]
+			[# currentRequest = "" #]
+	}
+	Goto observing
+	
+	State handle_ticket_rejected {
+		onMsg(ticketrejected: ticketrejected(REASON)) {
+			println("$name | Ticket Rejected for ID:$currentRequest") color yellow			
+			[# server.forward("error/ticketrejected: " + payloadArg(0) + "/" + currentRequest) #]
+			[# currentRequest = "" #]
+		}
+	}
+	Goto observing
+  	
+	State handle_charge_taken {
+		[# server.forward("notify/chargetaken") #]
+	}
+	Goto observing
+	
+	State handle_update {
+		onMsg(coapUpdate: coapUpdate(coldstorageservice, VAL)) {
+			[# server.forward("update/" + payloadArg(1)) #]	 
+		}
+	}
+  	Goto observing
+  	
+  	State handle_timeout {
+  		println("$name | An error occured") color red
+  	}
+  	Goto observing
+}
+
+
+QActor coldstorageservice context ctx_coldstorage {
+	[#	
+		val MaxWeightDDR = 50.0f
+		val MaxWeightcoldroom = 200.0f
+		val TicketTimeout = 20000
+		val TicketFormat = "yyyyMMddHHmmss"; // yyyy.MM.dd.HH.mm.ss
+		
+		var ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
+		
+		var CurrentWeight = 0.0f
+		var ReservedWeight = 0.0f
+		var RejectedRequests = 0 
+	#]
+	State s0 initial {
+		[# 
+			ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
+			CurrentWeight = 0.0f 
+			ReservedWeight = 0.0f
+			RejectedRequests = 0
+		#]
+		println("$name | init") color green
+	}
+	Goto idle
+	
+	State idle {
+		println("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight") color green
+		updateResource [# "'cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom'" #]
+	}
+	Transition t0 whenRequest proxy_storerequest	-> handle_store
+				  whenRequest proxy_insertticket	-> handle_ticket
+				  whenRequest chargedeposited		-> handle_deposited
+				  whenMsg	  chargetaken			-> handle_charge_taken
+					
+	State handle_store {
+		onMsg(proxy_storerequest: proxy_storerequest(FW)) {
+			println("$name | Received store request for ${payloadArg(0)} kg") color green
+		
+			[# val FW = payloadArg(0).toFloat() #]
+			
+			if [# (FW > MaxWeightDDR) #] {
+				[# RejectedRequests++ #]
+				replyTo proxy_storerequest with storerejected: storerejected(tooheavy)
+			} else {
+				if [# ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom) #] {
+					[# RejectedRequests++ #]
+					replyTo proxy_storerequest with storerejected: storerejected(full)
+				} else {
+					[#
+						val TICKET = ticketManager.newTicket(FW)
+					  	ReservedWeight += FW
+					  	val TicketId = TICKET.id
+					#]
+					replyTo proxy_storerequest with storeaccepted: storeaccepted($TicketId)
+				}	
+			}
+		}
+	}
+	Goto idle
+	
+	State handle_ticket {
+		onMsg(proxy_insertticket: proxy_insertticket(TICKET)) {
+			[# 
+				val Received = payloadArg(0).toString()
+				val TICKET = ticketManager.getTicket(Received)
+			#]
+			if [# (TICKET != null && TICKET.isValid) #]{
+				if [# (ticketManager.isWaiting) #] {
+					// reject ticket if one is already waiting
+					replyTo proxy_insertticket with ticketrejected: ticketrejected(queuefull)
+				} else {
+					if [# (!ticketManager.isWorking) #] {
+						println("$name | Approved ticket [ $Received ]. Requesting charge") color green
+						forward transporttrolley -m gotoindoor: gotoindoor(_)
+					} else {
+						println("$name | Approved ticket [ $Received ]. Currenty working on [ ${ticketManager.working} ]. Please wait") color green
+					}
+						
+					[#  ticketManager.setWaiting(Received) #]
+					replyTo proxy_insertticket with ticketaccepted: ticketaccepted(_)
+				}
+			} else {
+				if [#(TICKET != null)#] {
+					[#
+						ticketManager.remove(TICKET)
+						ReservedWeight -= TICKET.weight
+					#]
+					println("$name | Rejected ticket [ $Received ] - timedout") color green
+					replyTo proxy_insertticket with ticketrejected: ticketrejected(timedout)
+				} else {
+					println("$name | Rejected ticket [ $Received ] - doesn't exist") color green
+					replyTo proxy_insertticket with ticketrejected: ticketrejected(invalid)	
+				}				
+			}
+		}
+	}
+	Goto idle
+	
+	State handle_charge_taken {
+		[# 			
+			val TicketId = ticketManager.waitingNowWorking()
+		#]
+		println("$name | Charge taken for ticket [ $TicketId ]") color green
+		forward accessgui_proxy -m chargetaken: chargetaken(_)
+	}
+	Goto idle
+	
+	State handle_deposited {
+		onMsg(chargedeposited: chargedeposited(_)) {
+			[#
+				if (ticketManager.isWorking) {
+					CurrentWeight += ticketManager.workingTicket().weight
+					ReservedWeight -= ticketManager.workingTicket().weight
+				}
+				ticketManager.stopWorking()
+			#]
+			println("$name | Deposit confirmation received") color green
+			if [# (ticketManager.isWaiting) #] {
+				println("$name | Next ticket: [ ${ticketManager.waiting} ]") color green
+				replyTo chargedeposited with more: more(_)
+			} else {
+				replyTo chargedeposited with gohome: gohome(_)
+			}
+		}
+	}
+	Goto idle
+}
+
+
+//sonar
+QActor alarmdevice context ctx_coldstorage {
+	
+	[# var MINT = 10000L #]
+	
+	State init initial { 
+		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
+		println ("$name | init") color red
+	}
+	Goto work
+	
+	State work {
+		println("$name | attendo...") color red
+	}
+	Transition t0 whenEvent obstacle  -> handleobstacle
+	
+	State handleobstacle{ 
+		onMsg( obstacle : obstacle(D)){
+			println("$name | handleobstacle ALARM ${payloadArg(0)}") color red
+			emit alarm : alarm(_)			
+			updateResource [# "$name(ON)"#]	
+		}	
+	}
+	Transition t0 whenEvent obstaclefree -> handleobstaclefree	               
+	
+	State handleobstaclefree {
+		onMsg( obstaclefree : obstaclefree(D)){			
+			println("$name | obstaclefree RESUME ${payloadArg(0)}") color red
+			emit resume : resume(_) //resume TT
+			println("$name | aspetto DLMIT prima di poter gestire un successivo stop") color red
+			[# delay(MINT) #] //delay 10000
+			println("$name | sono di nuovo pronto per poter gestire uno stop") color red
+		}
+	}
+	Goto work
+}
+
+
+//Led
+QActor warningdevice context ctx_coldstorage {
+	[# 
+		var state = 0
+		var stato1 = "0"
+	#]  
+	State init initial {
+		println ("$name | init") color blue
+		observeResource transporttrolley
+		println("$name | LED IS OFF") color blue
+	}
+	Goto work
+	
+	State work {
+		println("$name | attendo update") color blue
+	}
+	Transition t0 whenMsg coapUpdate -> doObserve
+	
+	State doObserve {
+		discardMsg Off
+		onMsg ( coapUpdate : coapUpdate(transporttrolley, ARG)){
+			[# var stato1 = payloadArg(1) #]
+			if [# (stato1 == "transporttrolley(OFF)") #] {
+				println("$name | led off | ricevuto dal TT") color blue
+				[# state = 0 #]
+				emit ledoff : ledoff(_)
+			} else {
+				if [# (stato1 == "transporttrolley(ON)") #] {
+					println("$name | led ON | ricevuto dal TT") color blue
+					[# state = 1 #]
+					emit ledon : ledon(_)
+				} else {
+					if [# (stato1 == "transporttrolley(BLINK)") #] {
+						println("$name | led BLINK | ricevuto dal TT") color blue
+						[# state = 2 #]
+						emit ledblink : ledblink(_)
+					} 
+					else {
+						println ("$name | $stato1 | sconosciuto | ricevuto dal TT") color blue
+					}
+				}
+			}	 
+		}
+		onMsg( coapUpdate : coapUpdate(alarmdevice, ARG)){
+			[# var stato2 = payloadArg(1) #]
+			if [# (stato2 == "ON") #] {
+				println("$name | led on | ricevuto dal sonar") color blue
+				[# state = 1 #]
+			} else {
+				println ("$name | sconosciuto | ricevuto dal sonar") color blue
+			}
+		}
+	}
+	Goto work
+	
+}
+
+
+QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
+	[# var allarme: String = "" #]
+	State s0 initial {
+		println("$name | init e engage basicrobot") color magenta
+	
+		request basicrobot -m engage : engage(transporttrolley,330)
+	}
+	Transition 	t0	whenReply engagedone -> engaged
+					whenReply engagerefused -> quit
+	
+	State engaged {
+		println("$name | basicrobot engaged") color magenta
+		updateResource [# "$name(OFF)"#]
+	}
+	Goto idle
+	
+	State idle{
+		[# allarme = "inHome" #]
+	}
+	Transition t0 whenMsg gotoindoor -> moveToIndoor
+				  whenEvent alarm -> sonarobstacle
+	
+	State moveToIndoor {
+		[# allarme = "toIndoor" #]
+		updateResource [# "$name(BLINK)"#]
+		//discardMsg On
+		println("$name | vado all'INDOOR") color magenta
+		request basicrobot -m moverobot : moverobot (0,4)
+	}
+	Transition t0 whenReply moverobotdone -> loadTheCharge
+				  whenEvent alarm -> sonarobstacle
+	
+	State loadTheCharge {
+		//discardMsg On
+		[# allarme = "inIndoor" #]
+		updateResource [# "$name(ON)"#]
+		println("$name | sono in INDOOR") color magenta
+		// simulo azione di carico
+//		delay 3000
+	}
+	Transition t 	whenTime 3000 -> moveToColdroom
+					whenEvent alarm -> sonarobstacle
+	
+	
+	State moveToColdroom {
+		[# allarme = "toColdroom" #]
+		forward coldstorageservice -m chargetaken : chargetaken(_)
+		println("$name | vado verso la cold room") color magenta
+		updateResource [# "$name(BLINK)"#]
+		request basicrobot -m moverobot: moverobot (4,3) 
+	}
+	Transition t0 whenReply moverobotdone -> storeTheCharge
+			      whenEvent alarm -> sonarobstacle
+	
+	State storeTheCharge {
+		[# allarme = "inColdroom" #]
+		updateResource [# "$name(ON)"#]
+		//discardMsg On
+		println("$name | sono in Cold Room") color magenta		
+	}
+	Transition t0 whenTime 3000 	-> askService
+				  whenEvent alarm 	-> sonarobstacle
+	
+	State askService {
+		request coldstorageservice -m chargedeposited : chargedeposited(_)
+	}
+	Transition t0 whenReply more -> moveToIndoor
+				  whenReply gohome -> moveToHome
+	
+	State moveToHome{
+		[# allarme = "toHome" #]
+		updateResource [# "$name(BLINK)"#]
+		//discardMsg On 
+		println("$name | vado alla posizione HOME") color magenta
+		request basicrobot -m moverobot : moverobot (0,0)
+	}
+	Transition t0 whenReply moverobotdone -> trolleyathome
+				  whenEvent alarm -> sonarobstacle
+	
+	State trolleyathome {
+		updateResource [# "$name(OFF)"#]
+		//discardMsg On
+		println("$name | trolley at HOME") color magenta
+		forward basicrobot -m setdirection : dir(down)
+		delay 500
+	}
+	Goto idle
+	
+	State sonarobstacle {
+		discardMsg On
+		updateResource [# "$name(ON)"#]
+		println("$name | Sono fermo per ostacolo sonar") color magenta
+	}
+	Transition t0 whenEvent resume and [# allarme == "inHome" #] 		-> idle
+				  whenEvent resume and [# allarme == "toIndoor" #] 		-> moveToIndoor
+				  whenEvent resume and [# allarme == "inIndoor" #] 		-> moveToColdroom
+				  whenEvent resume and [# allarme == "toColdroom" #] 	-> loadTheCharge
+				  whenEvent resume and [# allarme == "inColdroom" #] 	-> storeTheCharge
+				  whenEvent resume and [# allarme == "toHome" #] 		-> moveToHome
+	
+	State quit {
+		updateResource [# "$name(OFF)"#]
+		forward basicrobot -m disengage : disengage(transporttrolley)
+		[# System.exit(0) #]
+	}
+}

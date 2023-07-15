@@ -28,12 +28,12 @@ class DistanceFilter(name: String) : ActorBasic(name) {
         if (distanceint > 0 && distanceint < DLIMIT) {
             //System.out.println("[distanceFilter] ho emesso obstacle")
             val m1 = MsgUtil.buildEvent(name, "obstacle", "obstacle($distanceint)")
-            CommUtils.outgreen("$tt $name |  emitLocalStreamEvent m1= $m1")
+            CommUtils.outblack("$name |  emitLocalStreamEvent m1= $m1")
             emitLocalStreamEvent(m1) //propagate event obstacle
         } else {
             //System.out.println("[distanceFilter] ho emesso obstaclefree")
             val m2 = MsgUtil.buildEvent(name, "obstaclefree", "obstaclefree($distanceint)")
-            CommUtils.outgreen("$tt $name |  emitLocalStreamEvent m2= $m2")
+            CommUtils.outblack("$name |  emitLocalStreamEvent m2= $m2")
             emitLocalStreamEvent(m2) //propagate event obstacle
         }
     }
@@ -51,12 +51,12 @@ class DistanceFilter(name: String) : ActorBasic(name) {
         if (distanceint > 0 && distanceint < DLIMIT) {
             //System.out.println("[distanceFilter] ho emesso obstacle")
             val m1 = MsgUtil.buildEvent(name, "obstacle", "obstacle($distanceint)")
-            CommUtils.outgreen("$tt $name |  emitLocalStreamEvent m1= $m1")
+            CommUtils.outblack("$name |  emitLocalStreamEvent m1= $m1")
             emitLocalStreamEvent(m1) //propagate event obstacle
         } else {
             //System.out.println("[distanceFilter] ho emesso obstaclefree")
             val m2 = MsgUtil.buildEvent(name, "obstaclefree", "obstaclefree($distanceint)")
-            CommUtils.outgreen("$tt $name |  emitLocalStreamEvent m2= $m2")
+            CommUtils.outblack("$name |  emitLocalStreamEvent m2= $m2")
             emitLocalStreamEvent(m2) //propagate event obstacle
         }
     }
