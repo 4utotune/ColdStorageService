@@ -16,13 +16,14 @@ eventedgeattr = {
     'color': 'red',
     'style': 'dotted'
 }
-with Diagram('coldstorageservice_sprint3Arch', show=False, outformat='png', graph_attr=graphattr) as diag:
+with Diagram('coldstorageservice_sprint4Arch', show=False, outformat='png', graph_attr=graphattr) as diag:
   with Cluster('env'):
      sys = Custom('','./qakicons/system.png')
      with Cluster('ctx_basicrobot', graph_attr=nodeattr):
-          basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
-     with Cluster('ctx_coldstorage', graph_attr=nodeattr):
           statusgui_proxy=Custom('statusgui_proxy','./qakicons/symActorSmall.png')
+          basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
+          robotpos=Custom('robotpos(ext)','./qakicons/externalQActor.png')
+     with Cluster('ctx_coldstorage', graph_attr=nodeattr):
           accessgui_proxy=Custom('accessgui_proxy','./qakicons/symActorSmall.png')
           coldstorageservice=Custom('coldstorageservice','./qakicons/symActorSmall.png')
           alarmdevice=Custom('alarmdevice','./qakicons/symActorSmall.png')
@@ -35,6 +36,7 @@ with Diagram('coldstorageservice_sprint3Arch', show=False, outformat='png', grap
      basicrobot >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> statusgui_proxy
      coldstorageservice >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> statusgui_proxy
      transporttrolley >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> statusgui_proxy
+     robotpos >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> statusgui_proxy
      coldstorageservice >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> accessgui_proxy
      accessgui_proxy >> Edge(color='magenta', style='solid', xlabel='proxy_storerequest', fontcolor='magenta') >> coldstorageservice
      accessgui_proxy >> Edge(color='magenta', style='solid', xlabel='proxy_insertticket', fontcolor='magenta') >> coldstorageservice

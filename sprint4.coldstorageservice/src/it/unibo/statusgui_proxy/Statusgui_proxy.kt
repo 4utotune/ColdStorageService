@@ -24,6 +24,7 @@ class Statusgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 						CoapObserverSupport(myself, "127.0.0.1","8020","ctx_basicrobot","basicrobot")
 						CoapObserverSupport(myself, "localhost","11802","ctx_coldstorage","coldstorageservice")
 						CoapObserverSupport(myself, "localhost","11802","ctx_coldstorage","transporttrolley")
+						CoapObserverSupport(myself, "127.0.0.1","8020","ctx_basicrobot","robotpos")
 						CommUtils.outred("$name | init")
 						//genTimer( actor, state )
 					}
@@ -46,7 +47,7 @@ class Statusgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
 						 	   
 						 try {  
-						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(RES,VAL)"), 
+						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(nasicrobot,VAL)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								CommUtils.outred("$name | update from ${payloadArg(0)} -> ${payloadArg(1)}")
 						}

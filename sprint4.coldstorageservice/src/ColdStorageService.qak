@@ -1,6 +1,6 @@
-System coldstorageservice_sprint3
+System coldstorageservice_sprint4
 
-// MESSAGES
+// MESSAGES   
 
 // BasicRobot
 Request 	engage				: 	engage(OWNER,STEPTIME)
@@ -13,7 +13,7 @@ Dispatch 	cmd					:	cmd(MOVE)
 Dispatch 	end					: 	end(ARG)
 
 Request 	step				: 	step(TIME)
-Reply 		stepdone			: 	stepdone(V)
+Reply 		stepdone			: 	stepdone(V) 
 Reply 		stepfailed			: 	stepfailed(DURATION, CAUSE)
 
 Request 	doplan				: 	doplan(PATH,OWNER,STEPTIME)
@@ -83,6 +83,7 @@ Context	ctx_coldstorage ip	[host="localhost" port=11802]
 //ACTORS
 
 ExternalQActor basicrobot 	context ctx_basicrobot
+ExternalQActor robotpos 	context ctx_basicrobot
 
 //CodedQActor sonar  context ctx_coldstorage className "sonarSimulator"           //IN LOCALE
 CodedQActor sonar  			context ctx_coldstorage className "rx.SonarMQTTReceiver"
@@ -91,12 +92,13 @@ CodedQActor distancefilter 	context ctx_coldstorage className "rx.DistanceFilter
 CodedQActor ledMQTTSender  	context ctx_coldstorage className "rx.ledMQTTSender"
 
 
-QActor statusgui_proxy context ctx_coldstorage {
+QActor statusgui_proxy context ctx_basicrobot {
 	State init initial {
 		
 		observeResource basicrobot
 		observeResource coldstorageservice
 		observeResource transporttrolley
+		observeResource robotpos
 		
 		
 		
@@ -121,7 +123,7 @@ QActor statusgui_proxy context ctx_coldstorage {
 		onMsg(coapUpdate: coapUpdate(transporttrolley, VAL)) {
 			println("$name | update from transporttrolley -> ${payloadArg(1)}") color red
 		}*/
-		onMsg(coapUpdate: coapUpdate(RES, VAL)) {
+		onMsg(coapUpdate: coapUpdate(basicrobot, VAL)) {
 			println("$name | update from ${payloadArg(0)} -> ${payloadArg(1)}") color red	 
 		}
 		
