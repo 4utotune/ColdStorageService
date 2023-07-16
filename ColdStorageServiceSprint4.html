@@ -67,12 +67,37 @@
             <li>Peso prenotato ma non ancora presente nella <b>ColdRoom</b></li>
             <li>La posizione del <b>TransportTrolley</b> sulla mappa</li>
             <li>Lo stato del <b>TransportTrolley</b></li>
-            <li>Numero di <b>richieste di store rifiutate</b> dall'inizio del sistema</li>
+            <li>Numero di <b>richieste di store rifiutate</b> dall'avvio del sistema</li>
         </ul>
 
 
         <h2>Analisi del Problema</h2>
+        Per la comunicazione delle informazioni che descrivono lo stato del nostro sistema si adotta il <b>pattern Observer</b>. <br>
+        Tutti i dati che vengono comunicati permettono di informare il <b>Service Manager</b> in modo completo dello stato del sistema, tranne per quanto 
+        riguarda la posizione in tempo reale del <b>transportrolley</b>. Questo succede perchè non avendo accesso diretto all'attore <b>robotpos</b> 
+        presente all'interno del <b>basicrobot23</b> offerto dal committente le uniche informazioni che si riescono a raccogliere sono le posizioni 
+        del <b>TransportTrolley</b> sulla mappa solo all'inizio e alla fine di una mossa <b>moverobot(coordinate)</b>.<br><br>
+        Esposti questi fatti si può agire in due modi differenti:<br>
+        <ol>
+            <li>Essere soddisfatti di questo livello di precisione e mostrare in modo accurato la posizione del <b>TransportTrolley</b>> quando questo è fermo, ma qualora si trovi 
+                in movimento ci si limita a comunicare la partenza e la destinazione, potenzialmente con l'aggiunta di una notifica ogni volta che questo effettua uno step.
+            </li>
+            <li>[Solo se si riesce ad ottenere il plan prima di fare doplan]Sapendo il percorso da effettuare grazie al <b>planner</b>, e conoscendo quando il <b>TransportTrolley</b> 
+            effettua uno step, si potrebbe ricostruire la sua posizione in coordinate sulla mappa.</li>
+        </ol>
+        Per il contesto che si sta analizzando si ritiene sufficiente adottare il primo metodo. Il secondo metodo comporterebbe costi maggiori, in particolare:
+        <ul>
+            <li>Se si può modificare il basicrobot23: si aggiungerebbe al Qak relativo le <b>updateResources</b> quando viene fatta ogni mossa</li>
+            <li>Se non si può toccare il basicrobot23 e quindi svolgere il punto 2 si richiederebbe lavoro extra di <b>TOT GIORNI</b></li>
+        </ul>
 
+        <br><br>
+        Il <b>TransportTrolley</b> si può trovare in tre stati diversi:
+        <ol>
+            <li><b>In HOME</b></li>
+            <li><b>In movimento</b></li>
+            <li><b>Fermo</b></li>
+        </ol>
 
         <h3>Interazioni</h3>
         Data la sua natura, tutte le interazioni hanno come destinatario <b>ServiceStatusGUI</b>. In particolare i seguenti messaggi sono prodotti grazie al 
@@ -93,7 +118,39 @@
                     <td>transportrolley</td>
                     <td>ServiceStatusGUI</td>
                     <td>Dispatch</td>
-                    <td>Informa la <b>ServiceStatusGUI</b> dello stato ...........
+                    <td>Informa la <b>ServiceStatusGUI</b> dello stato del <b>TransportTrolley</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td>coapUpdate</td>
+                    <td>basicrobot23</td>
+                    <td>ServiceStatusGUI</td>
+                    <td>Dispatch</td>
+                    <td>Informa la <b>ServiceStatusGUI</b> della posizione del <b>TransportTrolley</b> sulla mappa
+                    </td>
+                </tr>
+                <tr>
+                    <td>coapUpdate</td>
+                    <td>ColdStorageService</td>
+                    <td>ServiceStatusGUI</td>
+                    <td>Dispatch</td>
+                    <td>Informa la <b>ServiceStatusGUI</b> del peso fisico presente all'interno della <b>ColdRoom</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td>coapUpdate</td>
+                    <td>ColdStorageService</td>
+                    <td>ServiceStatusGUI</td>
+                    <td>Dispatch</td>
+                    <td>Informa la <b>ServiceStatusGUI</b> del peso prenotato ma ancora non presente nella <b>ColdRoom</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td>coapUpdate</td>
+                    <td>ColdStorageService</td>
+                    <td>ServiceStatusGUI</td>
+                    <td>Dispatch</td>
+                    <td>Informa la <b>ServiceStatusGUI</b> della quantità di richieste di storage rifiutate dall'avvio del sistema
                     </td>
                 </tr>
             </tbody>
@@ -111,8 +168,7 @@
                 <img src="./sprint3/coldstorageservice_sprint3arch.png" alt="architettura logica">
             </div>
         </center>
-        Siccome non compreso nell'immagine, si esplicita il fatto che l'evento alarm giunge anche al
-        <b>basicrobot23</b>, il quale alla sua ricezione ferma il DDR Robot.<br>
+
 
         <h2>Test plans</h2>
         <table id="myTable1">
@@ -126,105 +182,42 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>testObstacle</td>
-                    <td>alarm device</td>
-                    <td>Il <b>TransportTrolley</b> sta eseguendo le sue mansioni ed all'improvviso il <b>sonar</b>
-                        rileva una distanza minore di <b>DLIMT</b></td>
-                    <td>Un evento <b>alarm</b> viene scatenato da <b>alarmdevice</b></td>
+                    <td>TestAlarm</td>
+                    <td>ServiceStatusGUI</td>
+                    <td>Il <b>sonar</b> rileva una distanza minore di <b>DLIMT</b> e viene scatenato l'evento alarm per fermare il <b>TransportTrolley</b></td>
+                    <td>La <b>ServiceStatusGUI</b> mostra che il robot si è fermato</td>
                 </tr>
                 <tr>
-                    <td>testConsecutiveObstacleGreaterDLIMT</td>
-                    <td>alarm device</td>
-                    <td>Il <b>TransportTrolley</b> sta eseguendo le sue mansioni ed all'improvviso il <b>sonar</b>
-                        rileva una distanza minore di <b>DLIMT</b> e il <b>transportrolley</b> si ferma.
-                        Dopo un tempo pari ad 1/3 di <b>MINT</b> viene effettauta la resume, riattivando il
-                        <b>transportrolley</b>. Successivamente dopo <b>MINT</b>
-                        millisecondi dal precedente stop il <b>sonar</b> rileva di nuovo una distanza minore di
-                        <b>DLIMT</b>.
-                    </td>
-                    <td>In entrambi gli stop vengono emessi gli eventi <b>alarm</b>.</td>
+                    <td>TestRquestStorage</td>
+                    <td>ServiceStatusGUI</td>
+                    <td>Viene effettuata una richiesta di storage</td>
+                    <td>Il peso prenotato si aggiorna di una quantità pari a quella della storerequest</td>
                 </tr>
                 <tr>
-                    <td>testConsecutiveObstacleLowerDLIMT</td>
-                    <td>alarm device</td>
-                    <td>Il <b>TransportTrolley</b> sta eseguendo le sue mansioni ed all'improvviso il <b>sonar</b>
-                        rileva una distanza minore di <b>DLIMT</b> e il <b>transportrolley</b> si ferma.
-                        Dopo un tempo pari ad 1/3 di <b>MINT</b> viene effettauta la resume, riattivando il
-                        <b>transportrolley</b>. Successivamente entro <b>MINT</b>
-                        millisecondi dal precedente stop il <b>sonar</b> rileva di nuovo una distanza minore di
-                        <b>DLIMT</b>, ma immediatamente dopo ritorna a misurare una distanza maggiore di <b>DLIMT</b>.
-                    </td>
-                    <td>Al primo stop viene emesso l'evento <b>alarm</b>, ma al secondo l'evento <b>alarm</b> non viene
-                        scatenato.</td>
+                    <td>TestInsertTicket</td>
+                    <td>ServiceStatusGUI</td>
+                    <td>Viene effettuata una richiesta <u>isolata</u> di insertticket</td>
+                    <td>Ci si aspetta che il robot giunga alla posizione di <b>INDOOR</b>, direzionarsi po alla <b>PORT</b>, aggiornare sia il peso prenotato che quello 
+                    fisico, ed infine dirigersi verso alla <b>HOME</b></td>
+                </tr>
+                <tr>
+                    <td>TestRefusedRequest</td>
+                    <td>ServiceStatusGUI</td>
+                    <td>La <b>ColdRoom</b> si trova con lo spazio esaurito ed una richiesta di storage viene effettuata</td>
+                    <td>Il contatore di richieste di storage rifiutate deve essere incrementato di 1</td>
                 </tr>
             </tbody>
         </table>
 
         <h2>Project</h2>
-        Siccome nell'analisi del problema si è utilizzato un simulatore del <b>sonar</b> per creare il QAK, il passo
-        successivo è quello di integrarne uno fisico. Per fare ciò si adotta un broker gratuito e a disposizione di
-        tutti come <u>tcp://mqtt.eclipseprojects.io</u> che permette l'invio e la ricezione di eventi tra dispositivi
-        fisicamente non collegati ma connessi alla rete internet.<br>
-        Per comunicare dati utilizzando <b>MQTT</b> bisogna definire un topic che definisce il canale di utilizzo, utile
-        per distinguere categorie di eventi che vogliamo raggruppare.
-        Nel nostro caso si è adottato <b>unibo/sonar/events</b> come topic per comunicare i dati
-        dal <b>Raspberry</b> al Servizio. Prima di essere considerati da <b>ColdStorageService</b>, vengono filtrati da:
-        <ul>
-            <li><b>SonarMQTTReceiver</b>: si impegna a ricevere i dati "grezzi" del <b>sonar</b> tramite MQTT e poi
-                propaga l'evento all'interno del contesto ctx_coldstorage</li>
-            <li><b>DataCleaner</b>: pulisce i valori scartando le misurazioni che non sono comprese in un range che va
-                da 2 a 150 cm</li>
-            <li><b>DistanceFilter</b>: riceve i dati puliti dal <b>DataCleaner</b> e invia un evento <b>obstacle</b> o
-                <b>obstaclefree</b> qualora le misurazioni rispettivamente siano inferiori di <b>DLIMT</b>
-                oppure maggiori
-            </li>
-        </ul>
-        Per finire la catena: gli eventi <b>obstacle</b> e <b>obstaclefree</b> sono captabili da <b>alarm device</b> e,
-        qualora le condizioni riguardanti il tempo <b>MINT</b> tra uno stop e l'altro siano soddisfatte, emette un
-        evento alarm che verrà ricevuto sia da <b>basicrobot23</b> sia dal <b>Transport Trolley</b>.
-        <br><br>
-        Anche per comunicare con il <b>led</b> si utilizza MQTT, mandando un messaggio con l'ausilio dell'attore
-        <b>LedMQTTSender</b> ed utilizzando <b>unibo/led/events</b> come topic.
-        <br><br>
-        Per la fase di prototipazione il <b>sonar</b> e <b>led</b> saranno collegati ad un <b>Raspberry</b> tramite dei
-        cavetti jumper femmina-femmina.
-        <br>
-        Il software lato <b>Raspberry</b> sarà organizzato nella seguente maniera:
-        <ul>
-            <li>Un programma python che si occupa di utilizzare il <b>sonar</b> per estrapolare le distanze misurate
-            </li>
-            <li>Un programma python che cattura tali dati da standard input e li inoltra al broker nel corretto topic
-            </li>
-            <li>Un programma python che riceve dal broker i comandi e li inoltra su standard input</li>
-            <li>Un programma python che legge da standard input e comanda il led</li>
 
-        </ul>
-        Per definizione i programmi devono essere eseguiti in pipe, ad es. (per il sonar): <u>python sonar.py | python
-            controllerMQTT.py</u>
-        <br><br>
-        I file che definiscono il software necessario per il <b>Raspberry</b> sono: <a
-            href="./sprint3/sonar.py">sonar.py</a>, <a href="./sprint3/ControllerMqtt.py">controllerMQTT.py</a>,
-        <a href="./sprint3/LedDevice.py">LedDevice.py</a>, <a href="./sprint3/mqttReceiver.py">mqttReceiver.py</a>
-        <br><br>
-        La scelta di Python è motivata dal fatto che è un linguaggio ideale per la prototipazione: rapido,
-        con molte librerie di supporto e ben documentato.
-        Successivamente se si desiderano performace migliori si può pensare di ottimizzare scrivendo codice di più basso
-        livello.
-        <br><br>
-        I pin del <b>Raspberry</b> coinvolti sono:
-        <ul>
-            <li><b>GPIO 4</b>: pin TRIG sonar</li>
-            <li><b>GPIO 27</b>: pin ECHO sonar</li>
-            <li><b>GPIO 25</b>: pin led</li>
-        </ul>
 
         <h2>Conclusioni</h2>
 
         <div class="remark">
             Gli output dello sprint3 sono:<br>
             <ul>
-                <li>Warning Device e relativi attori e file python</li>
-                <li>Alarm Device e relativi attori e file python</li>
+                <li>ServiceStatusGUI</li>
             </ul>
         </div>
 
