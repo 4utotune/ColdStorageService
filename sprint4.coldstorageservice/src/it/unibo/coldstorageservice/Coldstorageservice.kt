@@ -48,7 +48,7 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				state("idle") { //this:State
 					action { //it:State
 						CommUtils.outgreen("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight")
-						updateResourceRep( "'cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom'"  
+						updateResourceRep( "'weight(cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom)'"  
 						)
 						//genTimer( actor, state )
 					}
@@ -68,11 +68,15 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 								 val FW = payloadArg(0).toFloat()  
 								if(  (FW > MaxWeightDDR)  
 								 ){ RejectedRequests++  
+								updateResourceRep( "'rejected($RejectedRequests)'"  
+								)
 								answer("proxy_storerequest", "storerejected", "storerejected(tooheavy)"   )  
 								}
 								else
 								 {if(  ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom)  
 								  ){ RejectedRequests++  
+								 updateResourceRep( "'rejected($RejectedRequests)'"  
+								 )
 								 answer("proxy_storerequest", "storerejected", "storerejected(full)"   )  
 								 }
 								 else

@@ -9,7 +9,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class WebSocketConfiguration implements WebSocketConfigurer {
     public static final ClientHandler wshandler_client = new ClientHandler();
-    public static final ActorHandler wshandler_actor = new ActorHandler();
+    public static final ActorHandler wshandler_actor = new ActorHandler(wshandler_client);
     public static final String wspath_client = "statusgui";
     public static final String wspath_actor = "statusguiproxy";
 

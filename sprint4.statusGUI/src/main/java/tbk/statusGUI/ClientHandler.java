@@ -7,9 +7,7 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ClientHandler extends AbstractWebSocketHandler {
     private final List<WebSocketSession> sessions = new ArrayList<>();
@@ -38,8 +36,30 @@ public class ClientHandler extends AbstractWebSocketHandler {
         System.out.println("CL | Received: " + msg);
     }
 
-    protected void updateStatusGUI(String message) {
+    protected void updateStatusGUI(String update) {
+        String[] parts = update.split("/");
+        String sender = parts[0];
+        String payload = parts[1];
+        switch (sender) {
+            case "basicrobot":
+                break;
+            case "engager":
+                break;
+            case "robotpos":
+                break;
+            case "planexec":
+                break;
+            case "coldstorageservice":
+                break;
+            case "transporttrolley":
+                break;
+            default:
+                break;
+        }
 
+        String message = sender + "/" + payload;
+        System.out.println("CL | Sending: " + message);
+        this.sendToAll(message);
     }
 
     protected void sendToAll(String message) {

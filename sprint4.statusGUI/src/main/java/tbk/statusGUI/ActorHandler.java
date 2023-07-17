@@ -18,7 +18,7 @@ public class ActorHandler extends AbstractWebSocketHandler {
 
     private ClientHandler clientHandler;
 
-    protected void init(ClientHandler clientHandler) {
+    public ActorHandler(ClientHandler clientHandler) {
         this.clientHandler = clientHandler;
     }
 

@@ -103,9 +103,6 @@ QActor statusgui_proxy context ctx_coldstorage {
 	#]
 	
 	State init initial {
-		
-		
-		
 		observeResource basicrobot
 		observeResource engager
 		observeResource robotpos
@@ -123,24 +120,24 @@ QActor statusgui_proxy context ctx_coldstorage {
 	Transition t whenMsg coapUpdate -> handle_update
 	
 	State handle_update {
-		[# try { #]
+		//[# try { #]
 		if [# (currentMsg.msgContent().contains("robotpos")) #] {			
 			[#
 			    val coordinates = Regex("""RobotPos=\((\d+),(\d+)\)""").
 			    		find(currentMsg.msgContent())?.destructured?.
 			    			let { (x, y) -> Pair(x.toInt(), y.toInt()) }
-			    server.forward("robotpos/" + coordinates)
+			    server.forward("robotpos/$coordinates")
 			#]
-			println("$name | received robotpos: $coordinates") color cyan
+			//println("$name | received robotpos: $coordinates") color cyan
 		} else {
 			onMsg(coapUpdate: coapUpdate(RES, VAL)) {
-				println("$name | update from ${payloadArg(0)} -> ${payloadArg(1)}") color cyan
-				[# server.forward("{payloadArg(0)}/" + {payloadArg(1)}) #]
+				//println("$name | update from ${payloadArg(0)} -> ${payloadArg(1)}") color cyan
+				[# server.forward("${payloadArg(0)}/" + payloadArg(1)) #]
 			}
 		}
-		[# } catch (e: Exception) { #] 
-			println("$name | ERROR: $currentMsg") color cyan 
-		[# } #]
+		//[# } catch (e: Exception) { #] 
+		//	println("$name | ERROR: $currentMsg") color cyan 
+		//[# } #]
 	}
 	Goto observing
 }
@@ -273,7 +270,7 @@ QActor coldstorageservice context ctx_coldstorage {
 	
 	State idle {
 		println("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight") color green
-		updateResource [# "'cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom'" #]
+		updateResource [# "'weight(cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom)'" #]
 	}
 	Transition t0 whenRequest proxy_storerequest	-> handle_store
 				  whenRequest proxy_insertticket	-> handle_ticket
@@ -288,10 +285,12 @@ QActor coldstorageservice context ctx_coldstorage {
 			
 			if [# (FW > MaxWeightDDR) #] {
 				[# RejectedRequests++ #]
+				updateResource [# "'rejected($RejectedRequests)'" #]				
 				replyTo proxy_storerequest with storerejected: storerejected(tooheavy)
 			} else {
 				if [# ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom) #] {
 					[# RejectedRequests++ #]
+					updateResource [# "'rejected($RejectedRequests)'" #]
 					replyTo proxy_storerequest with storerejected: storerejected(full)
 				} else {
 					[#
