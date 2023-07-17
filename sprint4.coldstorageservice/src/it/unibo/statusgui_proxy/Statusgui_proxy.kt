@@ -18,6 +18,10 @@ class Statusgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
+		 																
+				val server = unibo.basicomm23.ws.WsConnection.create("localhost:8087/statusguiproxy")
+				
+				var currentRequest = "" 
 		return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
@@ -52,12 +56,14 @@ class Statusgui_proxy ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 									    val coordinates = Regex("""RobotPos=\((\d+),(\d+)\)""").
 									    		find(currentMsg.msgContent())?.destructured?.
 									    			let { (x, y) -> Pair(x.toInt(), y.toInt()) }
+									    server.forward("robotpos/" + coordinates)
 						CommUtils.outcyan("$name | received robotpos: $coordinates")
 						}
 						else
 						 {if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(RES,VAL)"), 
 						                         currentMsg.msgContent()) ) { //set msgArgList
 						 		CommUtils.outcyan("$name | update from ${payloadArg(0)} -> ${payloadArg(1)}")
+						 		 server.forward("{payloadArg(0)}/" + {payloadArg(1)})  
 						 }
 						 }
 						 } catch (e: Exception) {  

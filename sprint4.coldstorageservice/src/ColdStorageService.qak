@@ -95,7 +95,16 @@ CodedQActor ledMQTTSender  	context ctx_coldstorage className "rx.ledMQTTSender"
 
 
 QActor statusgui_proxy context ctx_coldstorage {
+	
+	[# 																
+		val server = unibo.basicomm23.ws.WsConnection.create("localhost:8087/statusguiproxy")
+		
+		var currentRequest = "" 
+	#]
+	
 	State init initial {
+		
+		
 		
 		observeResource basicrobot
 		observeResource engager
@@ -109,7 +118,7 @@ QActor statusgui_proxy context ctx_coldstorage {
 	Goto observing
 	
 	State observing {
-		// println("$name | idle..")
+		// println("$name | idle..") 
 	}
 	Transition t whenMsg coapUpdate -> handle_update
 	
@@ -120,11 +129,13 @@ QActor statusgui_proxy context ctx_coldstorage {
 			    val coordinates = Regex("""RobotPos=\((\d+),(\d+)\)""").
 			    		find(currentMsg.msgContent())?.destructured?.
 			    			let { (x, y) -> Pair(x.toInt(), y.toInt()) }
+			    server.forward("robotpos/" + coordinates)
 			#]
 			println("$name | received robotpos: $coordinates") color cyan
 		} else {
 			onMsg(coapUpdate: coapUpdate(RES, VAL)) {
-				println("$name | update from ${payloadArg(0)} -> ${payloadArg(1)}") color cyan	 
+				println("$name | update from ${payloadArg(0)} -> ${payloadArg(1)}") color cyan
+				[# server.forward("{payloadArg(0)}/" + {payloadArg(1)}) #]
 			}
 		}
 		[# } catch (e: Exception) { #] 
