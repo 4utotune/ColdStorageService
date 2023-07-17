@@ -82,13 +82,14 @@
             <li>Essere soddisfatti di questo livello di precisione e mostrare in modo accurato la posizione del <b>TransportTrolley</b>> quando questo è fermo, ma qualora si trovi 
                 in movimento ci si limita a comunicare la partenza e la destinazione, potenzialmente con l'aggiunta di una notifica ogni volta che questo effettua uno step.
             </li>
-            <li>[Solo se si riesce ad ottenere il plan prima di fare doplan]Sapendo il percorso da effettuare grazie al <b>planner</b>, e conoscendo quando il <b>TransportTrolley</b> 
-            effettua uno step, si potrebbe ricostruire la sua posizione in coordinate sulla mappa.</li>
+            <li>Se si fosse a conoscenza del percorso da effettuare grazie al <b>planner</b>, e conoscendo quando il <b>TransportTrolley</b> 
+                effettua uno step, si potrebbe ricostruire la sua posizione in coordinate sulla mappa.</li>
         </ol>
         Per il contesto che si sta analizzando si ritiene sufficiente adottare il primo metodo. Il secondo metodo comporterebbe costi maggiori, in particolare:
         <ul>
-            <li>Se si può modificare il basicrobot23: si aggiungerebbe al Qak relativo le <b>updateResources</b> quando viene fatta ogni mossa</li>
-            <li>Se non si può toccare il basicrobot23 e quindi svolgere il punto 2 si richiederebbe lavoro extra di <b>TOT GIORNI</b></li>
+            <li>Se si può modificare il basicrobot23: si aggiungerebbe al Qak relativo le <b>updateResources</b> quando viene fatta ogni mossa.</li>
+            <li>Se non si può toccare il basicrobot23 e quindi svolgere il punto 2,ma  data la attuale situazione non si riuscirebbe ad atture
+                tale strategia perché il piano del che il <b>TransportTrolley</b> dovrà eseguire viene reso noto solo a posteriori.</li>
         </ul>
 
         <br><br>
