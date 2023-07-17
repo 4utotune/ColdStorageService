@@ -1,6 +1,6 @@
 System coldstorageservice_sprint4
 
-// MESSAGES   
+// MESSAGES
 
 // BasicRobot
 Request 	engage				: 	engage(OWNER,STEPTIME)
@@ -13,7 +13,7 @@ Dispatch 	cmd					:	cmd(MOVE)
 Dispatch 	end					: 	end(ARG)
 
 Request 	step				: 	step(TIME)
-Reply 		stepdone			: 	stepdone(V) 
+Reply 		stepdone			: 	stepdone(V)
 Reply 		stepfailed			: 	stepfailed(DURATION, CAUSE)
 
 Request 	doplan				: 	doplan(PATH,OWNER,STEPTIME)
@@ -77,13 +77,15 @@ Event 		ledblink		  	: 	ledblink(_)
 
 // CONTEXTS
 
-Context ctx_basicrobot 	ip 	[host="127.0.0.1" port=8020]  
+Context ctxbasicrobot 	ip 	[host="127.0.0.1" port=8020]  
 Context	ctx_coldstorage ip	[host="localhost" port=11802]
 
 //ACTORS
 
-ExternalQActor basicrobot 	context ctx_basicrobot
-ExternalQActor robotpos 	context ctx_basicrobot
+ExternalQActor basicrobot 	context ctxbasicrobot
+ExternalQActor engager 	context ctxbasicrobot
+ExternalQActor planexec 	context ctxbasicrobot
+ExternalQActor robotpos context ctxbasicrobot
 
 //CodedQActor sonar  context ctx_coldstorage className "sonarSimulator"           //IN LOCALE
 CodedQActor sonar  			context ctx_coldstorage className "rx.SonarMQTTReceiver"
@@ -92,17 +94,17 @@ CodedQActor distancefilter 	context ctx_coldstorage className "rx.DistanceFilter
 CodedQActor ledMQTTSender  	context ctx_coldstorage className "rx.ledMQTTSender"
 
 
-QActor statusgui_proxy context ctx_basicrobot {
+QActor statusgui_proxy context ctx_coldstorage {
 	State init initial {
 		
 		observeResource basicrobot
-		observeResource coldstorageservice
-		observeResource transporttrolley
+		observeResource engager
 		observeResource robotpos
+		observeResource planexec
+		observeResource coldstorageservice
+		observeResource transporttrolley		
 		
-		
-		
-		println("$name | init") color red
+		println("$name | init") color cyan
 	}
 	Goto observing
 	
@@ -112,24 +114,22 @@ QActor statusgui_proxy context ctx_basicrobot {
 	Transition t whenMsg coapUpdate -> handle_update
 	
 	State handle_update {
-		printCurrentMessage
 		[# try { #]
-		/*onMsg(coapUpdate: coapUpdate(basicrobot, VAL)) {
-			println("$name | update from basicrobot -> ${payloadArg(1)}") color red	 
+		if [# (currentMsg.msgContent().contains("robotpos")) #] {			
+			[#
+			    val coordinates = Regex("""RobotPos=\((\d+),(\d+)\)""").
+			    		find(currentMsg.msgContent())?.destructured?.
+			    			let { (x, y) -> Pair(x.toInt(), y.toInt()) }
+			#]
+			println("$name | received robotpos: $coordinates") color cyan
+		} else {
+			onMsg(coapUpdate: coapUpdate(RES, VAL)) {
+				println("$name | update from ${payloadArg(0)} -> ${payloadArg(1)}") color cyan	 
+			}
 		}
-		onMsg(coapUpdate: coapUpdate(coldstorageservice, VAL)) {
-			println("$name | update from coldstorageservice -> ${payloadArg(1)}")	color red
-		}
-		onMsg(coapUpdate: coapUpdate(transporttrolley, VAL)) {
-			println("$name | update from transporttrolley -> ${payloadArg(1)}") color red
-		}*/
-		onMsg(coapUpdate: coapUpdate(basicrobot, VAL)) {
-			println("$name | update from ${payloadArg(0)} -> ${payloadArg(1)}") color red	 
-		}
-		
-		[#} catch (e: Exception) { 
-			System.out.println("Errore")
-		} #]
+		[# } catch (e: Exception) { #] 
+			println("$name | ERROR: $currentMsg") color cyan 
+		[# } #]
 	}
 	Goto observing
 }

@@ -19,11 +19,13 @@ eventedgeattr = {
 with Diagram('coldstorageservice_sprint4Arch', show=False, outformat='png', graph_attr=graphattr) as diag:
   with Cluster('env'):
      sys = Custom('','./qakicons/system.png')
-     with Cluster('ctx_basicrobot', graph_attr=nodeattr):
-          statusgui_proxy=Custom('statusgui_proxy','./qakicons/symActorSmall.png')
+     with Cluster('ctxbasicrobot', graph_attr=nodeattr):
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
+          engager=Custom('engager(ext)','./qakicons/externalQActor.png')
+          planexec=Custom('planexec(ext)','./qakicons/externalQActor.png')
           robotpos=Custom('robotpos(ext)','./qakicons/externalQActor.png')
      with Cluster('ctx_coldstorage', graph_attr=nodeattr):
+          statusgui_proxy=Custom('statusgui_proxy','./qakicons/symActorSmall.png')
           accessgui_proxy=Custom('accessgui_proxy','./qakicons/symActorSmall.png')
           coldstorageservice=Custom('coldstorageservice','./qakicons/symActorSmall.png')
           alarmdevice=Custom('alarmdevice','./qakicons/symActorSmall.png')
@@ -34,9 +36,11 @@ with Diagram('coldstorageservice_sprint4Arch', show=False, outformat='png', grap
           distancefilter=Custom('distancefilter(coded)','./qakicons/codedQActor.png')
           ledMQTTSender=Custom('ledMQTTSender(coded)','./qakicons/codedQActor.png')
      basicrobot >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> statusgui_proxy
+     engager >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> statusgui_proxy
+     robotpos >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> statusgui_proxy
+     planexec >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> statusgui_proxy
      coldstorageservice >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> statusgui_proxy
      transporttrolley >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> statusgui_proxy
-     robotpos >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> statusgui_proxy
      coldstorageservice >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> accessgui_proxy
      accessgui_proxy >> Edge(color='magenta', style='solid', xlabel='proxy_storerequest', fontcolor='magenta') >> coldstorageservice
      accessgui_proxy >> Edge(color='magenta', style='solid', xlabel='proxy_insertticket', fontcolor='magenta') >> coldstorageservice
