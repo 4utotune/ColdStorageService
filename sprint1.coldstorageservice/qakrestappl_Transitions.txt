@@ -1,5 +1,0 @@
-{"actor":"accessguimock", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_mock_store_request", "msgId":"mock_store_request"}
-{"actor":"accessguimock", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_mock_ticket_input", "msgId":"mock_ticket_input"}
-{"actor":"accessguimock", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}
-{"actor":"coldstorageservice", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}
-{"actor":"transporttrolley", "msgType":"dispatch", "curstate":"idle", "nextstate":"moveToIndoor", "msgId":"gotoindoor"}
