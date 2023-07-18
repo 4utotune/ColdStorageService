@@ -35,7 +35,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("engaged") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("$name | basicrobot engaged")
-						updateResourceRep( "$name(OFF)" 
+						updateResourceRep( "$name(HOME)" 
 						)
 						//genTimer( actor, state )
 					}
@@ -58,7 +58,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("moveToIndoor") { //this:State
 					action { //it:State
 						 allarme = "toIndoor"  
-						updateResourceRep( "$name(BLINK)" 
+						updateResourceRep( "$name(MOVING)" 
 						)
 						CommUtils.outmagenta("$name | vado all'INDOOR")
 						request("moverobot", "moverobot(0,4)" ,"basicrobot" )  
@@ -73,7 +73,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("loadTheCharge") { //this:State
 					action { //it:State
 						 allarme = "inIndoor"  
-						updateResourceRep( "$name(ON)" 
+						updateResourceRep( "$name(STOPPED)" 
 						)
 						CommUtils.outmagenta("$name | sono in INDOOR")
 						//genTimer( actor, state )
@@ -91,7 +91,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 						 allarme = "toColdroom"  
 						forward("chargetaken", "chargetaken(_)" ,"coldstorageservice" ) 
 						CommUtils.outmagenta("$name | vado verso la cold room")
-						updateResourceRep( "$name(BLINK)" 
+						updateResourceRep( "$name(MOVING)" 
 						)
 						request("moverobot", "moverobot(4,3)" ,"basicrobot" )  
 						//genTimer( actor, state )
@@ -105,7 +105,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("storeTheCharge") { //this:State
 					action { //it:State
 						 allarme = "inColdroom"  
-						updateResourceRep( "$name(ON)" 
+						updateResourceRep( "$name(STOPPED)" 
 						)
 						CommUtils.outmagenta("$name | sono in Cold Room")
 						//genTimer( actor, state )
@@ -132,7 +132,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("moveToHome") { //this:State
 					action { //it:State
 						 allarme = "toHome"  
-						updateResourceRep( "$name(BLINK)" 
+						updateResourceRep( "$name(MOVING)" 
 						)
 						CommUtils.outmagenta("$name | vado alla posizione HOME")
 						request("moverobot", "moverobot(0,0)" ,"basicrobot" )  
@@ -146,7 +146,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("trolleyathome") { //this:State
 					action { //it:State
-						updateResourceRep( "$name(OFF)" 
+						updateResourceRep( "$name(HOME)" 
 						)
 						CommUtils.outmagenta("$name | trolley at HOME")
 						forward("setdirection", "dir(down)" ,"basicrobot" ) 
@@ -161,7 +161,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("sonarobstacle") { //this:State
 					action { //it:State
 						discardMessages = true
-						updateResourceRep( "$name(ON)" 
+						updateResourceRep( "$name(STOPPED)" 
 						)
 						CommUtils.outmagenta("$name | Sono fermo per ostacolo sonar")
 						//genTimer( actor, state )
@@ -184,8 +184,6 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("quit") { //this:State
 					action { //it:State
-						updateResourceRep( "$name(OFF)" 
-						)
 						forward("disengage", "disengage(transporttrolley)" ,"basicrobot" ) 
 						 System.exit(0)  
 						//genTimer( actor, state )

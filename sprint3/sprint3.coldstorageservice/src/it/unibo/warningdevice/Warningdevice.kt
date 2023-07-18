@@ -50,20 +50,20 @@ class Warningdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(transporttrolley,ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 var stato1 = payloadArg(1)  
-								if(  (stato1 == "transporttrolley(OFF)")  
-								 ){CommUtils.outblue("$name | led off | ricevuto dal TT")
+								if(  (stato1 == "transporttrolley(HOME)")  
+								 ){CommUtils.outblue("$name | HOME | ricevuto dal TT")
 								 state = 0  
 								emit("ledoff", "ledoff(_)" ) 
 								}
 								else
-								 {if(  (stato1 == "transporttrolley(ON)")  
-								  ){CommUtils.outblue("$name | led ON | ricevuto dal TT")
+								 {if(  (stato1 == "transporttrolley(STOPPED)")  
+								  ){CommUtils.outblue("$name | STOPPED | ricevuto dal TT")
 								  state = 1  
 								 emit("ledon", "ledon(_)" ) 
 								 }
 								 else
-								  {if(  (stato1 == "transporttrolley(BLINK)")  
-								   ){CommUtils.outblue("$name | led BLINK | ricevuto dal TT")
+								  {if(  (stato1 == "transporttrolley(MOVING)")  
+								   ){CommUtils.outblue("$name | MOVING | ricevuto dal TT")
 								   state = 2  
 								  emit("ledblink", "ledblink(_)" ) 
 								  }
