@@ -13,6 +13,7 @@ public class Ticket {
     private final String timestamp;
     private final Float FW;
     private final String id;
+    private boolean Approved = false;
 
     public Ticket(Float weight, Integer timeout, String format) {
         FW = weight;
@@ -32,6 +33,14 @@ public class Ticket {
 
     public Float getWeight() {
         return FW;
+    }
+
+    public boolean isApproved() {
+        return Approved;
+    }
+
+    public void approve() {
+        Approved = true;
     }
 
     public Boolean isValid() {

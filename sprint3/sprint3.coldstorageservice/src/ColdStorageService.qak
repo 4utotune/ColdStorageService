@@ -116,10 +116,10 @@ QActor coldstorageservice context ctx_coldstorage {
 		println("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight") color green
 		updateResource [# "weight(cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom)" #]
 	}
-	Transition t0 whenRequest storerequest	-> handle_store
-				  whenRequest insertticket	-> handle_ticket
-				  whenRequest chargedeposited		-> handle_deposited
-				  whenMsg	  chargetaken			-> handle_charge_taken
+	Transition t0 whenRequest storerequest		-> handle_store
+				  whenRequest insertticket		-> handle_ticket
+				  whenRequest chargedeposited	-> handle_deposited
+				  whenMsg	  chargetaken		-> handle_charge_taken
 					
 	State handle_store {
 		onMsg(storerequest: storerequest(FW)) {
@@ -307,7 +307,6 @@ QActor warningdevice context ctx_coldstorage {
 		}
 	}
 	Goto work
-	
 }
 
 

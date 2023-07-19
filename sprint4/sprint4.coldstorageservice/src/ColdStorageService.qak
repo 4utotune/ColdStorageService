@@ -38,23 +38,19 @@ Dispatch 	coapUpdate			: 	coapUpdate(RESOURCE, VALUE)
 Dispatch	chargetaken			: 	chargetaken(_)
 Request 	chargedeposited		: 	chargedeposited(_)
 
-// coldstorageservice -> transporttrolley_mock
+// coldstorageservice -> transporttrolley
 Reply 		more				:	more(_)
 Reply 		gohome				: 	gohome(_)
 Dispatch 	gotoindoor			: 	gotoindoor(_)
 
-// proxy <-> coldstorageservice:
-Request 	proxy_storerequest	: 	proxy_storerequest(FW)
+// external <-> coldstorageservice:
+Request 	storerequest		: 	storerequest(FW)
 Reply		storeaccepted		:	storeaccepted(TICKET)
 Reply		storerejected		: 	storerejected(REASON)
 
-Request		proxy_insertticket	: 	proxy_insertticket(TICKET)
-Reply		ticketaccepted		: 	ticketaccepted(_)
+Request		insertticket		: 	insertticket(TICKET)
+Reply		chargetaken			: 	chargetaken(_)
 Reply		ticketrejected		: 	ticketrejected(REASON)
-
-// spring -> proxy
-Dispatch 	gui_storerequest 	: 	gui_storerequest(FW, ID)
-Dispatch 	gui_insertticket 	: 	gui_insertticket(TICKET, ID)
 
 //Observer TT -> Led
 Dispatch	coapUpdate			:	coapUpdate(SOURCE,ARG)
@@ -80,168 +76,14 @@ Event 		ledblink		  	: 	ledblink(_)
 Context ctxbasicrobot 	ip 	[host="127.0.0.1" port=8020]  
 Context	ctx_coldstorage ip	[host="localhost" port=11802]
 
-//ACTORS
-
-ExternalQActor basicrobot 	context ctxbasicrobot
-ExternalQActor engager 	context ctxbasicrobot
-ExternalQActor planexec 	context ctxbasicrobot
-ExternalQActor robotpos context ctxbasicrobot
+// ACTORS
+ExternalQActor basicrobot context ctxbasicrobot
 
 //CodedQActor sonar  context ctx_coldstorage className "sonarSimulator"           //IN LOCALE
 CodedQActor sonar  			context ctx_coldstorage className "rx.SonarMQTTReceiver"
 CodedQActor datacleaner    	context ctx_coldstorage className "rx.DataCleaner"
 CodedQActor distancefilter 	context ctx_coldstorage className "rx.DistanceFilter"
 CodedQActor ledMQTTSender  	context ctx_coldstorage className "rx.ledMQTTSender"
-
-
-QActor statusgui_proxy context ctx_coldstorage {
-	
-	[# 																
-		val server = unibo.basicomm23.ws.WsConnection.create("localhost:8087/statusguiproxy")
-		
-		var currentRequest = "" 
-	#]
-	
-	State init initial {
-		observeResource basicrobot
-		observeResource engager
-		observeResource robotpos
-		observeResource planexec
-		observeResource coldstorageservice
-		observeResource transporttrolley		
-		
-		println("$name | init") color cyan
-	}
-	Goto observing
-	
-	State observing {
-		// println("$name | idle..") 
-	}
-	Transition t whenMsg coapUpdate -> handle_update
-	
-	State handle_update {
-		//[# try { #]
-		if [# (currentMsg.msgContent().contains("robotpos")) #] {			
-			[#
-			    val coordinates = Regex("""RobotPos=\((\d+),(\d+)\)""").
-			    		find(currentMsg.msgContent())?.destructured?.
-			    			let { (x, y) -> Pair(x.toInt(), y.toInt()) }
-			    server.forward("robotpos/$coordinates")
-			#]
-			//println("$name | received robotpos: $coordinates") color cyan
-		} else {
-			onMsg(coapUpdate: coapUpdate(RES, VAL)) {
-				//println("$name | update from ${payloadArg(0)} -> ${payloadArg(1)}") color cyan
-				[# server.forward("${payloadArg(0)}/" + payloadArg(1)) #]
-			}
-		}
-		//[# } catch (e: Exception) { #] 
-		//	println("$name | ERROR: $currentMsg") color cyan 
-		//[# } #]
-	}
-	Goto observing
-}
-
-
-QActor accessgui_proxy context ctx_coldstorage {	
-	[# 
-		val server = unibo.basicomm23.ws.WsConnection.create("localhost:8086/coldstoragesocket")
-		
-		var currentRequest = "" 
-	#]
-
-	State init initial {
-		observeResource coldstorageservice
-		
-		
-		println("$name | Init") color yellow
-	}
-	Goto observing
-	
-	State observing{
-		println("$name | Idle...") color yellow
-  	}
-	Transition 	t0 	whenMsg		gui_storerequest 	-> handle_storerequest
-  					whenMsg 	gui_insertticket 	-> handle_insertticket	
-  					whenMsg	 	coapUpdate 			-> handle_update
-  					whenMsg		chargetaken 		-> handle_charge_taken
-					
-
-	State handle_storerequest {
-		onMsg ( gui_storerequest : gui_storerequest(FW, ID)){
-			println("$name | Sending store request - FW:${payloadArg(0)}, ID:${payloadArg(1)} ") color yellow
-			[# currentRequest = payloadArg(1) #]
-			request coldstorageservice -m proxy_storerequest: proxy_storerequest($payloadArg(0))
-		}
-	}
-	Transition 	t	whenReply 	storeaccepted 	-> handle_store_accepted
-					whenReply 	storerejected 	-> handle_store_rejected
-					
-  	
-	State handle_store_accepted {
-		onMsg(storeaccepted: storeaccepted(TICKET)) {
-			[# val TICKET = payloadArg(0) #]
-			println("$name | Store Accepted. Received ticket [ $TICKET ] for ID:$currentRequest") color yellow
-			[# server.forward("ticket/" + TICKET + "/" + currentRequest) #]
-			[# currentRequest = "" #]
-		}
-	}
-	Goto observing
-	
-	State handle_store_rejected {
-		onMsg(storerejected: storerejected(REASON)) {
-			println("$name | Store Rejected for ID:$currentRequest") color yellow			
-			[# server.forward("error/storerejected: " + payloadArg(0) + "/" + currentRequest) #]
-			[# currentRequest = "" #]
-		}
-		
-	}
-	Goto observing
-  	
-  	State handle_insertticket {
-		onMsg ( gui_insertticket: gui_insertticket(TICKET, ID)){
-			println("$name | Sending insert ticket - TICKET:${payloadArg(0)}, ID:${payloadArg(1)} ") color yellow
-			[# currentRequest = payloadArg(1) #]
-			request coldstorageservice -m proxy_insertticket: proxy_insertticket($payloadArg(0))
-		}
-	}
-	Transition 	t	whenReply 	ticketaccepted 	-> handle_ticket_accepted
-					whenReply 	ticketrejected 	-> handle_ticket_rejected						
-	
-		
-	State handle_ticket_accepted {
-		println("$name | Ticket accepted for ID:$currentRequest") color yellow			
-		[# server.forward("notify/" + payloadArg(0) + " accepted" + "/" + currentRequest) #]
-			[# currentRequest = "" #]
-	}
-	Goto observing
-	
-	State handle_ticket_rejected {
-		onMsg(ticketrejected: ticketrejected(REASON)) {
-			println("$name | Ticket Rejected for ID:$currentRequest") color yellow			
-			[# server.forward("error/ticketrejected: " + payloadArg(0) + "/" + currentRequest) #]
-			[# currentRequest = "" #]
-		}
-	}
-	Goto observing
-  	
-	State handle_charge_taken {
-		[# server.forward("notify/chargetaken") #]
-	}
-	Goto observing
-	
-	State handle_update {
-		onMsg(coapUpdate: coapUpdate(coldstorageservice, VAL)) {
-			[# server.forward("update/" + payloadArg(1)) #]	 
-		}
-	}
-  	Goto observing
-  	
-  	State handle_timeout {
-  		println("$name | An error occured") color red
-  	}
-  	Goto observing
-}
 
 
 QActor coldstorageservice context ctx_coldstorage {
@@ -272,13 +114,13 @@ QActor coldstorageservice context ctx_coldstorage {
 		println("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight") color green
 		updateResource [# "'weight(cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom)'" #]
 	}
-	Transition t0 whenRequest proxy_storerequest	-> handle_store
-				  whenRequest proxy_insertticket	-> handle_ticket
-				  whenRequest chargedeposited		-> handle_deposited
-				  whenMsg	  chargetaken			-> handle_charge_taken
+	Transition t0 whenRequest storerequest		-> handle_store
+				  whenRequest insertticket		-> handle_ticket
+				  whenRequest chargedeposited	-> handle_deposited
+				  whenMsg	  chargetaken		-> handle_charge_taken
 					
 	State handle_store {
-		onMsg(proxy_storerequest: proxy_storerequest(FW)) {
+		onMsg(storerequest: storerequest(FW)) {
 			println("$name | Received store request for ${payloadArg(0)} kg") color green
 		
 			[# val FW = payloadArg(0).toFloat() #]
@@ -286,19 +128,20 @@ QActor coldstorageservice context ctx_coldstorage {
 			if [# (FW > MaxWeightDDR) #] {
 				[# RejectedRequests++ #]
 				updateResource [# "'rejected($RejectedRequests)'" #]				
-				replyTo proxy_storerequest with storerejected: storerejected(tooheavy)
+				replyTo storerequest with storerejected: storerejected(tooheavy)
 			} else {
 				if [# ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom) #] {
 					[# RejectedRequests++ #]
 					updateResource [# "'rejected($RejectedRequests)'" #]
-					replyTo proxy_storerequest with storerejected: storerejected(full)
+					replyTo storerequest with storerejected: storerejected(full)
 				} else {
 					[#
 						val TICKET = ticketManager.newTicket(FW)
 					  	ReservedWeight += FW
 					  	val TicketId = TICKET.id
 					#]
-					replyTo proxy_storerequest with storeaccepted: storeaccepted($TicketId)
+					println("$name | Store request accepted. Ticket: [ $TicketId ]") color green					
+					replyTo storerequest with storeaccepted: storeaccepted($TicketId)
 				}	
 			}
 		}
@@ -306,38 +149,41 @@ QActor coldstorageservice context ctx_coldstorage {
 	Goto idle
 	
 	State handle_ticket {
-		onMsg(proxy_insertticket: proxy_insertticket(TICKET)) {
+		onMsg(insertticket: insertticket(TICKET)) {
 			[# 
 				val Received = payloadArg(0).toString()
 				val TICKET = ticketManager.getTicket(Received)
 			#]
-			if [# (TICKET != null && TICKET.isValid) #]{
-				if [# (ticketManager.isWaiting) #] {
-					// reject ticket if one is already waiting
-					replyTo proxy_insertticket with ticketrejected: ticketrejected(queuefull)
-				} else {
-					if [# (!ticketManager.isWorking) #] {
-						println("$name | Approved ticket [ $Received ]. Requesting charge") color green
-						forward transporttrolley -m gotoindoor: gotoindoor(_)
-					} else {
-						println("$name | Approved ticket [ $Received ]. Currenty working on [ ${ticketManager.working} ]. Please wait") color green
+			
+			
+			if [# (TICKET != null) #] // ticket esiste
+			{
+				if [# (TICKET.isValid) #] // ticket non è scaduto
+				{
+					if [#(!TICKET.isApproved())#] { // ticket non ancora approvato
+						[# TICKET.approve() #]				 
+						if [# (!ticketManager.isWorking) #] { // servizio libero
+							println("$name | Approved ticket [ $Received ]. Requesting charge") color green
+							forward transporttrolley -m gotoindoor: gotoindoor(_)
+						} else {
+							println("$name | Approved ticket [ $Received ]. Currenty working on [ ${ticketManager.working} ]. Please wait") color green
+						}
+						[#  ticketManager.setWaiting(Received) #]
+					} else { // ticket già approvvato
+						println("$name | Rejected ticket [ $Received ] - already inserted") color green
+						replyTo insertticket with ticketrejected: ticketrejected(duplicate)					
 					}
-						
-					[#  ticketManager.setWaiting(Received) #]
-					replyTo proxy_insertticket with ticketaccepted: ticketaccepted(_)
-				}
-			} else {
-				if [#(TICKET != null)#] {
+				} else { // ticket scaduto
 					[#
 						ticketManager.remove(TICKET)
 						ReservedWeight -= TICKET.weight
 					#]
 					println("$name | Rejected ticket [ $Received ] - timedout") color green
-					replyTo proxy_insertticket with ticketrejected: ticketrejected(timedout)
-				} else {
-					println("$name | Rejected ticket [ $Received ] - doesn't exist") color green
-					replyTo proxy_insertticket with ticketrejected: ticketrejected(invalid)	
-				}				
+					replyTo insertticket with ticketrejected: ticketrejected(timedout)					
+				}	
+			} else { // ticket non esiste
+				println("$name | Rejected ticket [ $Received ] - doesn't exist") color green
+				replyTo insertticket with ticketrejected: ticketrejected(invalid)	
 			}
 		}
 	}
@@ -348,7 +194,7 @@ QActor coldstorageservice context ctx_coldstorage {
 			val TicketId = ticketManager.waitingNowWorking()
 		#]
 		println("$name | Charge taken for ticket [ $TicketId ]") color green
-		forward accessgui_proxy -m chargetaken: chargetaken(_)
+		replyTo insertticket with chargetaken: chargetaken(_)
 	}
 	Goto idle
 	
@@ -358,8 +204,8 @@ QActor coldstorageservice context ctx_coldstorage {
 				if (ticketManager.isWorking) {
 					CurrentWeight += ticketManager.workingTicket().weight
 					ReservedWeight -= ticketManager.workingTicket().weight
+					ticketManager.stopWorking()	// also removes ticket	
 				}
-				ticketManager.stopWorking()
 			#]
 			println("$name | Deposit confirmation received") color green
 			if [# (ticketManager.isWaiting) #] {
@@ -381,18 +227,18 @@ QActor alarmdevice context ctx_coldstorage {
 	
 	State init initial { 
 		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
-		println ("$name | init") color red
+		println ("$name | init") color yellow
 	}
 	Goto work
 	
 	State work {
-		println("$name | attendo...") color red
+		println("$name | attendo...") color yellow
 	}
 	Transition t0 whenEvent obstacle  -> handleobstacle
 	
 	State handleobstacle{ 
 		onMsg( obstacle : obstacle(D)){
-			println("$name | handleobstacle ALARM ${payloadArg(0)}") color red
+			println("$name | handleobstacle ALARM ${payloadArg(0)}") color yellow
 			emit alarm : alarm(_)			
 			updateResource [# "$name(ON)"#]	
 		}	
@@ -401,11 +247,11 @@ QActor alarmdevice context ctx_coldstorage {
 	
 	State handleobstaclefree {
 		onMsg( obstaclefree : obstaclefree(D)){			
-			println("$name | obstaclefree RESUME ${payloadArg(0)}") color red
+			println("$name | obstaclefree RESUME ${payloadArg(0)}") color yellow
 			emit resume : resume(_) //resume TT
-			println("$name | aspetto DLMIT prima di poter gestire un successivo stop") color red
+			println("$name | aspetto DLMIT prima di poter gestire un successivo stop") color yellow
 			[# delay(MINT) #] //delay 10000
-			println("$name | sono di nuovo pronto per poter gestire uno stop") color red
+			println("$name | sono di nuovo pronto per poter gestire uno stop") color yellow
 		}
 	}
 	Goto work
@@ -432,20 +278,20 @@ QActor warningdevice context ctx_coldstorage {
 	
 	State doObserve {
 		discardMsg Off
-		onMsg ( coapUpdate : coapUpdate(transporttrolley, ARG)){
+		onMsg ( coapUpdate : coapUpdate(azione, ARG)){
 			[# var stato1 = payloadArg(1) #]
-			if [# (stato1 == "transporttrolley(OFF)") #] {
-				println("$name | led off | ricevuto dal TT") color blue
+			if [# (stato1 == "azione(HOME)") #] {
+				println("$name | HOME | ricevuto dal TT") color blue
 				[# state = 0 #]
 				emit ledoff : ledoff(_)
 			} else {
-				if [# (stato1 == "transporttrolley(ON)") #] {
-					println("$name | led ON | ricevuto dal TT") color blue
+				if [# (stato1 == "azione(STOPPED)") #] {
+					println("$name | STOPPED | ricevuto dal TT") color blue
 					[# state = 1 #]
 					emit ledon : ledon(_)
 				} else {
-					if [# (stato1 == "transporttrolley(BLINK)") #] {
-						println("$name | led BLINK | ricevuto dal TT") color blue
+					if [# (stato1 == "azione(MOVING)") #] {
+						println("$name | MOVING | ricevuto dal TT") color blue
 						[# state = 2 #]
 						emit ledblink : ledblink(_)
 					} 
@@ -466,12 +312,12 @@ QActor warningdevice context ctx_coldstorage {
 		}
 	}
 	Goto work
-	
 }
 
 
+
 QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
-	[# var allarme: String = "" #]
+	[# var stato: String = "" #]
 	State s0 initial {
 		println("$name | init e engage basicrobot") color magenta
 	
@@ -482,19 +328,21 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	
 	State engaged {
 		println("$name | basicrobot engaged") color magenta
-		updateResource [# "$name(OFF)"#]
 	}
 	Goto idle
 	
 	State idle{
-		[# allarme = "inHome" #]
+		[# stato = "inHome" #]
+		updateResource [# "azione(HOME)"#]
+		updateResource [# "stato($stato)"#]
 	}
 	Transition t0 whenMsg gotoindoor -> moveToIndoor
 				  whenEvent alarm -> sonarobstacle
 	
 	State moveToIndoor {
-		[# allarme = "toIndoor" #]
-		updateResource [# "$name(BLINK)"#]
+		[# stato = "toIndoor" #]
+		updateResource [# "azione(MOVING)"#]
+		updateResource [# "stato($stato)"#]
 		//discardMsg On
 		println("$name | vado all'INDOOR") color magenta
 		request basicrobot -m moverobot : moverobot (0,4)
@@ -504,8 +352,9 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	
 	State loadTheCharge {
 		//discardMsg On
-		[# allarme = "inIndoor" #]
-		updateResource [# "$name(ON)"#]
+		[# stato = "inIndoor" #]
+		updateResource [# "azione(STOPPED)"#]
+		updateResource [# "stato($stato)"#]
 		println("$name | sono in INDOOR") color magenta
 		// simulo azione di carico
 //		delay 3000
@@ -513,20 +362,21 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	Transition t 	whenTime 3000 -> moveToColdroom
 					whenEvent alarm -> sonarobstacle
 	
-	
 	State moveToColdroom {
-		[# allarme = "toColdroom" #]
+		[# stato = "toColdroom" #]
 		forward coldstorageservice -m chargetaken : chargetaken(_)
 		println("$name | vado verso la cold room") color magenta
-		updateResource [# "$name(BLINK)"#]
+		updateResource [# "azione(MOVING)"#]
+		updateResource [# "stato($stato)"#]
 		request basicrobot -m moverobot: moverobot (4,3) 
 	}
 	Transition t0 whenReply moverobotdone -> storeTheCharge
 			      whenEvent alarm -> sonarobstacle
 	
 	State storeTheCharge {
-		[# allarme = "inColdroom" #]
-		updateResource [# "$name(ON)"#]
+		[# stato = "inColdroom" #]
+		updateResource [# "azione(STOPPED)"#]
+		updateResource [# "stato($stato)"#]
 		//discardMsg On
 		println("$name | sono in Cold Room") color magenta		
 	}
@@ -540,8 +390,9 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 				  whenReply gohome -> moveToHome
 	
 	State moveToHome{
-		[# allarme = "toHome" #]
-		updateResource [# "$name(BLINK)"#]
+		[# stato = "toHome" #]
+		updateResource [# "azione(MOVING)"#]
+		updateResource [# "stato($stato)"#]
 		//discardMsg On 
 		println("$name | vado alla posizione HOME") color magenta
 		request basicrobot -m moverobot : moverobot (0,0)
@@ -550,7 +401,8 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 				  whenEvent alarm -> sonarobstacle
 	
 	State trolleyathome {
-		updateResource [# "$name(OFF)"#]
+		updateResource [# "azione(HOME)"#]
+		updateResource [# "stato($stato)"#]
 		//discardMsg On
 		println("$name | trolley at HOME") color magenta
 		forward basicrobot -m setdirection : dir(down)
@@ -560,18 +412,18 @@ QActor transporttrolley context ctx_coldstorage {// ctx_trolley {
 	
 	State sonarobstacle {
 		discardMsg On
-		updateResource [# "$name(ON)"#]
+		updateResource [# "$name(STOPPED)"#]
 		println("$name | Sono fermo per ostacolo sonar") color magenta
 	}
-	Transition t0 whenEvent resume and [# allarme == "inHome" #] 		-> idle
-				  whenEvent resume and [# allarme == "toIndoor" #] 		-> moveToIndoor
-				  whenEvent resume and [# allarme == "inIndoor" #] 		-> moveToColdroom
-				  whenEvent resume and [# allarme == "toColdroom" #] 	-> loadTheCharge
-				  whenEvent resume and [# allarme == "inColdroom" #] 	-> storeTheCharge
-				  whenEvent resume and [# allarme == "toHome" #] 		-> moveToHome
+	Transition t0 whenEvent resume and [# stato == "inHome" #] 		-> idle
+				  whenEvent resume and [# stato == "toIndoor" #] 	-> moveToIndoor
+				  whenEvent resume and [# stato == "inIndoor" #] 	-> moveToColdroom
+				  whenEvent resume and [# stato == "toColdroom" #] 	-> loadTheCharge
+				  whenEvent resume and [# stato == "inColdroom" #] 	-> storeTheCharge
+				  whenEvent resume and [# stato == "toHome" #] 		-> moveToHome
 	
 	State quit {
-		updateResource [# "$name(OFF)"#]
+		//updateResource [# "$name(QUIT)"#]
 		forward basicrobot -m disengage : disengage(transporttrolley)
 		[# System.exit(0) #]
 	}

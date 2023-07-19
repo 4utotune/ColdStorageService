@@ -54,6 +54,7 @@ public class TicketManager {
     }
 
     public void stopWorking() {
+        this.remove(this.working);
         working = "";
     }
 

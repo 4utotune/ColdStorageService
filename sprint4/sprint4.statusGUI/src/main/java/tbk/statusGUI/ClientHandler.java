@@ -12,10 +12,20 @@ import java.util.List;
 public class ClientHandler extends AbstractWebSocketHandler {
     private final List<WebSocketSession> sessions = new ArrayList<>();
 
+    private StatusGUI guiManager;
+
+    protected void setManager(StatusGUI manager) {
+        this.guiManager = manager;
+    }
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         sessions.add(session);
         System.out.println("CL | Added client session: " + session.getUri());
+
+        if (guiManager.hasUpdate()) {
+            guiManager.sendUpdateMsg();
+        }
 
         super.afterConnectionEstablished(session);
     }
@@ -36,40 +46,14 @@ public class ClientHandler extends AbstractWebSocketHandler {
         System.out.println("CL | Received: " + msg);
     }
 
-    protected void updateStatusGUI(String update) {
-        String[] parts = update.split("/");
-        String sender = parts[0];
-        String payload = parts[1];
-        switch (sender) {
-            case "basicrobot":
-                break;
-            case "engager":
-                break;
-            case "robotpos":
-                break;
-            case "planexec":
-                break;
-            case "coldstorageservice":
-                break;
-            case "transporttrolley":
-                break;
-            default:
-                break;
-        }
-
-        String message = sender + "/" + payload;
-        System.out.println("CL | Sending: " + message);
-        this.sendToAll(message);
-    }
-
     protected void sendToAll(String message) {
+        System.out.println("CL | Sending: " + message);
         for (WebSocketSession session : sessions) {
             try {
                 session.sendMessage(new TextMessage(message));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                System.out.println("Errore nell'invio del messaggio " + message);
             }
         }
     }
-
 }

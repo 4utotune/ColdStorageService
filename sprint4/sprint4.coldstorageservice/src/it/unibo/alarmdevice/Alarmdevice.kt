@@ -23,7 +23,7 @@ class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 				state("init") { //this:State
 					action { //it:State
 						 subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar")  
-						CommUtils.outred("$name | init")
+						CommUtils.outyellow("$name | init")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -33,19 +33,19 @@ class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 				}	 
 				state("work") { //this:State
 					action { //it:State
-						CommUtils.outred("$name | attendo...")
+						CommUtils.outyellow("$name | attendo...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t013",targetState="handleobstacle",cond=whenEvent("obstacle"))
+					 transition(edgeName="t04",targetState="handleobstacle",cond=whenEvent("obstacle"))
 				}	 
 				state("handleobstacle") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("obstacle(D)"), Term.createTerm("obstacle(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								CommUtils.outred("$name | handleobstacle ALARM ${payloadArg(0)}")
+								CommUtils.outyellow("$name | handleobstacle ALARM ${payloadArg(0)}")
 								emit("alarm", "alarm(_)" ) 
 								updateResourceRep( "$name(ON)" 
 								)
@@ -55,17 +55,17 @@ class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t014",targetState="handleobstaclefree",cond=whenEvent("obstaclefree"))
+					 transition(edgeName="t05",targetState="handleobstaclefree",cond=whenEvent("obstaclefree"))
 				}	 
 				state("handleobstaclefree") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("obstaclefree(D)"), Term.createTerm("obstaclefree(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								CommUtils.outred("$name | obstaclefree RESUME ${payloadArg(0)}")
+								CommUtils.outyellow("$name | obstaclefree RESUME ${payloadArg(0)}")
 								emit("resume", "resume(_)" ) 
-								CommUtils.outred("$name | aspetto DLMIT prima di poter gestire un successivo stop")
+								CommUtils.outyellow("$name | aspetto DLMIT prima di poter gestire un successivo stop")
 								 delay(MINT)  
-								CommUtils.outred("$name | sono di nuovo pronto per poter gestire uno stop")
+								CommUtils.outyellow("$name | sono di nuovo pronto per poter gestire uno stop")
 						}
 						//genTimer( actor, state )
 					}

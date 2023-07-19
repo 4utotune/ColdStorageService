@@ -2,21 +2,15 @@ package tbk.sprint2accessGUI;
 
 import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapResponse;
-import org.springframework.web.socket.WebSocketSession;
 import unibo.basicomm23.coap.CoapConnection;
 import unibo.basicomm23.interfaces.IApplMessage;
 import unibo.basicomm23.interfaces.Interaction;
 import unibo.basicomm23.tcp.TcpClientSupport;
 import unibo.basicomm23.utils.CommUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ActorHandler {
     private final String senderId;
     private final String destActor;
-
-    private final List<WebSocketSession> sessions = new ArrayList<>();
 
     private final AccessGUI guiManager;
     private final Interaction tcpConn;
