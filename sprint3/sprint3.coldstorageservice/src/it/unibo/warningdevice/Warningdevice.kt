@@ -42,7 +42,7 @@ class Warningdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t014",targetState="doObserve",cond=whenDispatch("coapUpdate"))
+					 transition(edgeName="t06",targetState="doObserve",cond=whenDispatch("coapUpdate"))
 				}	 
 				state("doObserve") { //this:State
 					action { //it:State

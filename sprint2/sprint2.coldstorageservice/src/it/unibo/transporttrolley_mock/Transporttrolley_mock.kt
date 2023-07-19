@@ -47,7 +47,7 @@ class Transporttrolley_mock ( name: String, scope: CoroutineScope  ) : ActorBasi
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t012",targetState="moveToIndoor",cond=whenDispatch("gotoindoor"))
+					 transition(edgeName="t04",targetState="moveToIndoor",cond=whenDispatch("gotoindoor"))
 				}	 
 				state("moveToIndoor") { //this:State
 					action { //it:State
@@ -97,8 +97,8 @@ class Transporttrolley_mock ( name: String, scope: CoroutineScope  ) : ActorBasi
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t013",targetState="moveToIndoor",cond=whenReply("more"))
-					transition(edgeName="t014",targetState="movetohome",cond=whenReply("gohome"))
+					 transition(edgeName="t05",targetState="moveToIndoor",cond=whenReply("more"))
+					transition(edgeName="t06",targetState="movetohome",cond=whenReply("gohome"))
 				}	 
 				state("movetohome") { //this:State
 					action { //it:State

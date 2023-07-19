@@ -47,40 +47,42 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("idle") { //this:State
 					action { //it:State
+						delay(100) 
 						CommUtils.outgreen("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight")
-						updateResourceRep( "'cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom'"  
+						updateResourceRep( "weight(cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom)"  
 						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t08",targetState="handle_store",cond=whenRequest("proxy_storerequest"))
-					transition(edgeName="t09",targetState="handle_ticket",cond=whenRequest("proxy_insertticket"))
-					transition(edgeName="t010",targetState="handle_deposited",cond=whenRequest("chargedeposited"))
-					transition(edgeName="t011",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
+					 transition(edgeName="t00",targetState="handle_store",cond=whenRequest("storerequest"))
+					transition(edgeName="t01",targetState="handle_ticket",cond=whenRequest("insertticket"))
+					transition(edgeName="t02",targetState="handle_deposited",cond=whenRequest("chargedeposited"))
+					transition(edgeName="t03",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
 				}	 
 				state("handle_store") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("proxy_storerequest(FW)"), Term.createTerm("proxy_storerequest(FW)"), 
+						if( checkMsgContent( Term.createTerm("storerequest(FW)"), Term.createTerm("storerequest(FW)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								CommUtils.outgreen("$name | Received store request for ${payloadArg(0)} kg")
 								 val FW = payloadArg(0).toFloat()  
 								if(  (FW > MaxWeightDDR)  
 								 ){ RejectedRequests++  
-								answer("proxy_storerequest", "storerejected", "storerejected(tooheavy)"   )  
+								answer("storerequest", "storerejected", "storerejected(tooheavy)"   )  
 								}
 								else
 								 {if(  ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom)  
 								  ){ RejectedRequests++  
-								 answer("proxy_storerequest", "storerejected", "storerejected(full)"   )  
+								 answer("storerequest", "storerejected", "storerejected(full)"   )  
 								 }
 								 else
 								  {
 								  						val TICKET = ticketManager.newTicket(FW)
 								  					  	ReservedWeight += FW
 								  					  	val TicketId = TICKET.id
-								  answer("proxy_storerequest", "storeaccepted", "storeaccepted($TicketId)"   )  
+								  CommUtils.outgreen("$name | Store request accepted. Ticket: [ $TicketId ]")
+								  answer("storerequest", "storeaccepted", "storeaccepted($TicketId)"   )  
 								  }
 								 }
 						}
@@ -93,14 +95,14 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("handle_ticket") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("proxy_insertticket(TICKET)"), Term.createTerm("proxy_insertticket(TICKET)"), 
+						if( checkMsgContent( Term.createTerm("insertticket(TICKET)"), Term.createTerm("insertticket(TICKET)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 
 												val Received = payloadArg(0).toString()
 												val TICKET = ticketManager.getTicket(Received)
 								if(  (TICKET != null && TICKET.isValid)  
 								 ){if(  (ticketManager.isWaiting)  
-								 ){answer("proxy_insertticket", "ticketrejected", "ticketrejected(queuefull)"   )  
+								 ){answer("insertticket", "ticketrejected", "ticketrejected(queuefull)"   )  
 								}
 								else
 								 {if(  (!ticketManager.isWorking)  
@@ -111,7 +113,6 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 								  {CommUtils.outgreen("$name | Approved ticket [ $Received ]. Currenty working on [ ${ticketManager.working} ]. Please wait")
 								  }
 								   ticketManager.setWaiting(Received)  
-								 answer("proxy_insertticket", "ticketaccepted", "ticketaccepted(_)"   )  
 								 }
 								}
 								else
@@ -120,11 +121,11 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 								 						ticketManager.remove(TICKET)
 								 						ReservedWeight -= TICKET.weight
 								 CommUtils.outgreen("$name | Rejected ticket [ $Received ] - timedout")
-								 answer("proxy_insertticket", "ticketrejected", "ticketrejected(timedout)"   )  
+								 answer("insertticket", "ticketrejected", "ticketrejected(timedout)"   )  
 								 }
 								 else
 								  {CommUtils.outgreen("$name | Rejected ticket [ $Received ] - doesn't exist")
-								  answer("proxy_insertticket", "ticketrejected", "ticketrejected(invalid)"   )  
+								  answer("insertticket", "ticketrejected", "ticketrejected(invalid)"   )  
 								  }
 								 }
 						}
@@ -140,7 +141,7 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 						 			
 									val TicketId = ticketManager.waitingNowWorking()
 						CommUtils.outgreen("$name | Charge taken for ticket [ $TicketId ]")
-						forward("chargetaken", "chargetaken(_)" ,"accessgui_proxy" ) 
+						answer("insertticket", "chargetaken", "chargetaken(_)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

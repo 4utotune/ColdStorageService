@@ -1,6 +1,11 @@
 package tbk.sprint2accessGUI;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class AccessGUI {
     private final ClientHandler clientHandler;
     private final ActorHandler actorHandler;
@@ -9,49 +14,57 @@ public class AccessGUI {
     private Float ReservedWeight = 0f;
     private Float MaxWeight = 0f;
 
-    public AccessGUI(ClientHandler clientHandler, ActorHandler actorHandler) {
+    public AccessGUI(ClientHandler clientHandler) {
         this.clientHandler = clientHandler;
-        this.actorHandler = actorHandler;
+        this.actorHandler = new ActorHandler(this, "handler", "coldstorageservice");
 
         this.clientHandler.setManager(this);
-        this.actorHandler.init(this, "handler", "accessgui_proxy");
     }
 
-    public void messageFromActor(String msg) {
-        String[] parts = msg.split("/");
-        String message = parts[0];
-        String payload = parts[1];
-        String requestId = "";
-        if (parts.length > 2) {
-            requestId = parts[2];
+    public void responseFromActor(String msg, String requestId) {
+        if (requestId.equals("")) {
+            updateMsg(msg);
+        } else {
+            String value = extractFromMsg(msg);
+            if (!value.equals("")) {
+                if (msg.contains("storeaccepted")) {
+                    ticketMsg(value, requestId);
+                } else if (msg.contains("storerejected")) {
+                    errorMsg("storerejected/" + value, requestId);
+                } else if (msg.contains("chargetaken")) {
+                    notifyMsg("chargetaken", requestId);
+                } else if (msg.contains("ticketrejected")) {
+                    errorMsg("ticketrejected/" + value, requestId);
+                }
+            }
         }
+    }
 
-        switch (message) {
-            case "update":
-                updateMsg(payload);
-                break;
-            case "ticket":
-                ticketMsg(payload, requestId);
-                break;
-            case "notify":
-                notifyMsg(payload, requestId);
-                break;
-            case "error":
-                errorMsg(payload, requestId);
-                break;
-            default:
-                break;
+    public String extractFromMsg(String msg) {
+        Pattern pattern = Pattern.compile("\\((.*?)\\)");
+        Matcher matcher = pattern.matcher(msg);
+
+        if (matcher.find()) {
+            return matcher.group(1);
         }
+        return "";
     }
 
     private void updateMsg(String data) {
-        String[] parts = data.split(",");
+        Pattern pattern = Pattern.compile("\\d+\\.\\d+");
+        Matcher matcher = pattern.matcher(data);
+        List<Float> matches = new ArrayList<>();
+        while (matcher.find()) {
+            matches.add(Float.parseFloat(matcher.group()));
 
-        this.CurrentWeight = Float.parseFloat(parts[1]);
-        this.ReservedWeight = Float.parseFloat(parts[3]);
-        this.MaxWeight = Float.parseFloat(parts[5]);
+        }
+        if (matches.size() == 3) {
+            this.CurrentWeight = matches.get(0);
+            this.ReservedWeight = matches.get(1);
+            this.MaxWeight = matches.get(2);
 
-        this.clientHandler.sendToAll("update/" + (CurrentWeight + ReservedWeight) + "," + MaxWeight);
+            this.clientHandler.sendToAll("update/" + (CurrentWeight + ReservedWeight) + "," + MaxWeight);
+        }
     }
 
     private void ticketMsg(String ticket, String requestId) {
@@ -59,11 +72,7 @@ public class AccessGUI {
     }
 
     private void notifyMsg(String message, String requestId) {
-        if (requestId.equals("")) {
-            this.clientHandler.sendToAll("notify/" + message);
-        } else {
-            this.clientHandler.sendToClient("notify/" + message, requestId);
-        }
+        this.clientHandler.sendToClient("notify/" + message, requestId);
     }
 
     private void errorMsg(String error, String requestId) {
