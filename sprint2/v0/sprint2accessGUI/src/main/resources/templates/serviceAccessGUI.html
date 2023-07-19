@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ColdStorageService</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <div class="header">
+        <div class="titolo">
+            <div class="text">
+                <h1>ColdStorageService</h1>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="doppio">
+            <div class="col1">
+                <div class="title">
+                    <b>INSERISCI I DATI</b>
+                </div>
+                <div class="dati">
+                    <div class="riga">
+                        <div class="parte1">
+                            <label class="label" for="peso">Peso del carico (Kg):</label>
+                            <div class="input"><input type="text" name="peso" id="peso"></div>
+                        </div>
+                        <div class="parte2">
+                            <div class="submit" onclick="submitPressedPeso()">
+                                <div class="text">Store Request</div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="linea-nero">
+                    <div class="riga">
+                        <div class="parte1">
+                            <label class="label" for="ticket">Ticket:</label>
+                            <div class="input"><input type="text" name="ticket" id="ticket"></div>
+                        </div>
+                        <div class="parte2">
+                            <div class="submit" onclick="submitPressedTicket()">
+                                <div class="text">Submit Ticket</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col2">
+                <div class="titles">
+                    <h4>Capienza ColdRoom: <span id="cur">Current</span>/<span id="max">Maximum</span> KG</h4>
+                </div>
+                <div role="progressbar" id="progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                    style="--value: 0"></div>
+            </div>
+        </div>
+        <div class="info">
+            <div class="title">
+                <b>INFO</b>
+            </div>
+            <div class="display-info" id="messageArea">
+
+            </div>
+        </div>
+    </div>   
+
+<script src="../main.js"></script>
+</body>
+
+</html>

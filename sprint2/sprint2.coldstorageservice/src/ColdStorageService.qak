@@ -12,126 +12,17 @@ Reply 		more				:	more(_)
 Reply 		gohome				: 	gohome(_)
 Dispatch 	gotoindoor			: 	gotoindoor(_)
 
-// proxy <-> coldstorageservice:
-Request 	proxy_storerequest	: 	proxy_storerequest(FW)
+// external <-> coldstorageservice:
+Request 	storerequest		: 	storerequest(FW)
 Reply		storeaccepted		:	storeaccepted(TICKET)
 Reply		storerejected		: 	storerejected(REASON)
 
-Request		proxy_insertticket	: 	proxy_insertticket(TICKET)
-Reply		ticketaccepted		: 	ticketaccepted(_)
+Request		insertticket		: 	insertticket(TICKET)
+Reply		chargetaken			: 	chargetaken(_)
 Reply		ticketrejected		: 	ticketrejected(REASON)
-
-// spring -> proxy
-Dispatch gui_storerequest 		: 	gui_storerequest(FW, ID)
-Dispatch gui_insertticket 		: 	gui_insertticket(TICKET, ID)
 
 
 Context	ctx_coldstorage ip	[host="localhost" port=11802]
-
-
-QActor accessgui_proxy context ctx_coldstorage {	
-	[# 
-		val server = unibo.basicomm23.ws.WsConnection.create("localhost:8086/coldstoragesocket")
-		
-		var currentRequest = "" 
-	#]
-
-	State init initial {
-		observeResource coldstorageservice
-		
-		
-		println("$name | Init") color yellow
-	}
-	Goto observing
-	
-	State observing{
-		println("$name | Idle...") color yellow
-  	}
-	Transition 	t0 	whenMsg		gui_storerequest 	-> handle_storerequest
-  					whenMsg 	gui_insertticket 	-> handle_insertticket	
-  					whenMsg	 	coapUpdate 			-> handle_update
-  					whenMsg		chargetaken 		-> handle_charge_taken
-					
-
-	State handle_storerequest {
-		onMsg ( gui_storerequest : gui_storerequest(FW, ID)){
-			println("$name | Sending store request - FW:${payloadArg(0)}, ID:${payloadArg(1)} ") color yellow
-			[# currentRequest = payloadArg(1) #]
-			request coldstorageservice -m proxy_storerequest: proxy_storerequest($payloadArg(0))
-		}
-	}
-	Transition 	t	whenReply 	storeaccepted 	-> handle_store_accepted
-					whenReply 	storerejected 	-> handle_store_rejected
-					
-  	
-	State handle_store_accepted {
-		onMsg(storeaccepted: storeaccepted(TICKET)) {
-			[# val TICKET = payloadArg(0) #]
-			println("$name | Store Accepted. Received ticket [ $TICKET ] for ID:$currentRequest") color yellow
-			[# server.forward("ticket/" + TICKET + "/" + currentRequest) #]
-			[# currentRequest = "" #]
-		}
-	}
-	Goto observing
-	
-	State handle_store_rejected {
-		onMsg(storerejected: storerejected(REASON)) {
-			println("$name | Store Rejected for ID:$currentRequest") color yellow			
-			[# server.forward("error/storerejected: " + payloadArg(0) + "/" + currentRequest) #]
-			[# currentRequest = "" #]
-		}
-		
-	}
-	Goto observing
-  	
-  	State handle_insertticket {
-		onMsg ( gui_insertticket: gui_insertticket(TICKET, ID)){
-			println("$name | Sending insert ticket - TICKET:${payloadArg(0)}, ID:${payloadArg(1)} ") color yellow
-			[# currentRequest = payloadArg(1) #]
-			request coldstorageservice -m proxy_insertticket: proxy_insertticket($payloadArg(0))
-		}
-	}
-	Transition 	t	whenReply 	ticketaccepted 	-> handle_ticket_accepted
-					whenReply 	ticketrejected 	-> handle_ticket_rejected						
-	
-		
-	State handle_ticket_accepted {
-		println("$name | Ticket accepted for ID:$currentRequest") color yellow			
-		[# server.forward("notify/" + payloadArg(0) + " accepted" + "/" + currentRequest) #]
-			[# currentRequest = "" #]
-	}
-	Goto observing
-	
-	State handle_ticket_rejected {
-		onMsg(ticketrejected: ticketrejected(REASON)) {
-			println("$name | Ticket Rejected for ID:$currentRequest") color yellow			
-			[# server.forward("error/ticketrejected: " + payloadArg(0) + "/" + currentRequest) #]
-			[# currentRequest = "" #]
-		}
-	}
-	Goto observing
-  	
-	State handle_charge_taken {
-		[# server.forward("notify/chargetaken") #]
-	}
-	Goto observing
-	
-	State handle_update {
-		onMsg(coapUpdate: coapUpdate(RES, VAL)) {
-			[# val RES = payloadArg(0) #]
-			[# val VAL = payloadArg(1) #]
-			if [# RES == "coldstorageservice" #] {
-				[# server.forward("update/" + VAL) #]	
-			} 
-		}
-	}
-  	Goto observing
-  	
-  	State handle_timeout {
-  		println("$name | An error occured") color red
-  	}
-  	Goto observing
-}
 
 
 QActor coldstorageservice context ctx_coldstorage {
@@ -159,34 +50,36 @@ QActor coldstorageservice context ctx_coldstorage {
 	Goto idle
 	
 	State idle {
+		delay 100
 		println("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight") color green
-		updateResource [# "'cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom'" #]
+		updateResource [# "weight(cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom)" #]
 	}
-	Transition t0 whenRequest proxy_storerequest	-> handle_store
-				  whenRequest proxy_insertticket	-> handle_ticket
+	Transition t0 whenRequest storerequest	-> handle_store
+				  whenRequest insertticket	-> handle_ticket
 				  whenRequest chargedeposited		-> handle_deposited
 				  whenMsg	  chargetaken			-> handle_charge_taken
 					
 	State handle_store {
-		onMsg(proxy_storerequest: proxy_storerequest(FW)) {
+		onMsg(storerequest: storerequest(FW)) {
 			println("$name | Received store request for ${payloadArg(0)} kg") color green
 		
 			[# val FW = payloadArg(0).toFloat() #]
 			
 			if [# (FW > MaxWeightDDR) #] {
 				[# RejectedRequests++ #]
-				replyTo proxy_storerequest with storerejected: storerejected(tooheavy)
+				replyTo storerequest with storerejected: storerejected(tooheavy)
 			} else {
 				if [# ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom) #] {
 					[# RejectedRequests++ #]
-					replyTo proxy_storerequest with storerejected: storerejected(full)
+					replyTo storerequest with storerejected: storerejected(full)
 				} else {
 					[#
 						val TICKET = ticketManager.newTicket(FW)
 					  	ReservedWeight += FW
 					  	val TicketId = TICKET.id
 					#]
-					replyTo proxy_storerequest with storeaccepted: storeaccepted($TicketId)
+					println("$name | Store request accepted. Ticket: [ $TicketId ]") color green
+					replyTo storerequest with storeaccepted: storeaccepted($TicketId)
 				}	
 			}
 		}
@@ -194,7 +87,7 @@ QActor coldstorageservice context ctx_coldstorage {
 	Goto idle
 	
 	State handle_ticket {
-		onMsg(proxy_insertticket: proxy_insertticket(TICKET)) {
+		onMsg(insertticket: insertticket(TICKET)) {
 			[# 
 				val Received = payloadArg(0).toString()
 				val TICKET = ticketManager.getTicket(Received)
@@ -202,7 +95,7 @@ QActor coldstorageservice context ctx_coldstorage {
 			if [# (TICKET != null && TICKET.isValid) #]{
 				if [# (ticketManager.isWaiting) #] {
 					// reject ticket if one is already waiting
-					replyTo proxy_insertticket with ticketrejected: ticketrejected(queuefull)
+					replyTo insertticket with ticketrejected: ticketrejected(queuefull)
 				} else {
 					if [# (!ticketManager.isWorking) #] {
 						println("$name | Approved ticket [ $Received ]. Requesting charge") color green
@@ -212,7 +105,6 @@ QActor coldstorageservice context ctx_coldstorage {
 					}
 						
 					[#  ticketManager.setWaiting(Received) #]
-					replyTo proxy_insertticket with ticketaccepted: ticketaccepted(_)
 				}
 			} else {
 				if [#(TICKET != null)#] {
@@ -221,10 +113,10 @@ QActor coldstorageservice context ctx_coldstorage {
 						ReservedWeight -= TICKET.weight
 					#]
 					println("$name | Rejected ticket [ $Received ] - timedout") color green
-					replyTo proxy_insertticket with ticketrejected: ticketrejected(timedout)
+					replyTo insertticket with ticketrejected: ticketrejected(timedout)
 				} else {
 					println("$name | Rejected ticket [ $Received ] - doesn't exist") color green
-					replyTo proxy_insertticket with ticketrejected: ticketrejected(invalid)	
+					replyTo insertticket with ticketrejected: ticketrejected(invalid)	
 				}				
 			}
 		}
@@ -236,7 +128,7 @@ QActor coldstorageservice context ctx_coldstorage {
 			val TicketId = ticketManager.waitingNowWorking()
 		#]
 		println("$name | Charge taken for ticket [ $TicketId ]") color green
-		forward accessgui_proxy -m chargetaken: chargetaken(_)
+		replyTo insertticket with chargetaken: chargetaken(_)
 	}
 	Goto idle
 	

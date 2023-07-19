@@ -1,0 +1,7 @@
+{"actor":"accessgui_proxy", "msgType":"dispatch", "curstate":"observing", "nextstate":"handle_storerequest", "msgId":"gui_storerequest"}
+{"actor":"accessgui_proxy", "msgType":"dispatch", "curstate":"observing", "nextstate":"handle_insertticket", "msgId":"gui_insertticket"}
+{"actor":"accessgui_proxy", "msgType":"dispatch", "curstate":"observing", "nextstate":"handle_update", "msgId":"coapUpdate"}
+{"actor":"accessgui_proxy", "msgType":"dispatch", "curstate":"observing", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}
+{"actor":"coldstorageservice", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_charge_taken", "msgId":"chargetaken"}
+{"actor":"warningdevice", "msgType":"dispatch", "curstate":"work", "nextstate":"doObserve", "msgId":"coapUpdate"}
+{"actor":"transporttrolley", "msgType":"dispatch", "curstate":"idle", "nextstate":"moveToIndoor", "msgId":"gotoindoor"}

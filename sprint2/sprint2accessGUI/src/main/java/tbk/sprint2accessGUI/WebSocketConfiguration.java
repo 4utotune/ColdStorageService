@@ -8,16 +8,13 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @Configuration
 @EnableWebSocket
 public class WebSocketConfiguration implements WebSocketConfigurer {
-    public static final ClientHandler wshandler_client = new ClientHandler();
-    public static final ActorHandler wshandler_actor = new ActorHandler();
-    public static final String wspath_client = "socket";
-    public static final String wspath_actor = "coldstoragesocket";
+    public final ClientHandler clientHandler = new ClientHandler();
+    public final String clientPath = "accessgui";
 
-    public final AccessGUI guiManager = new AccessGUI(wshandler_client, wshandler_actor);
+    public final AccessGUI guiManager = new AccessGUI(clientHandler);
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(wshandler_actor, wspath_actor).setAllowedOrigins("*");
-        registry.addHandler(wshandler_client, wspath_client).setAllowedOrigins("*");
+        registry.addHandler(clientHandler, clientPath).setAllowedOrigins("*");
     }
 }

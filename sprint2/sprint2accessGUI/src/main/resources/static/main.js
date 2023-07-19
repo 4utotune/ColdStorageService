@@ -3,7 +3,7 @@ var socket = connect();
 function connect() {
     const host = document.location.host;
     const pathname = document.location.pathname;
-    const addr = "ws://" + host + pathname + "socket";
+    const addr = "ws://" + host + pathname + "accessgui";
 
     // Assicura che sia aperta un unica connessione
     if (socket !== undefined && socket.readyState !== WebSocket.CLOSED) {
