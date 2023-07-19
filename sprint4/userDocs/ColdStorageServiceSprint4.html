@@ -18,7 +18,7 @@
 
     <div class="body">
         <h2>Introduction</h2>
-        Lo <b>Sprin43</b> è il naturale proseguo di quanto realizzato nello Sprint2.
+        Lo <b>Sprint4</b> è il naturale proseguo di quanto realizzato nello Sprint2.
 
         <h2>Requirements</h2>
 
@@ -69,17 +69,26 @@
             <li>Lo stato del <b>TransportTrolley</b></li>
             <li>Numero di <b>richieste di store rifiutate</b> dall'avvio del sistema</li>
         </ul>
+        <div class="remark keypoint">La <b>ServiceStatusGUI</b> dovrà mostrare: il peso fisico corrente, il peso prenotato,
+            la posizione e lo stato del <b>TransportTrolley</b>, numero di richieste store rifiutate dall'avvio del sistema.
+        </div>
 
 
         <h2>Analisi del Problema</h2>
-        Per la comunicazione delle informazioni che descrivono lo stato del nostro sistema si adotta il <b>pattern Observer</b>. <br>
-        Tutti i dati che vengono comunicati permettono di informare il <b>Service Manager</b> in modo completo dello stato del sistema, tranne per quanto 
-        riguarda la posizione in tempo reale del <b>transportrolley</b>. Questo succede perchè non avendo accesso diretto all'attore <b>robotpos</b> 
-        presente all'interno del <b>basicrobot23</b> offerto dal committente le uniche informazioni che si riescono a raccogliere sono le posizioni 
-        del <b>TransportTrolley</b> sulla mappa solo all'inizio e alla fine di una mossa <b>moverobot(coordinate)</b>.<br><br>
+        <bc>Problema: come raccogliere le informazioni del sistema?</bc><br>
+        <u>Soluzione:</u> per la comunicazione delle informazioni che descrivono lo stato del nostro sistema si adotta il <b>pattern Observer</b>. <br>
+        <div class="remark keypoint">La <b>ServiceStatusGUI</b> adotta il <b>pattern Observer</b> per ascoltare gli aggiornamenti prodotti dagli attori 
+            di suo interesse
+        </div>
+        <br>
+        <bc>Problema: come rappresentare la posizione del <b>Transport Trolley</b></bc>
+        <u>Soluzione:</u> tutti i dati che vengono comunicati permettono di informare il <b>Service Manager</b> in modo completo dello stato del sistema, tranne per quanto 
+        riguarda la posizione in tempo reale del <b>transportrolley</b>. Questo succede perchè non avendo accesso diretto all'attore <b>robotpos</b>, 
+        presente all'interno del <b>basicrobot23</b> offerto dal committente, le uniche informazioni che si riescono a raccogliere sono le posizioni 
+        del <b>TransportTrolley</b> sulla mappa <u>solo all'inizio e alla fine</u> di una mossa <b>moverobot(coordinate)</b>.<br><br>
         Esposti questi fatti si può agire in due modi differenti:<br>
         <ol>
-            <li>Essere soddisfatti di questo livello di precisione e mostrare in modo accurato la posizione del <b>TransportTrolley</b>> quando questo è fermo, ma qualora si trovi 
+            <li>Essere soddisfatti di questo livello di precisione e mostrare in modo accurato la posizione del <b>TransportTrolley</b>> quando questo è fermo, e qualora si trovi 
                 in movimento ci si limita a comunicare la partenza e la destinazione, potenzialmente con l'aggiunta di una notifica ogni volta che questo effettua uno step.
             </li>
             <li>Se si fosse a conoscenza del percorso da effettuare grazie al <b>planner</b>, e conoscendo quando il <b>TransportTrolley</b> 
@@ -88,27 +97,32 @@
         Per il contesto che si sta analizzando si ritiene sufficiente adottare il primo metodo. Il secondo metodo comporterebbe costi maggiori, in particolare:
         <ul>
             <li>Se si può modificare il basicrobot23: si aggiungerebbe al Qak relativo le <b>updateResources</b> quando viene fatta ogni mossa.</li>
-            <li>Se non si può toccare il basicrobot23 e quindi svolgere il punto 2,ma  data la attuale situazione non si riuscirebbe ad atture
-                tale strategia perché il piano del che il <b>TransportTrolley</b> dovrà eseguire viene reso noto solo a posteriori.</li>
+            <li>Se non si può toccare il basicrobot23 e quindi svolgere il punto 2. Un ostacolo che non ci permette i seguire questa strada è che 
+                data la attuale situazione il piano del che il <b>TransportTrolley</b> dovrà eseguire viene reso noto solo a posteriori.</li>
         </ul>
+        <div class="remark keypoint">La posizione del <b>TransportTrolley</b> durante il suo movimento saranno mostrare solo partenza e destinazione, con 
+            l'aggiunta di una notifica ogni volta che uno step viene effettuato.
+        </div>
 
         <br><br>
-        Il <b>TransportTrolley</b> si può trovare in tre stati diversi:
+        <bc>Problema: quali sono gli stati del <b>TransportTrolley</b>?</bc>
+        <u>Soluzione:</u> il <b>TransportTrolley</b> avrà gli stessi stati identificati durante l'analisi dello Sprint3, quindi:
         <ol>
             <li><b>In HOME</b></li>
             <li><b>In movimento</b></li>
             <li><b>Fermo</b></li>
         </ol>
+        <div class="remark keypoint">Il <b>TransportTrolley</b> si potrà trovare in tre stati: HOME, movimento, Fermo.
+        </div>
 
-        <h3>Interazioni</h3>
-        Data la sua natura, tutte le interazioni hanno come destinatario <b>ServiceStatusGUI</b>. In particolare i seguenti messaggi sono prodotti grazie al 
-        <b>pattern Observer</b>, per questo motivo possiedono tutti lo stesso nome "coapUpdate":
+        <h3>Informazioni osservate</h3>
+        Tutti i seguenti messaggi sono prodotti grazie al 
+        <b>pattern Observer</b>:
         <table id="myTable">
             <thead>
                 <tr>
                     <th>Messaggio</th>
-                    <th>Mittente</th>
-                    <th>Destinatario</th>
+                    <th>Attore ascoltato</th>
                     <th>Semantica messaggio</th>
                     <th>Descrizione</th>
                 </tr>
@@ -117,7 +131,6 @@
                 <tr>
                     <td>coapUpdate</td>
                     <td>transportrolley</td>
-                    <td>ServiceStatusGUI</td>
                     <td>Dispatch</td>
                     <td>Informa la <b>ServiceStatusGUI</b> dello stato del <b>TransportTrolley</b>
                     </td>
@@ -125,7 +138,6 @@
                 <tr>
                     <td>coapUpdate</td>
                     <td>basicrobot23</td>
-                    <td>ServiceStatusGUI</td>
                     <td>Dispatch</td>
                     <td>Informa la <b>ServiceStatusGUI</b> della posizione del <b>TransportTrolley</b> sulla mappa
                     </td>
@@ -133,7 +145,6 @@
                 <tr>
                     <td>coapUpdate</td>
                     <td>ColdStorageService</td>
-                    <td>ServiceStatusGUI</td>
                     <td>Dispatch</td>
                     <td>Informa la <b>ServiceStatusGUI</b> del peso fisico presente all'interno della <b>ColdRoom</b>
                     </td>
@@ -141,7 +152,6 @@
                 <tr>
                     <td>coapUpdate</td>
                     <td>ColdStorageService</td>
-                    <td>ServiceStatusGUI</td>
                     <td>Dispatch</td>
                     <td>Informa la <b>ServiceStatusGUI</b> del peso prenotato ma ancora non presente nella <b>ColdRoom</b>
                     </td>
@@ -149,7 +159,6 @@
                 <tr>
                     <td>coapUpdate</td>
                     <td>ColdStorageService</td>
-                    <td>ServiceStatusGUI</td>
                     <td>Dispatch</td>
                     <td>Informa la <b>ServiceStatusGUI</b> della quantità di richieste di storage rifiutate dall'avvio del sistema
                     </td>
@@ -211,10 +220,16 @@
         </table>
 
         <h2>Project</h2>
+        [QUI DESCRIVERE A PAROLE CON IMMAGINE COME SI E' REALIZZATA L'INTERFACCIA GRAFICA]
 
+        Nell'occasione di questo Sprint si è corretto un comportamento anomalo riguardante il conteggio del peso prenotato. A tal fine si 
+        è modificata la business logic dell'attore <b>coldstorageservice</b> e aggiunti dei metodi alla classe di rappresentazione dei <b>Ticket</b>. 
 
         <h2>Conclusioni</h2>
+        Questo Sprint produce il sistema finale richiesto dal committente nel  <a target="_blank" href="http://calendar.altervista.org/TemaFinale23.pdf">TemaFinale23</a>
 
+        <br>
+        [Vogliamo fare delle conclusioni più corpose? siccome è la conculsione delle conclusioni]
         <div class="remark">
             Gli output dello sprint3 sono:<br>
             <ul>
