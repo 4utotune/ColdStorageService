@@ -1,0 +1,487 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<!--
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+
+<link rel="stylesheet" type="text/css" href="../../common/sprintstyle.css">
+
+<head>
+    <title>Sprint2</title>
+</head>
+
+<body>
+    <div id="top">
+        <h1>LABORATORIO DI INGEGNERIA DEI SISTEMI SOFTWARE<font size="5"></font>
+        </h1>
+    </div>
+
+    <div class="body">
+
+        <h2>Introduction</h2>
+        Lo <b>Sprint2</b> è il naturale prosieguo di quanto realizzato nello Sprint1. Dopo aver delineato, realizzato e
+        testato il Core Business del sistema, composto dal <b>ColdStorageService</b> e <b>Transport Trolley</b>,
+        possiamo proseguire sostituendo il simulatore della <b>ServiceAccessGUI</b> con il componente reale.
+
+        <h2>Requirements</h2>
+
+        <div class="remark">
+            <a target="_blank" href="http://calendar.altervista.org/TemaFinale23.pdf">Descrizione del
+                TemaFinale23</a><br>
+
+            <bc>Goals Sprint 2</bc>
+            <ol>
+                <li>Identificare ed analizzare tutti i problemi relativi ai requisiti che coinvolgono la
+                    <b>ServiceAccessGUI</b>
+                </li>
+                <li>Integrare al sistema realizzato nello Sprint1 la <b>ServiceAccessGUI</b>, che permette l'interazione
+                    tra il conducente del <b>Fridge Truck</b> ed il servizio <b>ColdStorageService</b></li>
+                <li>Realizzare l'interfaccia grafica</li>
+                <li>Testare il sistema</li>
+            </ol>
+        </div>
+
+        <h2>Requirement analysis</h2>
+
+        <h4>Chiarimenti del committente</h4>
+        L'interazione con il committente ha permesso di chiarire alcuni aspetti del progetto:
+        <ul>
+            <li>La ServiceAccessGUI deve essere <b>unica</b> e visualizzabile da qualunque dispositivo connesso a
+                internet</li>
+            <li>I conducenti dei <b>Fridge Truck</b> inseriscono i <b>ticket</b> solo quando si trovano davanti alla
+                <b>INDOOR</b>
+            </li>
+            <li>L'analisi richiestaci in merito all'uso di Ticket in applicazioni già diffuse è presente nella <a
+                    href="#analisiticket">apposita sezione</a> dell'Analisi del Problema</li>
+        </ul>
+
+        <h4>Chiarimenti con il committente</h4>
+        <ul>
+            <li>Strategia da utilizzare in merito alla problematica di assenza di una coda di Truck e potenziale elevato
+                numero di Ticket emessi in attesa di essere serviti dal Servizio.<br>(Si veda la <a
+                    href="./StrategiaTicket.html" target="_blank">apposita sezione</a>)</li>
+        </ul>
+
+        <h4>Sistema</h4>
+        Lo Sprint2 prevede l'interazione tra due componenti principali: <b>ServiceAccessGUI</b> e
+        <b>ColdStorageService</b>. <br>
+        Ai fini di test includiamo nelle interazioni anche il componente <b>MockTransportTrolley</b>, che rappresenta
+        in questo Sprint un componente <b>reattivo</b> che simulerà l'invio di istruzioni al DDR Robot.<br>
+
+        <center>
+            <div class="piccola">
+                <img src="sprint2/sistemaSprint2.png">
+            </div>
+        </center>
+
+        <h3>Analisi</h3>
+        Dai requisiti espressi nel <a target="_blank" href="http://calendar.altervista.org/TemaFinale23.pdf">Tema
+            Finale</a> e dalle analisi già effettuate negli Sprint0 e Sprint1,
+        in questo Sprint occorre analizzare le entità:
+        <ul>
+            <li><b>ServiceAccessGUI</b>, che è una interfaccia grafica per interagire con il servizio</li>
+            <li><b>ColdStorageService</b>, per verificare che sia pienamente compatibile con il workflow una volta
+                introdotta la GUI</li>
+        </ul>
+        Tra i requisiti specificati vi è che la <b>ServiceAccessGUI</b> deve essere in grado di interagire con il
+        servizio <b>ColdStorageService</b> effettuando due richieste possibili:<br>
+        <ul>
+            <li>Richiesta di emissione di un <b>ticket</b> specificando il peso che si intende depositare</li>
+            <li>Richiesta di scarico (inserendo un ticket presso la INDOOR)</li>
+        </ul>
+        La <b>ServiceAccessGUI</b> deve anche mostrare il peso corrente presente nella <b>ColdRoom</b>.
+
+        <h2>Analisi del Problema</h2>
+        Il corpo di questo Sprint è il componente <b>ServiceAccessGUI</b>.
+
+
+        <h3>ServiceAccessGUI</h3>
+        <bc>Problema: Quale è il compito della ServiceAccessGUI?</b></bc><br>
+        <u>Soluzione:</u> Questo componente, che potremmo descrivere come esterno al sistema, svolge il ruolo di
+        intermediario tra i
+        conducenti ed il <b>ColdStorageService</b>, mediante una interfaccia grafica che permette l'invio di
+        richieste al servizio. Queste richieste, come da requisiti, sono due:<br>
+        <ul>
+            <li><b>storerequest</b>: richiesta di erogazione di un <b>ticket</b>. Contiene l'informazione del peso
+                <b>FW</b> del carico.
+            </li>
+            <li><b>insertticket</b>: richiesta di servizio di scarico presso l'<b>INDOOR</b>. Contiene l'informazione
+                del numero del <b>ticket</b> corrispondente.</li>
+        </ul>
+        Oltre a permettere di interagire con il servizio la ServiceAccessGUI deve anche mostrarne lo stato. In
+        particolare, l'informazione relativa al peso corrente contenuto all'interno della ColdRoom. Questo dovrà essere
+        aggiornato in tempo reale.
+        <div class="remark keypoint">La ServiceAccessGUI è una interfaccia grafica per interagire con il Servizio e
+            ottenerne informazioni sullo stato</div>
+
+
+        <bc>Problema: Quali sono le informazioni che deve gestire la ServiceAccessGUI?</bc><br>
+        <u>Soluzione:</u>
+        Si deduce che la <b>ServiceAccessGUI</b> deve essere fornita di:
+        <ul>
+            <li>un campo per inserire il <b>peso</b> ed un pulsante per effettuare la richiesta <u>storerequest</u>.
+            </li>
+            <li>un campo per inserire il <b>ticket</b> ed un pulsante per effettuare la richiesta <u>insertticket</u>.
+            </li>
+            <li>una finestra che mostri il peso corrente presente nella <b>ColdRoom</b>.</li>
+        </ul>
+        <div class="remark keypoint">La <b>ServiceAccessGUI</b> deve essere fornita di due campi di input per effettuare
+            le richieste e uno spazio dove mostrare le informazioni relative alla Coldroom</div>
+
+        <bc>Problema: Come si garantisce un riscontro dal Servizio, per comprendere che le richieste vadano o meno a buon fine?</bc>
+        <br>
+        <u>Soluzione:</u>
+        Per avere un riscontro dal Servizio se le richieste vanno o meno a buon fine, è necessario che i messaggi
+        inviati da ColdStorageService vengano visualizzati a schermo, opportunamente filtrati e formattati per mostrare
+        solo informazioni utili agli utenti finali.
+        <div class="remark keypoint">La <b>ServiceAccessGUI</b> deve consentire all'utente finale di comprendere se la richiesta effettuata sia andata o meno a buon fine, mostrando solo le informazioni strettamente necessarie</div>
+        
+
+        <bc>Problema: Come si interagisce con il Servizio?</bc><br>
+        <u>Soluzione:</u>
+        Dopo un confronto con il committente lo scenario che si presenta per interagire con il nostro servizio è
+        scomponibile in due parti:<br>
+        <ol>
+            <li>I conducenti dei <b>Fridge Truck</b> che si stanno direzionando verso il <b>ColdStorageService</b> sono
+                interessati a capire se
+                c'è posto per scaricare il loro carico, per questo motivo tramite il loro dispositivo mobile accedono
+                alla GUI che permetterà loro di:
+                <ul>
+                    <li>Vedere il peso presente nella <b>ColdRoom</b></li>
+                    <li>Richiedere l'erogazione di un <b>ticket</b>. Nel caso venga rifiutata, verrà mostrato un
+                        opportuno messaggio di errore</li>
+                </ul>
+            </li>
+            <li>Una volta arrivato presso il servizio il conducente procederà all'inserimento del
+                <b>ticket</b>.
+                <br>Se è approvato, il conducente verrà informato dei vari step operativi del servizio. Se è rifiutato,
+                gli verrà comunicato il motivo.
+            </li>
+        </ol>
+
+        <div class="remark keypoint">La <b>ServiceAccessGUI</b> verrà visualizzata sui dispositivi mobili dei conducenti
+        </div>
+
+        <bc>Problema: Come viene aggiornato il peso della ColdRoom?</bc><br>
+        <u>Soluzione:</u>
+        Per quanto riguarda il peso della <b>ColdRoom</b> mostrato, la <b>ServiceAccessGUI</b> si impegna solamente a
+        mostrare il peso che riceve dalla <b>ColdStorageService</b> ogni qualvolta avviene un cambiamento. <br>
+        Considerando come si è modellata la politica di prenotazione dei <b>ticket</b> nel <b>ColdStorageService</b>, si
+        potrebbe decidere che un conducente che accede alla <b>ServiceAccessGUI</b> veda solo il peso effettivamente
+        presente nella <b>ColdRoom</b>, e non anche quello prenotato. Ciò potrebbe portare a scenari dove un conducente
+        vede attraverso la <b>ServiceAccessGUI</b> che il suo carico è ideoneo ma la sua richiesta <u>storerequest</u>
+        viene rifiutata per spazio insufficiente. Questo è dovuto al fatto che non mostrando anche il peso prenotato c'è
+        l'illusione che ci sia posto quando in realtà è stato già riservato.<br>
+        Per ovviare a questa problematica è sufficiente mostrare il peso complessivo, sommando al peso effettivamente
+        presente all'interno della <b>ColdRoom</b> il peso prenotato. A questo proposito andrebbe modificata
+        l'informazione contenuta dentro il messaggio <u>coldroomdata</u> precedentemente delineato nello Sprint1, che
+        fino ad ora conteneva solo il peso corrente della <b>ColdRoom</b>.<br>
+        La GUI è sufficiente mostri il totale, in quanto vedere il peso prenotato potrebbe considerarsi una informazione
+        sensibile che espone il fuzionamento del Servizio a un utente che non ne ha interesse.
+        <div class="remark keypoint">La <b>ServiceAccessGUI</b> deve mostrare il peso della <b>ColdRoom</b> come somma
+            del peso effettivamente presente con quello prenotato.</div>
+
+        <h5 id="strategiaticket">Nota importante:</h5>
+        <b>Politica esubero Ticket non gestiti</b>
+        Durante l'analisi compiuta nello Sprint1 si è deciso di permettere a un solo Truck per volta di interagire con
+        il servizio, dando al massimo la possibilità di inserire il proprio Ticket quando ancora il DDR Robot sta
+        completando le operazioni del precedente. Questa scelta di non gestire una coda di Truck che hanno inserito il
+        proprio ticket e aspettano di scaricare porta alla conseguenza che i Ticket potrebbero scadere in attesa che la
+        zona INDOOR del servizio sia vuota.<br>
+        Per non cambiare drasticamente il Servizio (operazione che può essere rimandata ad un aggiornamento futuro nel
+        caso in cui l'esperienza pratica porti a conclusioni diverse in merito alle necessità del committente)
+        indichiamo tre possibilità per alleviare il problema:
+        <ol>
+            <li>Il <b>coldstorageservice</b> deve rifiutare le richieste di <u>storage</u> non solo guardando allo
+                spazio disponibile, ma anche guardando la quantità di <b>ticket</b>
+                erogati ancora facenti parte del sistema (che cioè non hanno ricevuto il messaggio
+                <u>chargetaken</u>). In questo caso andrebbe stabilito un numero massimo di Ticket disponibili
+                contemporaneamente.
+            </li>
+            <li>Quando viene erogato il <b>ticket</b> viene comunicato al conducente anche quanti potenziali altri
+                conducenti si trovano davanti a lui. Si tratta di "potenziali" perché non è assicurato che tutti
+                raggiungano il servizio entro
+                <b>TICKETTIME</b>.
+            </li>
+            <li>Simile alla precedente ma, invece di inviare il numero di persone che si trovano davanti, si mostra
+                l'informazione direttamente sulla <b>ServiceAccessGUI</b>. In questo modo si responsabilizza il
+                conducente dandogli una scelta informata.</li>
+        </ol>
+        Per il momento rimandiamo la decisione in merito, attendendo di confermare con il committente la scelta da
+        prendere. Il costo in termini di tempo di implementazione è identico e non elevato per tutte e tre le opzioni
+        (e, ovviamente, nullo nel caso si scelga di non gestire questa problematica).<br>Nel caso invece si richieda un
+        cambiamento di politica di accettazione Ticket, introducendo ad esempio una coda, il costo sarebbe maggiore
+        in quanto sarebbe necessaria una operazione di correzione dell'intero ColdStorageService.
+
+        <h5>Policy invio messaggi a client connessi</h5>
+        Un certo numero di Truck Driver può essere connesso al sistema nello stesso momento, ognuno con la propria
+        sessione ServiceAccessGUI. Non tutte le informazioni che il Servizio manda sono di interesse per tutti i Driver.
+        Ad esempio, chi effettua una richiesta di scarico vorrà essere l'unico a vedere il Ticket corrispondente, in
+        maniera tale da evitare che qualcun'altro usi il suo codice. Allo stesso modo, eventuali messaggi di successo o
+        errore sono di interesse esclusivo di chi ha effettuato le richieste, anche per non creare confusione.<br>
+        D'altro canto, tutto ciò che è controllato direttamente dal Servizio potrebbe essere mostrato a tutti i client
+        connessi senza problemi; ad esempio, quali Ticket sono "chargetaken" e quali hanno il proprio carico
+        correttamente scaricato nella ColdRoom. Questo lascerebbe la possibilità, nel caso si volesse scorporare il
+        componente di
+        visualizzazione messaggi, di creare un monitor che mostri lo stato di tutti i ticket presenti nel Servizio in un
+        dato momento, come nei Fast Food è visibile da tutti lo stato degli ordini man mano che vengono processati.
+        <br>
+        Per riassumere:
+        <table>
+            <thead>
+                <tr>
+                    <th>Informazione</th>
+                    <th>Visibilità</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Conferma prenotazione / errore</td>
+                    <td>Richiedente</td>
+                </tr>
+                <tr>
+                    <td>Ticket / errore</td>
+                    <td>Richiedente</td>
+                </tr>
+                <tr>
+                    <td>Stato Cold Room</td>
+                    <td>Tutti</td>
+                </tr>
+                <tr>
+                    <td>Charge taken</td>
+                    <td>Tutti</td>
+                </tr>
+                <tr>
+                    <td>Deposito avvenuto</td>
+                    <td>Tutti</td>
+                </tr>
+                <tr>
+                    <td><i>Altro</i></td>
+                    <td>Tutti</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="remark keypoint">
+        È necessario che venga garantito l'invio al solo client interessato nel caso di informazioni "private".</div>
+
+        <h3>ColdStorageService</h3>
+        Questo componente può rimanere invariato nella logica operativa, una volta aggiornato il metodo di generazione e
+        controllo Ticket introducendo una sequenza randomica di lettere e numeri come identificativo.<br>
+        Per quanto riguarda il dialogo con la ServiceAccessGUI, rendendo quest'ultimo un Observer del Service possiamo
+        aggiornare in maniera agevole l'informazione relativa al peso.
+
+        <h3>Proxy ServiceAccessGUI (valutare se cambiare nome)</h3>
+        L'architettura logica del sistema vedrà l'introduzione di un attore non precedentemente citato: un componente
+        che si comporti da proxy per qualunque scelta tecnica venga presa in merito alla realizzazione della GUI.
+        Questo attore si dovrà porre tra il ColdStorageService e la GUI vera e propria gestendo la comunicazione da
+        entrambi i lati, diventando un ponte tra le tecnologie: da una parte il sistema QaK e dall'altro il server che
+        gestirà i client ServiceAccess. L'utilità di questo componente sta quindi nell'adattare il modello a stati e a
+        scambio di messaggi, utilizzato sinora, alla comunicazione con un server esterno e potenzialmente estraneo a
+        questi paradigmi.<br>
+
+        <h3>TransportTrolley</h3>
+        Ai fini di questo Sprint, il componente TransportTrolley può essere sostituito con un Mock che simuli il dialogo
+        con il DDR Robot. Così facendo, escludiamo momentaneamente le complessità tecniche e i tempi di attesa di questo
+        componente, che rallenterebbero lo sviluppo e i test.
+
+        <h3>Interazioni</h3>
+        Le interazioni precedentemente definite nello Sprint1 trovano riscontro anche in questo Sprint2, con poche
+        differenze:<ul>
+            <li>Le interazioni storerequest e insertticket vengono rinominate rispettivamente proxy_storerequest e
+                proxy_insertticket, per sottolineare l'attore di provenienza e non confondersi con le richieste che
+                proverranno invece dalla GUI vera e propria.</li>
+            <li>L'interazione coldroomdata viene rinominata coapUpdate, in quanto la ServiceAccessGui Proxy sarà un
+                observer di ColdStorageService.</li>
+        </ul>
+
+
+        <h3>Architettura logica</h3>
+        <div class="remark">
+            Codice QAK per la modellazione del sistema: <a
+                href="./sprint2.coldstorageservice/src/ColdStorageService.qak"
+                target="_blank">ColdStorageService.qak</a>
+        </div>
+        Il sistema da noi modellato presenta la seguente architettura logica:
+        <center>
+            <div class="piccola">
+                <img src="sprint2/coldstorageservice_sprint2arch.png" alt="architettura logica">
+            </div>
+        </center>
+
+        <h2>Test plans</h2>
+        Testare la GUI si compone di due parti distinte:<ul>
+            <li>Test Unitari sui singoli componenti di back-end</li>
+            <li>Verifica comportamento corretto front-end e servizio in toto, con Test End-to-End sull'intero
+                sistema</li>
+        </ul>
+        <h4>Test Unitari</h4>
+        I Test Unitari possono essere effettuati utilizzando JUnit. Dovranno concentrarsi sia sugli attori generati dal
+        modello QaK sia sulle singole risorse aggiuntive come Ticket.kt e TicketManager.kt, aggiornati in questo Sprint
+        per supportare la nuova scelta di identificativo dei ticket stessi.<br>
+        Ovviamente, tutti i test già delineati in precedenza dovranno continuare a essere validi.
+        <table id="myTable1">
+            <thead>
+                <tr>
+                    <th>Test</th>
+                    <th>Entità coinvolte</th>
+                    <th>Scenario</th>
+                    <th>Comportamento atteso</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Funzionalità TicketManager</td>
+                    <td>TicketManager<br>Ticket</td>
+                    <td>Test di ogni metodo delle classi TicketManager e Ticket, tra cui: creazione manager, aggiunta
+                        ticket, generazione Id e Timestamp, rimozione ticket, ricerca per Id o Timestamp, cambio di
+                        stato
+                        da <i>waiting</i> a <i>working</i>, etc.</td>
+                    <td>I componenti presentano un corretto funzionamento</td>
+                </tr>
+                <tr>
+                    <td>Store Request</td>
+                    <td>ServiceAccessGui_Proxy<br>ColdStorageService</td>
+                    <td>Viene inviata una serie di messaggi contententi diverse richieste di storage a
+                        ServiceAccessGui_Proxy,
+                        che interagirà di conseguenza con ColdStorageService per confermarle o rifiutarle.<br>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>Richiesta per quantità minore di peso max -> richiesta accettata</li>
+                            <li>Richiesta per peso troppo grande -> richiesta rifiutata</li>
+                            <li>Richiesta formattata male -> richiesta rifiutata</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Insert Ticket</td>
+                    <td>ServiceAccessGui_Proxy<br>ColdStorageService</td>
+                    <td>Viene inviata una serie di messaggi contententi diverse richieste di inserimento ticket a
+                        ServiceAccessGui_Proxy, che interagirà di conseguenza con ColdStorageService per confermarle o
+                        rifiutarle.</td>
+                    <td>
+                        <ul>
+                            <li>Richiesta di storage seguita da inserimento ticket entro tempo di timeout -> richiesta
+                                accettata</li>
+                            <li>Richiesta di storage seguita da inserimento ticket dopo tempo di timeout -> richiesta
+                                rifiutata per timeout</li>
+                            <li>Inserimento ticket mai ricevuto dal servizio -> richiesta rifiutata</li>
+                            <li>Doppia richiesta di storage seguita da inserimento dei ticket entro tempo di timeout ->
+                                prima richiesta accettata, seconda rifiutata per servizio occupato</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Aggiornamento stato ColdRoom</td>
+                    <td>ServiceAccessGui_Proxy<br>ColdStorageService</td>
+                    <td>La ServiceAccessGui_Proxy deve ricevere gli aggiornamenti di peso da ColdStorageService</td>
+                    <td>Richiesta di storage per N kg seguita da inserimento ticket entro tempo di timeout -> ricezione
+                        update con
+                        peso prenotato pari a N. Dopo un certo numero di secondi (a operazioni di scarico concluse),
+                        ricezione update con peso
+                        prenotato pari a 0 e reale pari a N.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>Test End-to-End</h4>
+        Il servizio andrà testato dal punto di vista dell'utente finale, il Truck Driver, provando che gli stessi test
+        descritti nella sezione precedente continuino a essere validi anche se ogni richiesta è effettuata tramite GUI.
+
+        <h2>Project (da inserire codice?)</h2>
+        Per realizzare la ServiceAccessGUI scegliamo come tecnologia Spring, in quanto la software house ne ha già
+        esperienza. Questo framework necessita di pochi componenti per funzionare e mantiene la comunicazione tra client
+        e server mediante Websocket.<br>
+        Delineiamo due tipi diversi di connessioni: quelle tra Client e Server Spring e quelle tra il Server Spring e
+        ColdStorageService (tramite il componente Proxy).<br>
+        Le classi che ci serviranno saranno quindi:<ul>
+            <li><b>Application</b>, il main del programma che istruirà Spring di avviare l'applicazione</li>
+            <li><b>WebSocketConfiguration</b>, dove definiremo due tipi di Handler: Client (comunicazione C/S) e Actor
+                (comunicazione Server/QaK)</li>
+            <li><b>ClientHandler</b>, che manterrà le sessioni con i Client connessi, intercettando le richieste e
+                inoltrando le risposte</li>
+            <li><b>ActorHandler</b>, che scambierà messaggi con il Proxy della GUI nel contesto del ColdStorageService
+            </li>
+            <li><b>Controller</b>, che gestirà le pagine web mostrate ai client (path degli url, eventuali variabili,
+                etc...)</li>
+        </ul>
+        In aggiunta a questi componenti che si occupano principalmente delle connessioni e della struttura imposta da
+        Spring, all'interno del Server avremo bisogno anche di un componente <b>ServiceAccessGUI</b> che gestisca la
+        logica operativa. <br>
+        Il seguente schema riassume il passaggio di messaggi tra i vari componenti:<br>
+        <center>
+            <div class="piccola"><img src="sprint2/Spring-QaK.png"></div>
+        </center>
+        Lo scambio di messaggi sia tra i componenti della GUI che con il Proxy avverrà sempre con dispatch. In questo
+        modo, non avremo richieste bloccanti e il sistema risulterà più permissivo. Ciò vuol però dire che è necessario
+        associare ai messaggi anche un identificativo di chi effettua la richiesta, in maniera tale da fornire la
+        risposta solo al client giusto. Questa informazione dovrà arrivare al Proxy, che invece gestisce Storerequest e
+        Insertticket come Request-Reply.<br>
+        A ogni richiesta effettuata dai Client verrà abbinato un RequestId, a sua volta associato alla sessione di
+        pertinenza.
+        <br><br>
+        Il server Spring non è un Attore QaK, quindi la comunicazione con l'attore Proxy deve avvenire in maniera
+        diversa dal solito. Una connessione tramite WebSocket è creata dal Proxy al Server, mentre una normale
+        connessione TCP dal Server al Proxy.<br>
+        Il Proxy manderà al Server i messaggi nella forma <i>tipo</i><b>/</b><i>contenuto</i>[<b>/</b><i>id
+            richiesta</i>]. Questo modello viene scelto anche per la comunicazione tra Server e Client. <br>
+        Il Server invierà invece i suoi messaggi al Proxy con la stessa semantica propria del modello QaK.
+        <br><br>
+        Per quanto riguarda l'interfaccia, un semplice prototipo mostrerà i campi di input, una finestra per i messaggi
+        e un componente per visualizzare lo stato della ColdRoom:
+        <center>
+            <div class="piccola"><img src="sprint2/interfaccia.png"></div>
+        </center>
+
+        Questa pagina html verrà integrata nelle funzionalità con un file javascript che gestirà la connessione via
+        WebSocket al Server, l'invio e la ricezione di messaggi e l'aggiornamento dei vari componenti a
+        schermo.
+
+        <h2>Testing</h2>
+        La tecnologia scelta per il front-end, Spring, non offre le funzionalità necessarie a testare lo scambio di
+        messaggi attraverso
+        WebSocket nell'ambito dei test JUnit. Risulta inoltre impossibile controllare il corretto funzionamento
+        del lato JavaScript dell'applicazione. Per questo, va considerato l'utilizzo di un framework esterno per
+        effettuare i Test End-to-End, come ad esempio <a href="https://www.cypress.io/">Cypress.js</a>.
+
+        <h2>Conclusioni</h2>
+
+        <div class="remark">
+            Gli output dello Sprint2 sono:<br>
+            <ul>
+                <li>ServiceAccessGUI, composta da Attore Proxy (Proxy?) e Applicazione Spring</li>
+                <li>Versione aggiornata ColdStorageService</li>
+                <li>MockTransportTrolley</li>
+            </ul>
+        </div>
+
+        <h4>Goals Sprint 3</h4>
+        Si possono definire in seguito i goal relativi allo Sprint3:<br>
+        <ol>
+            <li>Identificare ed analizzare tutti i problemi relativi ai requisiti che coinvolgono la
+                <b>Alarm Device</b> e il <b>Warning Device</b>
+            </li>
+            <li>Integrare al sistema realizzato nello Sprint2 la <b>Alarm Device</b> e il <b>Warning Device</b>, che
+                esprimono gli <u>Alarm Requirements</u></li>
+            <li>Sviluppare il software ed eseguirlo su una scheda Raspberry Pi con i componenti hardware collegati</li>
+            <li>Testare il sistema</li>
+        </ol>
+
+        <br /><br />
+
+        <div style="background-color:rgba(86, 56, 253, 0.9); width:60%; text-align:left;color:white">
+            By <br>Tassinari Gabriele, email: gabriele.tassinari2@studio.unibo.it<br>
+            Baraldi Leonardo, email: leonardo.baraldi@studio.unibo.it<br>
+            Koss Krystian, email: krystian.koss@studio.unibo.it<br>
+            <div class="foto">
+                <img src="../../common/gabriele.jpeg" alt="mbot" width="15%" height="15%">
+                <img src="../../common/Baraldi.jpeg" alt="mbot" width="15%" height="15%">
+                <img src="../../common/kriss.jpeg" alt="mbot" width="15%" height="15%">
+            </div>
+            <br>
+            GIT repo: https://github.com/4utotune/ColdStorageService/ <br>
+        </div>
+    </div>
+</body>
+
+</html>
