@@ -31,8 +31,7 @@
                 <li>Identificare ed analizzare tutti i problemi relativi ai requisiti che coinvolgono la
                     <b>Alarm Device</b> e il <b>Warning Device</b>
                 </li>
-                <li>Integrare al sistema realizzato nello Sprint2 la <b>Alarm Device</b> e il <b>Warning Device</b>, che
-                    esprimono gli <u>Alarm Requirements</u></li>
+                <li>Integrare al sistema realizzato nello Sprint2 la <b>Alarm Device</b> e il <b>Warning Device</b>, soddisfando gli <u>Alarm Requirements</u></li>
                 <li>Sviluppare il software ed eseguirlo su una scheda Raspberry Pi con i componenti hardware collegati
                 </li>
                 <li>Testare il sistema</li>
@@ -44,8 +43,8 @@
         <h4>Chiarimenti del committente</h4>
         L'interazione con il committente ha permesso di chiarire alcuni aspetti del progetto:
         <ul>
-            <li>Il Led e il Sonar possono non essere montati a bordo del DDR Robot</li>
-            <li>Il Transport Trolley deve fermarsi il prima possibile alla ricezione di un Alarm</li>
+            <li>Il <b>Led</b> e il <b>Sonar</b> possono non essere montati a bordo del <b>DDR Robot</b></li>
+            <li>Il <b>Transport Trolley</b> deve fermarsi il prima possibile alla ricezione di un Alarm</li>
         </ul>
 
         <h3>Sistema</h3>
@@ -78,7 +77,7 @@
                 <b>Led</b>
             </li>
         </ul>
-        Entrambi dovranno eseguire all'interno di una scheda Raspberry Pi.<br>
+        Entrambi dovranno eseguire all'interno di una scheda <b>Raspberry Pi</b>.<br>
         Inoltre questi rappresentano gli <b>Alarm Requirements</b> che dovranno essere sempre soddisfatti per fare in
         modo che il <b>Transport Trolley</b> si comporti in linea con i requisiti forniti dal committente.
         <br>
@@ -95,6 +94,9 @@
         Nota importante è che il <b>Transport Trolley</b> non può essere fermato due volte consecutive entro un lasso di
         tempo pari a <b>MINT</b> millisecondi (ovvero deve intercorrere un tempo <b>MINT</b> millisecondi tra uno stop
         e quello successivo).
+        <div class="remark keypoint">Il <b>Transport Trolley</b> non può essere fermato due volte consecutive entro un lasso di
+            tempo pari a <b>MINT</b> millisecondi.
+        </div>
 
 
         <h4>warning device</h4>
@@ -112,7 +114,7 @@
 
         <h2>Analisi del Problema</h2>
         <bc>Problema: cosa deve fare il <b>Transport Trolley alla resume?</b></bc><br>
-        <u>Soluzione:</u> quando il <b>Transport Trolley</b> verrà rimesso in movimento sopo uno stop, dovrà riprendere dal punto dove si era
+        <u>Soluzione:</u> quando il <b>Transport Trolley</b> verrà rimesso in movimento dopo uno stop, dovrà riprendere dal punto dove si era
         fermato, concludendo correttamente la richiesta a cui stava lavorando.
         <div class="remark keypoint">Il <b>Transport Trolley</b> fermato per via della soglia violata tornerà a svolgere
             il compito su cui stava lavorando una volta conclusosi l'allarme.
@@ -136,7 +138,7 @@
             </div>
         </center>
 
-        <div class="remark keypoint">Il <b>TransportTrolley</b> non si può fermare prima di <b>MINT</b> millisecondi dall'ultima resume
+        <div class="remark keypoint">Il <b>TransportTrolley</b> non si può fermare prima di <b>MINT</b> millisecondi dall'ultima resume.
         </div>
 
         <bc>Problema: come comunicare al <b>basicrobot23</b> di fermarsi?</bc><br>
@@ -152,8 +154,8 @@
         Questo è dovuto dal fatto che indipendentemente dalla
         posizione del <b>Transport Trolley</b>, comunicando a questo ultimo <b>moverobot(coordinate)</b> il risultato
         sarà il medesimo, ovvero raggiungere tale posizione richiesta.
-        <div class="remark keypoint">Per continuare il compito che il <b>TransportTrolley</b> aveva lasciato in sospeso per via dell stop è necessario
-            ripetere l'ultimo comando non andato a buon fine
+        <div class="remark keypoint">Per continuare il compito che il <b>TransportTrolley</b> aveva lasciato in sospeso per via dello stop è necessario
+            ripetere l'ultimo comando non andato a buon fine.
         </div>
 
 
@@ -166,10 +168,10 @@
         </div>
         Per quanto riguarda invece la resume: il <b>Sonar</b> quando rileverà di nuovo una distanza che permetterà lo
         sblocco del <b>Transport Trolley</b> verrà emesso
-        un evento che il <b>Transport Trolley</b> riceverà e si impegnerà a risbloccare il robot dall'operazione che si
+        un evento che il <b>Transport Trolley</b> riceverà e si impegnerà a risbloccare il robot dall'operazione su cui si
         era fermato, riprendendo così la sua routine.
         <div class="remark keypoint">L'<b>alarm device</b> emetterà un evento <b>resume</b>, ed il <b>TransportTrolley</b>
-            si impegnerà a riattivare il robot
+            si impegnerà a riattivare il robot.
         </div>
 
         <h5>|</h5>
@@ -178,7 +180,7 @@
         Si adotta il <b>pattern Observer</b> che permette al <b>Led</b> di venire notificato ogni volta che un cambio di stato del <b>TransportTrolley</b>
          a lui interessante succede. Il <b>warning device</b> implementa la logica di gestione. Il <b>led</b> deve considerare anche quando
         il robot è fermo perché sta caricando/scaricando il carico.
-        <div class="remark keypoint">Il <b>warning device</b> viene notificato ad ogni cambiamento di stato del <b>TransportTrolley</b>
+        <div class="remark keypoint">Il <b>warning device</b> viene notificato ad ogni cambiamento di stato del <b>TransportTrolley</b>.
         </div>
 
         <br>
@@ -192,6 +194,7 @@
         a quando non viene ricevuta un altra notifica.
         <br>
         <br>
+        [LA SEGUENTE PARTE INVECE NON SO SE DEBBA NADARE IN PROJECT]
         Si utilizzi MQTT per inviare gli eventi tra il servzio ed il <b>led</b> e <b>sonar</b>.
         <br>La scelta di emettere un evento con MQTT è motivata
         dal pensiero lungimirante, a favore dell'estendibilità, di avere in futuro molteplici <b>Transport Trolley</b> e
@@ -231,7 +234,7 @@
         
 
         <h3>Sonar Simulator</h3>
-        Ai fini di test per il momento si può adottare un <b>sonar</b> simulatore che genera misure casualmente, per poi
+        Ai fini di test per il momento si può adottare un <b>sonar</b> simulatore che genera misurazioni prestabilite, per poi
         successivamente passare a un <b>sonar</b> fisico.
 
         <h3>Interazioni</h3>
@@ -252,7 +255,8 @@
                     <td>warning device</td>
                     <td>Dispatch</td>
                     <td>Informa il <b>warning device</b> dello stato che il
-                        <b>led</b> deve assumere adottando il <b>pattern Observer</b>.
+                        <b>led</b> deve assumere adottando il <b>pattern Observer</b>. Semantica <u>Dispatch</u> per via del fatto che 
+                        si adotta un pattern Observer.
                     </td>
                 </tr>
                 <tr>
@@ -261,7 +265,7 @@
                     <td>transportrolley <br> basicrobot
                     </td>
                     <td>Event</td>
-                    <td>Informa chi è interessato che il DDR Robot si deve fermare.</td>
+                    <td>Informa chi è interessato che il DDR Robot si deve fermare. Semantica <u>Event</u> perchè<b>########</b></td>
                 </tr>
 
                 <tr>
@@ -272,7 +276,7 @@
                     <td>Parte della pipeline dei gestori delle misurazioni del
                         <b>sonar</b>, che in questo caso notifica ad <b>alarmdevice</b> che la distanza misurata è
                         inferiore alla
-                        soglia prestabilita <b>DLIMT</b>.
+                        soglia prestabilita <b>DLIMT</b>.  Semantica <u>Event</u> perchè<b>########</b>
                     </td>
                 </tr>
                 <tr>
@@ -283,7 +287,7 @@
                     <td>Parte della pipeline dei gestori delle misurazioni del
                         <b>sonar</b> che in questo caso notifica ad <b>alarmdevice</b> che la distanza misurata è
                         superiore alla
-                        soglia prestabilita <b>DLIMT</b>.
+                        soglia prestabilita <b>DLIMT</b>.  Semantica <u>Event</u> perchè<b>########</b>
                     </td>
                 </tr>
 
@@ -292,12 +296,13 @@
                     <td>alarm device</td>
                     <td>transportrolley</td>
                     <td>Event</td>
-                    <td>Il <b>transportrolley</b> riceve istruzione di far ripartire il robot.</td>
+                    <td>Il <b>transportrolley</b> riceve istruzione di far ripartire il robot.  Semantica <u>Event</u> perchè<b>########</b></td>
                 </tr>
             </tbody>
         </table>
 
         <h3>Architettura logica</h3>
+       <b> MANCA IL FILE SOTTO</b>
         <div class="remark">
             Codice QAK per la modellazione del sistema: <a href="./sprint3.coldstorageservice/src/SonarLed.qak"
                 target="_blank">SonarLed.qak</a>
@@ -309,8 +314,8 @@
                 <img src="sprint3/coldstorageservice_sprint3arch.png" alt="architettura logica">
             </div>
         </center>
-        Siccome non compreso nell'immagine, si esplicita il fatto che l'evento alarm giunge anche al
-        <b>basicrobot23</b>, il quale alla sua ricezione ferma il DDR Robot.<br>
+        Siccome non compreso nell'immagine, si esplicita il fatto che l'evento <b>alarm</b> giunge anche al
+        <b>basicrobot23</b>, il quale alla sua ricezione ferma il <b>DDR Robot</b>.<br>
 
         <h2>Test plans</h2>
         <table id="myTable1">
@@ -428,8 +433,8 @@
         <div class="remark">
             Gli output dello sprint3 sono:<br>
             <ul>
-                <li>Warning Device e relativi attori e file python</li>
-                <li>Alarm Device e relativi attori e file python</li>
+                <li><b>Warning Device</b> e relativi attori e file python</li>
+                <li><b>Alarm Device</b> e relativi attori e file python</li>
             </ul>
         </div>
 
