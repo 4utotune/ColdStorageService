@@ -54,7 +54,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t09",targetState="moveToIndoor",cond=whenDispatch("gotoindoor"))
+					 transition(edgeName="t09",targetState="moveToIndoor",cond=whenRequest("gotoindoor"))
 					transition(edgeName="t010",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
 				state("moveToIndoor") { //this:State
@@ -77,6 +77,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("loadTheCharge") { //this:State
 					action { //it:State
 						 stato = "inIndoor"  
+						forward("setdirection", "dir(down)" ,"basicrobot" ) 
 						updateResourceRep( "azione(STOPPED)" 
 						)
 						updateResourceRep( "stato($stato)" 
@@ -95,7 +96,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("moveToColdroom") { //this:State
 					action { //it:State
 						 stato = "toColdroom"  
-						forward("chargetaken", "chargetaken(_)" ,"coldstorageservice" ) 
+						answer("gotoindoor", "chargetaken", "chargetaken(_)"   )  
 						CommUtils.outmagenta("$name | vado verso la cold room")
 						updateResourceRep( "azione(MOVING)" 
 						)
@@ -125,19 +126,21 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				 	 		stateTimer = TimerActor("timer_storeTheCharge", 
 				 	 					  scope, context!!, "local_tout_transporttrolley_storeTheCharge", 3000.toLong() )
 					}	 	 
-					 transition(edgeName="t017",targetState="askService",cond=whenTimeout("local_tout_transporttrolley_storeTheCharge"))   
+					 transition(edgeName="t017",targetState="chargeDeposited",cond=whenTimeout("local_tout_transporttrolley_storeTheCharge"))   
 					transition(edgeName="t018",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
-				state("askService") { //this:State
+				state("chargeDeposited") { //this:State
 					action { //it:State
-						request("chargedeposited", "chargedeposited(_)" ,"coldstorageservice" )  
+						CommUtils.outmagenta("$name | terminato deposito. Aspetto istruzioni")
+						updateResourceRep( "deposited"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t019",targetState="moveToIndoor",cond=whenReply("more"))
-					transition(edgeName="t020",targetState="moveToHome",cond=whenReply("gohome"))
+					 transition(edgeName="t019",targetState="moveToIndoor",cond=whenRequest("gotoindoor"))
+					transition(edgeName="t020",targetState="moveToHome",cond=whenDispatch("gohome"))
 				}	 
 				state("moveToHome") { //this:State
 					action { //it:State
@@ -164,7 +167,6 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 						)
 						CommUtils.outmagenta("$name | trolley at HOME")
 						forward("setdirection", "dir(down)" ,"basicrobot" ) 
-						delay(500) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

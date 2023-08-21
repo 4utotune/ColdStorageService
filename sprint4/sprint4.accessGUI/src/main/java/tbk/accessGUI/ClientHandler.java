@@ -62,7 +62,7 @@ public class ClientHandler extends AbstractWebSocketHandler {
         }
     }
 
-    protected void sendToClient(String message, String requestId) {
+    protected void sendToClient(String message, String requestId, Boolean requestComplete) {
         System.out.println("CL | Sending to client " + message);
         WebSocketSession session = this.pendingRequests.get(requestId);
         try {
@@ -70,7 +70,9 @@ public class ClientHandler extends AbstractWebSocketHandler {
         } catch (Exception e) {
             System.out.println("CL | There was an error while sending the response " + message + " to " + session);
         }
-        this.pendingRequests.remove(requestId);
+        if (requestComplete) {
+            this.pendingRequests.remove(requestId);
+        }
     }
 
     protected String newRequest(WebSocketSession session) {

@@ -36,7 +36,6 @@ class Warningdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 				}	 
 				state("work") { //this:State
 					action { //it:State
-						CommUtils.outblue("$name | attendo update")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

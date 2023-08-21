@@ -30,7 +30,9 @@ with Diagram('coldstorageservice_sprint4Arch', show=False, outformat='png', grap
           datacleaner=Custom('datacleaner(coded)','./qakicons/codedQActor.png')
           distancefilter=Custom('distancefilter(coded)','./qakicons/codedQActor.png')
           ledMQTTSender=Custom('ledMQTTSender(coded)','./qakicons/codedQActor.png')
-     coldstorageservice >> Edge(color='blue', style='solid', xlabel='gotoindoor', fontcolor='blue') >> transporttrolley
+     transporttrolley >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> coldstorageservice
+     coldstorageservice >> Edge(color='magenta', style='solid', xlabel='gotoindoor', fontcolor='magenta') >> transporttrolley
+     coldstorageservice >> Edge(color='blue', style='solid', xlabel='gohome', fontcolor='blue') >> transporttrolley
      sys >> Edge(color='red', style='dashed', xlabel='obstacle', fontcolor='red') >> alarmdevice
      alarmdevice >> Edge( xlabel='alarm', **eventedgeattr, fontcolor='red') >> sys
      sys >> Edge(color='red', style='dashed', xlabel='obstaclefree', fontcolor='red') >> alarmdevice
@@ -42,8 +44,6 @@ with Diagram('coldstorageservice_sprint4Arch', show=False, outformat='png', grap
      transporttrolley >> Edge(color='magenta', style='solid', xlabel='engage', fontcolor='magenta') >> basicrobot
      sys >> Edge(color='red', style='dashed', xlabel='alarm', fontcolor='red') >> transporttrolley
      transporttrolley >> Edge(color='magenta', style='solid', xlabel='moverobot', fontcolor='magenta') >> basicrobot
-     transporttrolley >> Edge(color='blue', style='solid', xlabel='chargetaken', fontcolor='blue') >> coldstorageservice
-     transporttrolley >> Edge(color='magenta', style='solid', xlabel='chargedeposited', fontcolor='magenta') >> coldstorageservice
      transporttrolley >> Edge(color='blue', style='solid', xlabel='setdirection', fontcolor='blue') >> basicrobot
      sys >> Edge(color='red', style='dashed', xlabel='resume', fontcolor='red') >> transporttrolley
      transporttrolley >> Edge(color='blue', style='solid', xlabel='disengage', fontcolor='blue') >> basicrobot

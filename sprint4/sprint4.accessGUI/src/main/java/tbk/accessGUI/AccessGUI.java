@@ -2,7 +2,9 @@ package tbk.accessGUI;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,6 +15,8 @@ public class AccessGUI {
     private Float CurrentWeight = 0f;
     private Float ReservedWeight = 0f;
     private Float MaxWeight = 0f;
+
+    private final Map<String, String> waitingTickets = new HashMap<>();
 
     public AccessGUI(ClientHandler clientHandler) {
         this.clientHandler = clientHandler;
@@ -26,20 +30,28 @@ public class AccessGUI {
     }
 
     public void responseFromActor(String msg, String requestId) {
+        String value = extractFromMsg(msg);
         if (requestId.equals("")) {
-            updateWeight(msg);
-            updateMsg();
+            if (msg.contains("chargetaken")) {
+                requestId = waitingTickets.remove(value);
+                if (requestId != null) {
+                    chargetakenMsg(requestId);
+                }
+            } else if (msg.contains("weight")) {
+                updateWeight(value);
+                updateMsg();
+            }
         } else {
-            String value = extractFromMsg(msg);
             if (!value.equals("")) {
                 if (msg.contains("storeaccepted")) {
                     ticketMsg(value, requestId);
                 } else if (msg.contains("storerejected")) {
                     errorMsg("storerejected/" + value, requestId);
-                } else if (msg.contains("chargetaken")) {
-                    notifyMsg("chargetaken", requestId);
+                } else if (msg.contains("ticketaccepted")) {
+                    notifyMsg("ticketaccepted/" + value, requestId);
                 } else if (msg.contains("ticketrejected")) {
                     errorMsg("ticketrejected/" + value, requestId);
+                    waitingTickets.remove(ticketAssociatedWithRequest(requestId));
                 }
             }
         }
@@ -75,15 +87,19 @@ public class AccessGUI {
     }
 
     private void ticketMsg(String ticket, String requestId) {
-        this.clientHandler.sendToClient("ticket/" + ticket, requestId);
+        this.clientHandler.sendToClient("ticket/" + ticket, requestId, true);
     }
 
     private void notifyMsg(String message, String requestId) {
-        this.clientHandler.sendToClient("notify/" + message, requestId);
+        this.clientHandler.sendToClient("notify/" + message, requestId, false);
+    }
+
+    private void chargetakenMsg(String requestId) {
+        this.clientHandler.sendToClient("chargetaken", requestId, true);
     }
 
     private void errorMsg(String error, String requestId) {
-        this.clientHandler.sendToClient("error/" + error, requestId);
+        this.clientHandler.sendToClient("error/" + error, requestId, true);
     }
 
     public void clientRequest(String msg, String requestId) {
@@ -96,6 +112,7 @@ public class AccessGUI {
                 storerequest(payload, requestId);
                 break;
             case "insertticket":
+                waitingTickets.put(payload, requestId);
                 insertticket(payload, requestId);
                 break;
             default:
@@ -109,5 +126,14 @@ public class AccessGUI {
 
     private void insertticket(String ticket, String requestId) {
         this.actorHandler.insertticket(ticket, requestId);
+    }
+
+    private String ticketAssociatedWithRequest(String requestId) {
+        for (String ticket : waitingTickets.keySet()) {
+            if (waitingTickets.get(ticket).equals(requestId)) {
+                return waitingTickets.get(ticket);
+            }
+        }
+        return "";
     }
 }
