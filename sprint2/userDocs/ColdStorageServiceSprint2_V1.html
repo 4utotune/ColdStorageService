@@ -270,10 +270,10 @@
         Per quanto riguarda il dialogo con la ServiceAccessGUI, rendendo quest'ultimo un Observer del Service possiamo
         aggiornare in maniera agevole l'informazione relativa al peso.
 
-        <h3>Proxy ServiceAccessGUI (valutare se cambiare nome)</h3>
-        L'architettura logica del sistema vedrà l'introduzione di un attore non precedentemente citato: un componente
-        che si comporti da proxy per qualunque scelta tecnica venga presa in merito alla realizzazione della GUI.
-        Questo attore si dovrà porre tra il ColdStorageService e la GUI vera e propria gestendo la comunicazione da
+        <h3>ServiceAccessGUI</h3>
+        L'architettura logica del sistema vedrà l'introduzione di un componente
+        che si comporti da intermediario per qualunque scelta tecnica venga presa in merito alla realizzazione della GUI.
+        Questo componente si dovrà porre tra il ColdStorageService e la GUI vera e propria gestendo la comunicazione da
         entrambi i lati, diventando un ponte tra le tecnologie: da una parte il sistema QaK e dall'altro il server che
         gestirà i client ServiceAccess. L'utilità di questo componente sta quindi nell'adattare il modello a stati e a
         scambio di messaggi, utilizzato sinora, alla comunicazione con un server esterno e potenzialmente estraneo a
@@ -287,10 +287,8 @@
         <h3>Interazioni</h3>
         Le interazioni precedentemente definite nello Sprint1 trovano riscontro anche in questo Sprint2, con poche
         differenze:<ul>
-            <li>Le interazioni storerequest e insertticket vengono rinominate rispettivamente proxy_storerequest e
-                proxy_insertticket, per sottolineare l'attore di provenienza e non confondersi con le richieste che
-                proverranno invece dalla GUI vera e propria.</li>
-            <li>L'interazione coldroomdata viene rinominata coapUpdate, in quanto la ServiceAccessGui Proxy sarà un
+            <li>Vengono mantenute le interazioni storerequest e insertticket, come richiesto dai requisiti del committente</li>
+            <li>L'interazione coldroomdata viene rinominata coapUpdate, in quanto la ServiceAccessGui sarà un
                 observer di ColdStorageService.</li>
         </ul>
 
@@ -340,9 +338,9 @@
                 </tr>
                 <tr>
                     <td>Store Request</td>
-                    <td>ServiceAccessGui_Proxy<br>ColdStorageService</td>
+                    <td>ServiceAccessGui<br>ColdStorageService</td>
                     <td>Viene inviata una serie di messaggi contententi diverse richieste di storage a
-                        ServiceAccessGui_Proxy,
+                        ServiceAccessGui,
                         che interagirà di conseguenza con ColdStorageService per confermarle o rifiutarle.<br>
                     </td>
                     <td>
@@ -355,9 +353,9 @@
                 </tr>
                 <tr>
                     <td>Insert Ticket</td>
-                    <td>ServiceAccessGui_Proxy<br>ColdStorageService</td>
+                    <td>ServiceAccessGui<br>ColdStorageService</td>
                     <td>Viene inviata una serie di messaggi contententi diverse richieste di inserimento ticket a
-                        ServiceAccessGui_Proxy, che interagirà di conseguenza con ColdStorageService per confermarle o
+                        ServiceAccessGui, che interagirà di conseguenza con ColdStorageService per confermarle o
                         rifiutarle.</td>
                     <td>
                         <ul>
@@ -373,12 +371,12 @@
                 </tr>
                 <tr>
                     <td>Aggiornamento stato ColdRoom</td>
-                    <td>ServiceAccessGui_Proxy<br>ColdStorageService</td>
-                    <td>La ServiceAccessGui_Proxy deve ricevere gli aggiornamenti di peso da ColdStorageService</td>
+                    <td>ServiceAccessGui<br>ColdStorageService</td>
+                    <td>La ServiceAccessGui deve ricevere gli aggiornamenti di peso da ColdStorageService</td>
                     <td>Richiesta di storage per N kg seguita da inserimento ticket entro tempo di timeout -> ricezione
-                        update con
+                        coapupdate con
                         peso prenotato pari a N. Dopo un certo numero di secondi (a operazioni di scarico concluse),
-                        ricezione update con peso
+                        ricezione coapupdate con peso
                         prenotato pari a 0 e reale pari a N.</td>
                 </tr>
             </tbody>
@@ -388,19 +386,19 @@
         Il servizio andrà testato dal punto di vista dell'utente finale, il Truck Driver, provando che gli stessi test
         descritti nella sezione precedente continuino a essere validi anche se ogni richiesta è effettuata tramite GUI.
 
-        <h2>Project (da inserire codice?)</h2>
-        Per realizzare la ServiceAccessGUI scegliamo come tecnologia Spring, in quanto la software house ne ha già
+        <h2>Project</h2>
+        Per realizzare la ServiceAccessGUI scegliamo come tecnologia Spring, in quanto la Software House ne ha già
         esperienza. Questo framework necessita di pochi componenti per funzionare e mantiene la comunicazione tra client
         e server mediante Websocket.<br>
         Delineiamo due tipi diversi di connessioni: quelle tra Client e Server Spring e quelle tra il Server Spring e
-        ColdStorageService (tramite il componente Proxy).<br>
+        ColdStorageService.<br>
         Le classi che ci serviranno saranno quindi:<ul>
             <li><b>Application</b>, il main del programma che istruirà Spring di avviare l'applicazione</li>
             <li><b>WebSocketConfiguration</b>, dove definiremo due tipi di Handler: Client (comunicazione C/S) e Actor
                 (comunicazione Server/QaK)</li>
             <li><b>ClientHandler</b>, che manterrà le sessioni con i Client connessi, intercettando le richieste e
                 inoltrando le risposte</li>
-            <li><b>ActorHandler</b>, che scambierà messaggi con il Proxy della GUI nel contesto del ColdStorageService
+            <li><b>ActorHandler</b>, che scambierà messaggi con il ColdStorageService
             </li>
             <li><b>Controller</b>, che gestirà le pagine web mostrate ai client (path degli url, eventuali variabili,
                 etc...)</li>
@@ -412,23 +410,23 @@
         <center>
             <div class="piccola"><img src="sprint2/QakSpring.png"></div>
         </center>
-        Lo scambio di messaggi sia tra i componenti della GUI che con il Proxy avverrà sempre con dispatch. In questo
+        Lo scambio di messaggi sia tra i componenti della GUI che con il ColdStorageService avverrà sempre con dispatch. In questo
         modo, non avremo richieste bloccanti e il sistema risulterà più permissivo. Ciò vuol però dire che è necessario
         associare ai messaggi anche un identificativo di chi effettua la richiesta, in maniera tale da fornire la
-        risposta solo al client giusto. Questa informazione dovrà arrivare al Proxy, che invece gestisce Storerequest e
+        risposta solo al client giusto. Questa informazione dovrà arrivare al ColdStorageService, che invece gestisce i messaggi di Storerequest e
         Insertticket come Request-Reply.<br>
         A ogni richiesta effettuata dai Client verrà abbinato un RequestId, a sua volta associato alla sessione di
         pertinenza.
         <br><br>
-        Il server Spring non è un Attore QaK, quindi la comunicazione con l'attore Proxy deve avvenire in maniera
-        diversa dal solito. Una connessione tramite WebSocket è creata dal Proxy al Server, mentre una normale
-        connessione TCP dal Server al Proxy.<br>
-        Il Proxy manderà al Server i messaggi nella forma <i>tipo</i><b>/</b><i>contenuto</i>[<b>/</b><i>id
+        Il server <b>Spring</b> non è un Attore QaK, quindi la comunicazione con l'attore ColdStorageService deve avvenire in maniera
+        diversa dal solito. Una connessione tramite WebSocket è creata dal ColdStorageService al Server, mentre una normale
+        connessione TCP dal Server al ColdStorageService.<br>
+        Il ColdStorageService manderà al Server i messaggi nella forma <i>tipo</i><b>/</b><i>contenuto</i>[<b>/</b><i>id
             richiesta</i>]. Questo modello viene scelto anche per la comunicazione tra Server e Client. <br>
-        Il Server invierà invece i suoi messaggi al Proxy con la stessa semantica propria del modello QaK.
+        Il Server invierà invece i suoi messaggi al ColdStorageService con la stessa semantica propria del modello QaK.
         <br><br>
         Per quanto riguarda l'interfaccia, un semplice prototipo mostrerà i campi di input, una finestra per i messaggi
-        e un componente per visualizzare lo stato della ColdRoom:
+        ed un componente per visualizzare lo stato della ColdRoom:
         <center>
             <div class="piccola"><img src="sprint2/interfaccia.png"></div>
         </center>
@@ -449,7 +447,7 @@
         <div class="remark">
             Gli output dello Sprint2 sono:<br>
             <ul>
-                <li>ServiceAccessGUI, composta da Attore Proxy (Proxy?) e Applicazione Spring</li>
+                <li>Una ServiceAccessGUI operativa e funzionante</li>
                 <li>Versione aggiornata ColdStorageService</li>
                 <li>MockTransportTrolley</li>
             </ul>
