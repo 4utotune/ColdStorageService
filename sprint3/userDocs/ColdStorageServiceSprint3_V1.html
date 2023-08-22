@@ -18,7 +18,9 @@
 
     <div class="body">
         <h2>Introduction</h2>
-        Lo <b>Sprint3</b> è il naturale proseguo di quanto realizzato nello Sprint2.
+        Considerando sufficiente per adesso il lavoro svolto sul componente ServiceAccessGUI presentato nello Sprint2,
+        lo <b>Sprint3</b> si impegna a soddisfare gli <b>Alarm Requirements</b>, introducendo i componenti <b>Alarm
+            Device</b> e <b>Warning Device</b>.
 
         <h2>Requirements</h2>
 
@@ -31,8 +33,10 @@
                 <li>Identificare ed analizzare tutti i problemi relativi ai requisiti che coinvolgono la
                     <b>Alarm Device</b> e il <b>Warning Device</b>
                 </li>
-                <li>Integrare al sistema realizzato nello Sprint2 la <b>Alarm Device</b> e il <b>Warning Device</b>, soddisfando gli <u>Alarm Requirements</u></li>
-                <li>Sviluppare il software ed eseguirlo su una scheda Raspberry Pi con i componenti hardware collegati
+                <li>Integrare al sistema realizzato nello Sprint2 la <b>Alarm Device</b> e il <b>Warning Device</b>,
+                    verificando che soddisfino gli <u>Alarm Requirements</u></li>
+                <li>Sviluppare il software da collocare sulla scheda Raspberry Pi con i componenti hardware collegati
+                    (sonar e led)
                 </li>
                 <li>Testare il sistema</li>
             </ol>
@@ -60,7 +64,7 @@
             <li>un <b>Led</b></li>
             <li>un <b>Sonar</b></li>
             <li>una scheda <b>Raspberry Pi</b> che identificherà il nodo computazionale dei due device</li>
-            <li>cavetti jumper femmina-femmina per permettere i collegamenti tra <b>Sonar</b>,<b>Led</b> e
+            <li>cavetti jumper femmina-femmina per permettere i collegamenti tra <b>Sonar</b>, <b>Led</b> e
                 <b>Raspberry Pi</b>
             </li>
         </ul>
@@ -87,14 +91,16 @@
         sè ed un ostacolo posto di fronte.
         Quando il <b>Sonar</b> rileva una distanza minore di una soglia <b>DLIMT</b> il <b>Transport Trolley</b> deve
         essere fermato, fino a che non viene rilevata una distanza maggiore a <b>DLIMT</b>.<br>
-        <div class="remark keypoint">Il <b>Transport Trolley</b> si deve fermare quando il <b>sonar rileva una distanza minore di 
-            una soglia <b>DLIMT</b>.
-        </b>
+        <div class="remark keypoint">Il <b>Transport Trolley</b> si deve fermare quando il <b>sonar rileva una distanza
+                minore di
+                una soglia <b>DLIMT</b>.
+            </b>
         </div>
         Nota importante è che il <b>Transport Trolley</b> non può essere fermato due volte consecutive entro un lasso di
         tempo pari a <b>MINT</b> millisecondi (ovvero deve intercorrere un tempo <b>MINT</b> millisecondi tra uno stop
         e quello successivo).
-        <div class="remark keypoint">Il <b>Transport Trolley</b> non può essere fermato due volte consecutive entro un lasso di
+        <div class="remark keypoint">Il <b>Transport Trolley</b> non può essere fermato due volte consecutive entro un
+            lasso di
             tempo pari a <b>MINT</b> millisecondi.
         </div>
 
@@ -108,21 +114,61 @@
             <li><b>Transport Trolley in movimento</b>: il <b>Led</b> lampeggia con un intervallo costante</li>
             <li><b>Transport Trolley è fermo</b>: il <b>Led</b> è acceso</li>
         </ul>
-        <div class="remark keypoint">Gli stati del <b>Led</b> sono tre: spento se il <b>TransportTrolley</b> è in <b>HOME</b>, acceso se 
+        <div class="remark keypoint">Gli stati del <b>Led</b> sono tre: spento se il <b>TransportTrolley</b> è in
+            <b>HOME</b>, acceso se
             fermo, lampeggiante se in movimento.
         </div>
 
         <h2>Analisi del Problema</h2>
-        <bc>Problema: cosa deve fare il <b>Transport Trolley alla resume?</b></bc><br>
-        <u>Soluzione:</u> quando il <b>Transport Trolley</b> verrà rimesso in movimento dopo uno stop, dovrà riprendere dal punto dove si era
-        fermato, concludendo correttamente la richiesta a cui stava lavorando.
+
+        <bc>Problema: come comunicare al <b>basicrobot23</b> di fermarsi?</bc><br>
+        <u>Soluzione:</u> il <b>basicrobot23</b> a nostra disposizione è già in ascolto di un evento <b>alarm</b> il cui
+        effetto è quello di
+        interrompere l'azione che stava compiendo, quindi si può utilizzare questo sistema.
+        <br><br>
+        <bc>Problema: come fermare il TransportTrolley?</bc><br>
+        L'evento alarm viene recepito direttamente dal <b>basicrobot23</b> ma bisogna occuparsi
+        comunque di inviare al <b>Transport Trolley</b> tale informazione per
+        informarlo dell'accaduto, siccome la reply del <b>moverobot(coordinate)</b> in casi di fallimento non
+        restituisce la loro causa.
+        <div class="remark keypoint">Per soddisfare gli <b>Alarm Requirements</b> l'<b>alarm device</b> emetterà un
+            <b>alarm</b>
+            per fermare direttamente il <b>transportrolley</b>
+        </div>
+        Per quanto riguarda invece la resume, quando il <b>Sonar</b> rileverà di nuovo una distanza che permetterà lo
+        sblocco del <b>Transport Trolley</b>, verrà emesso un evento che il <b>Transport Trolley</b> riceverà e si
+        impegnerà a sbloccare il robot dall'operazione su cui si era fermato, riprendendo così la sua routine.
+        <div class="remark keypoint">L'<b>alarm device</b> emetterà un evento <b>resume</b>, ed il
+            <b>TransportTrolley</b> si impegnerà a riattivare il robot.
+        </div>
+        <br>
+        <bc>Problema: cosa deve fare il <b>Transport Trolley terminato un allarme?</b></bc><br>
+        <u>Soluzione:</u> quando il <b>Transport Trolley</b> verrà rimesso in movimento dopo uno stop, dovrà riprendere
+        dal punto dove si era fermato, concludendo correttamente la richiesta a cui stava lavorando.
         <div class="remark keypoint">Il <b>Transport Trolley</b> fermato per via della soglia violata tornerà a svolgere
             il compito su cui stava lavorando una volta conclusosi l'allarme.
         </div>
-
+        <br>
+        <bc>Problema: come far tornare il <b>TransportTrolley</b> a svolgere il compito che stava facendo all'arrivo
+            dello stop?</bc><br>
+        Dato che il <b>Transport Trolley</b> comunica con <b>basicrobot23</b> tramite il solo comando
+        <b>moverobot(coordinate)</b>, la
+        risoluzione della casisitica risulta agevolata: quando il <b>Transport Trolley</b> viene fermato da un
+        <b>alarm</b> per
+        riprendere ciò che stava facendo è sufficiente ripetere
+        lo stesso comando <b>moverobot(coordinate)</b> che non era andato a buon fine per via dell'evento straordinario.
+        Questo è dovuto dal fatto che indipendentemente dalla
+        posizione del <b>Transport Trolley</b>, comunicando a questo ultimo <b>moverobot(coordinate)</b> il risultato
+        sarà il medesimo, ovvero raggiungere la posizione richiesta.
+        <div class="remark keypoint">Per continuare il compito che il <b>TransportTrolley</b> aveva lasciato in sospeso
+            per via dello stop è necessario ripetere l'ultimo comando (quello non andato a buon fine).
+        </div>
+        <br>
         <bc>Problema: quando bisogna far partire il conteggio di <b>MINT</b>?</bc><br>
-        <u>Soluzione:</u> leggendo con attenzione il <a target="_blank" href="http://calendar.altervista.org/TemaFinale23.pdf">Tema
-            Finale</a> il <b>Transport Trolley</b> una volta ripresa l'esecuzione a seguito di uno stop può subirne un altro solo dopo
+        <u>Soluzione:</u> leggendo con attenzione il <a target="_blank"
+            href="http://calendar.altervista.org/TemaFinale23.pdf">Tema
+            Finale</a> il <b>Transport Trolley</b> una volta ripresa l'esecuzione a seguito di uno stop può subirne un
+        altro solo dopo
         <b>MINT</b> millisecondi dalla ultima <b>resume</b>. Si possono presentare 3 scenari:
         <ol>
             <li>Arriva uno stop <u>dopo</u> <b>MINT</b> millisecondi e il <b>Transport Trolley</b> è in movimento</li>
@@ -130,85 +176,29 @@
             </li>
             <li>Arriva uno stop e il <b>Transport Trolley</b> è ancora fermo dallo stop precedente</li>
         </ol>
-        Solo nel primo scenario il <b>TransportTrolley</b> seguirà il comportamento previsto. Negli scenari 2 e 3 l'evento di
-        Stop andrà ignorato.
+        Solo nel primo scenario il <b>TransportTrolley</b> seguirà il comportamento previsto. Negli scenari 2 e 3
+        l'evento di Stop andrà ignorato.
         <center>
             <div class="piccola">
                 <img src="sprint3/diagrammaeventi.png" alt="architettura logica">
             </div>
         </center>
-
-        <div class="remark keypoint">Il <b>TransportTrolley</b> non si può fermare prima di <b>MINT</b> millisecondi dall'ultima resume.
+        <div class="remark keypoint">Il <b>TransportTrolley</b> non si può fermare prima di <b>MINT</b> millisecondi
+            dall'ultima resume.
         </div>
-
-        <bc>Problema: come comunicare al <b>basicrobot23</b> di fermarsi?</bc><br>
-        <u>Soluzione:</u> il <b>basicrobot23</b> è in ascolto di un evento <b>alarm</b> il quale effetto è quello di interrompere l'azione 
-        che stava compiendo, quindi si utilizza quello.<br><br>
-
-        <bc>Problema: come far tornare il <b>TransportTrolley</b> a svolgere il compito che stava facendo all'arrivo dello stop?</bc><br>
-        Dato che il <b>Transport Trolley</b> comunica con <b>basicrobot23</b> tramite il solo comando
-        <b>moverobot(coordinate)</b>, la
-        risoluzione della casisitica risulta agevolata: quando il <b>Transport Trolley</b> viene fermato da un <b>alarm</b> per
-        riprendere ciò che stava facendo è sufficiente ripetere
-        lo stesso comando <b>moverobot(coordinate)</b> che non era andato a buon fine per via dell'evento straordinario.
-        Questo è dovuto dal fatto che indipendentemente dalla
-        posizione del <b>Transport Trolley</b>, comunicando a questo ultimo <b>moverobot(coordinate)</b> il risultato
-        sarà il medesimo, ovvero raggiungere tale posizione richiesta.
-        <div class="remark keypoint">Per continuare il compito che il <b>TransportTrolley</b> aveva lasciato in sospeso per via dello stop è necessario
-            ripetere l'ultimo comando non andato a buon fine.
-        </div>
-
-
-        <h5>Nota importante:</h5>
-        L'evento alarm viene recepito direttamente dal <b>basicrobot23</b> ma bisogna occuparsi
-        comunque di inviare al <b>Transport Trolley</b> tale informazione per
-        informarlo dell'accaduto, siccome la reply del <b>moverobot(coordinate)</b> in casi di fallimento non
-        restituisce la loro causa.
-        <div class="remark keypoint">Per gli <b>Alarm Requirements</b> l'<b>alarm device</b> emetterà un <b>alarm</b> per fermare direttamente il <b>transportrolley</b>
-        </div>
-        Per quanto riguarda invece la resume: il <b>Sonar</b> quando rileverà di nuovo una distanza che permetterà lo
-        sblocco del <b>Transport Trolley</b> verrà emesso
-        un evento che il <b>Transport Trolley</b> riceverà e si impegnerà a risbloccare il robot dall'operazione su cui si
-        era fermato, riprendendo così la sua routine.
-        <div class="remark keypoint">L'<b>alarm device</b> emetterà un evento <b>resume</b>, ed il <b>TransportTrolley</b>
-            si impegnerà a riattivare il robot.
-        </div>
-
-        <h5>|</h5>
-
+        <br>
         <bc>Problema: chi si occupa di gestire il <b>Led</b>?</bc><br>
-        Si adotta il <b>pattern Observer</b> che permette al <b>Led</b> di venire notificato ogni volta che un cambio di stato del <b>TransportTrolley</b>
-         a lui interessante succede. Il <b>warning device</b> implementa la logica di gestione. Il <b>led</b> deve considerare anche quando
-        il robot è fermo perché sta caricando/scaricando il carico.
-        <div class="remark keypoint">Il <b>warning device</b> viene notificato ad ogni cambiamento di stato del <b>TransportTrolley</b>.
+        Si adotta il <b>pattern Observer</b> che permette al <b>Led</b> di venire notificato ogni volta che un cambio di
+        stato del <b>TransportTrolley</b>
+        a lui interessante succede. Il <b>warning device</b> implementa la logica di gestione. Il <b>led</b> deve
+        considerare anche quando il robot è fermo perché sta caricando/scaricando il carico.
+        <div class="remark keypoint">Il <b>warning device</b> viene notificato ad ogni cambiamento di stato del
+            <b>TransportTrolley</b>.
         </div>
-
         <br>
-        [QUANTO RIPORTATO IN SEGUITO LO ELIMINEREI]
-        Utilizzando coap come protocollo di invio messaggi per il nostro
-        <b>pattern Observer</b>, siccome facente parte integrante del QAK, c'è il rischio remoto che qualche messaggio
-        vada perso dato che si utilizza il protocollo di trasporto
-        UDP. Non si valuta questo problema come critico in quanto la perdita di notifica di uno stato comprometterebbe
-        il comportamento del <b>led</b> solo per breve tempo(indicativamente 3 secondi data la stanza presa in analisi),
-        cioè fino
-        a quando non viene ricevuta un altra notifica.
-        <br>
-        <br>
-        [LA SEGUENTE PARTE INVECE NON SO SE DEBBA NADARE IN PROJECT]
-        Si utilizzi MQTT per inviare gli eventi tra il servzio ed il <b>led</b> e <b>sonar</b>.
-        <br>La scelta di emettere un evento con MQTT è motivata
-        dal pensiero lungimirante, a favore dell'estendibilità, di avere in futuro molteplici <b>Transport Trolley</b> e
-        dal fatto che la nostra software house sia già in possesso di materiale utilizzabile per questo scopo tramite il
-        protocollo <a href="https://mqtt.org/">MQTT</a>. Trattasi di un protocollo adatto per contesti IoT dove sono
-        coinvolti sensori, attuatori
-        e microcontrollori di potenza ridotta. Così facendo si fa in modo che il <b>Raspberry</b> invii esternamente
-        tutti i valori che rileva; sarà il <b>ColdStorageService</b> a sfoltirli ed elaborarli, evitando di appesantire
-        il <b>Raspberry</b> con ulteriori operazioni.
-        <div class="remark keypoint"><b>Led</b> e <b>sonar</b> comunicano tramite il protocollo <b>MQTT</b>
-        </div>
-        <br><br>
         <bc>Problema: come gestire gli invii al <b>led</b>?</bc><br>
-        La comunicazione verso il <b>Raspberry</b> avviene tramite protocollo MQTT, seguendo la seguente catena di attori:
+        La comunicazione verso il <b>Raspberry</b> avviene tramite protocollo MQTT, seguendo la seguente catena di
+        attori:
         <ul>
             <li><b>Warning Device</b>, che osserva cambiamenti nel TransportTrolley </li>
             <li><b>LedMQTTSender</b>, che invia i comandi al Raspberry</li>
@@ -229,13 +219,11 @@
         Questi attori messi assieme adottano il <b>pattern pipeline</b>, dove l'attore successivo consuma l'output di
         quello precedente.
         <div class="remark keypoint">Gestione delle misurazioni <b>sonar</b> ripartita tra cinque attori</div>
-        <br><br>
-        
-        
+        <br>
 
         <h3>Sonar Simulator</h3>
-        Ai fini di test per il momento si può adottare un <b>sonar</b> simulatore che genera misurazioni prestabilite, per poi
-        successivamente passare a un <b>sonar</b> fisico.
+        Ai fini di test per il momento si può adottare un <b>sonar</b> simulatore che genera misurazioni prestabilite,
+        per poi successivamente passare a un <b>sonar</b> fisico.
 
         <h3>Interazioni</h3>
         <table id="myTable">
@@ -255,7 +243,8 @@
                     <td>warning device</td>
                     <td>Dispatch</td>
                     <td>Informa il <b>warning device</b> dello stato che il
-                        <b>led</b> deve assumere adottando il <b>pattern Observer</b>. Semantica <u>Dispatch</u> per via del fatto che 
+                        <b>led</b> deve assumere adottando il <b>pattern Observer</b>. Semantica <u>Dispatch</u> per via
+                        del fatto che
                         si adotta un pattern Observer.
                     </td>
                 </tr>
@@ -265,7 +254,8 @@
                     <td>transportrolley <br> basicrobot
                     </td>
                     <td>Event</td>
-                    <td>Informa chi è interessato che il DDR Robot si deve fermare. Semantica <u>Event</u> perchè<b>########</b></td>
+                    <td>Informa chi è interessato che il DDR Robot si deve fermare. Semantica <u>Event</u>
+                        perchè<b>########</b></td>
                 </tr>
 
                 <tr>
@@ -276,7 +266,7 @@
                     <td>Parte della pipeline dei gestori delle misurazioni del
                         <b>sonar</b>, che in questo caso notifica ad <b>alarmdevice</b> che la distanza misurata è
                         inferiore alla
-                        soglia prestabilita <b>DLIMT</b>.  Semantica <u>Event</u> perchè<b>########</b>
+                        soglia prestabilita <b>DLIMT</b>. Semantica <u>Event</u> perchè<b>########</b>
                     </td>
                 </tr>
                 <tr>
@@ -287,7 +277,7 @@
                     <td>Parte della pipeline dei gestori delle misurazioni del
                         <b>sonar</b> che in questo caso notifica ad <b>alarmdevice</b> che la distanza misurata è
                         superiore alla
-                        soglia prestabilita <b>DLIMT</b>.  Semantica <u>Event</u> perchè<b>########</b>
+                        soglia prestabilita <b>DLIMT</b>. Semantica <u>Event</u> perchè<b>########</b>
                     </td>
                 </tr>
 
@@ -296,15 +286,16 @@
                     <td>alarm device</td>
                     <td>transportrolley</td>
                     <td>Event</td>
-                    <td>Il <b>transportrolley</b> riceve istruzione di far ripartire il robot.  Semantica <u>Event</u> perchè<b>########</b></td>
+                    <td>Il <b>transportrolley</b> riceve istruzione di far ripartire il robot. Semantica <u>Event</u>
+                        perchè<b>########</b></td>
                 </tr>
             </tbody>
         </table>
 
         <h3>Architettura logica</h3>
-       <b> MANCA IL FILE SOTTO</b>
+        <b> MANCA IL FILE SOTTO</b>
         <div class="remark">
-            Codice QAK per la modellazione del sistema: <a href="./sprint3.coldstorageservice/src/SonarLed.qak"
+            Codice QAK per la modellazione del sistema: <a href="../sprint3.coldstorageservice/src/ColdStorageService.qak"
                 target="_blank">SonarLed.qak</a>
         </div>
 
@@ -364,17 +355,31 @@
         </table>
 
         <h2>Project</h2>
-        
+
+        Per inviare gli eventi tra il servizio ed il <b>led</b> e <b>sonar</b> si sceglie di utilizzare il protocollo
+        MQTT.
+        <br>Questa scelta è motivata dal pensiero lungimirante e a favore dell'estendibilità di permettere in futuro
+        molteplici <b>Transport Trolley</b>: i dati dovrebbero in quel caso essere a disposizione di più entità. La
+        nostra software house è già in possesso di materiale utilizzabile per questo scopo, proprio tramite il
+        protocollo <a href="https://mqtt.org/">MQTT</a>. Trattasi di un protocollo
+        adatto per contesti IoT dove sono coinvolti sensori, attuatori e microcontrollori di potenza ridotta.
+        <br>La strategia è fare sì che il <b>Raspberry</b> invii esternamente tutti i valori che rileva; sarà il
+        <b>ColdStorageService</b> a sfoltirli ed elaborarli, evitando di appesantire il <b>Raspberry</b> con ulteriori
+        operazioni.
+        <br><br>
         Siccome nell'analisi del problema si è utilizzato un simulatore del <b>sonar</b> per creare il QAK, il passo
-        successivo è quello di integrarne uno fisico. Per fare ciò si adotta un broker gratuito e a disposizione di
-        tutti come <u>tcp://mqtt.eclipseprojects.io</u> che permette l'invio e la ricezione di eventi tra dispositivi
-        fisicamente non collegati ma connessi alla rete internet.<br>
+        successivo è quello di integrarne uno fisico. Per fare ciò per il momento adottiamo un broker gratuito e a
+        disposizione di tutti come <u>tcp://mqtt.eclipseprojects.io</u> che permette l'invio e la ricezione di eventi
+        tra dispositivi fisicamente non collegati ma connessi alla rete internet. In futuro si potrà decidere di passare
+        a un broker privato.<br>
         Per comunicare dati utilizzando <b>MQTT</b> bisogna definire un topic che definisce il canale di utilizzo, utile
         per distinguere categorie di eventi che vogliamo raggruppare.
         Nel nostro caso si è adottato <b>unibo/sonar/events</b> come topic per comunicare i dati
-        dal <b>Raspberry</b> al Servizio. 
+        dal <b>Raspberry</b> al Servizio.
         <div class="remark keypoint">Topic MQTT per il <b>sonar</b>: <b>unibo/sonar/events</b>
-        </div>Prima di essere considerati da <b>ColdStorageService</b>, vengono filtrati da:
+        </div>
+        <br>
+        Prima di essere considerati da <b>ColdStorageService</b>, i dati vengono filtrati da:
         <ul>
             <li><b>SonarMQTTReceiver</b>: si impegna a ricevere i dati "grezzi" del <b>sonar</b> tramite MQTT e poi
                 propaga l'evento all'interno del contesto ctx_coldstorage</li>
@@ -385,15 +390,15 @@
                 oppure maggiori
             </li>
         </ul>
-        Per finire la catena: gli eventi <b>obstacle</b> e <b>obstaclefree</b> sono captabili da <b>alarm device</b> e,
-        qualora le condizioni riguardanti il tempo <b>MINT</b> tra uno stop e l'altro siano soddisfatte, emette un
+        Per completare la catena: gli eventi <b>obstacle</b> e <b>obstaclefree</b> sono captabili da <b>alarm device</b>
+        e, qualora le condizioni riguardanti il tempo <b>MINT</b> tra uno stop e l'altro siano soddisfatte, emette un
         evento alarm che verrà ricevuto sia da <b>basicrobot23</b> sia dal <b>Transport Trolley</b>.
         <br><br>
         Anche per comunicare con il <b>led</b> si utilizza MQTT, mandando un messaggio con l'ausilio dell'attore
         <b>LedMQTTSender</b> ed utilizzando <b>unibo/led/events</b> come topic.
         <div class="remark keypoint">Topic MQTT per il <b>led</b>: <b>unibo/led/events</b>
         </div>
-        <br><br>
+        <br>
         Per la fase di prototipazione il <b>sonar</b> e <b>led</b> saranno collegati ad un <b>Raspberry</b> tramite dei
         cavetti jumper femmina-femmina.
         <br>
@@ -420,7 +425,7 @@
         livello.
         <div class="remark keypoint">Per i programmi da eseguire su <b>Raspberry</b> si adotta <b>Python</b>
         </div>
-        <br><br>
+        <br>
         I pin del <b>Raspberry</b> coinvolti sono:
         <ul>
             <li><b>GPIO 4</b>: pin TRIG sonar</li>
