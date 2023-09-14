@@ -128,14 +128,17 @@
         <div class="remark keypoint">La <b>ServiceAccessGUI</b> deve essere fornita di due campi di input per effettuare
             le richieste e uno spazio dove mostrare le informazioni relative alla Coldroom</div>
 
-        <bc>Problema: Come si garantisce un riscontro dal Servizio, per comprendere che le richieste vadano o meno a buon fine?</bc>
+        <bc>Problema: Come si garantisce un riscontro dal Servizio, per comprendere che le richieste vadano o meno a
+            buon fine?</bc>
         <br>
         <u>Soluzione:</u>
         Per avere un riscontro dal Servizio se le richieste vanno o meno a buon fine, è necessario che i messaggi
         inviati da ColdStorageService vengano visualizzati a schermo, opportunamente filtrati e formattati per mostrare
         solo informazioni utili agli utenti finali.
-        <div class="remark keypoint">La <b>ServiceAccessGUI</b> deve consentire all'utente finale di comprendere se la richiesta effettuata sia andata o meno a buon fine, mostrando solo le informazioni strettamente necessarie</div>
-        
+        <div class="remark keypoint">La <b>ServiceAccessGUI</b> deve consentire all'utente finale di comprendere se la
+            richiesta effettuata sia andata o meno a buon fine, mostrando solo le informazioni strettamente necessarie
+        </div>
+
 
         <bc>Problema: Come si interagisce con il Servizio?</bc><br>
         <u>Soluzione:</u>
@@ -181,8 +184,7 @@
         <div class="remark keypoint">La <b>ServiceAccessGUI</b> deve mostrare il peso della <b>ColdRoom</b> come somma
             del peso effettivamente presente con quello prenotato.</div>
 
-        <h5 id="strategiaticket">Nota importante:</h5>
-        <b>Politica esubero Ticket non gestiti</b>
+        <h5 id="strategiaticket">Politica esubero Ticket non gestiti</h5>
         Durante l'analisi compiuta nello Sprint1 si è deciso di permettere a un solo Truck per volta di interagire con
         il servizio, dando al massimo la possibilità di inserire il proprio Ticket quando ancora il DDR Robot sta
         completando le operazioni del precedente. Questa scelta di non gestire una coda di Truck che hanno inserito il
@@ -213,7 +215,7 @@
         cambiamento di politica di accettazione Ticket, introducendo ad esempio una coda, il costo sarebbe maggiore
         in quanto sarebbe necessaria una operazione di correzione dell'intero ColdStorageService.
 
-        <h5>Policy invio messaggi a client connessi</h5>
+        <h5>Politica invio messaggi a client connessi</h5>
         Un certo numero di Truck Driver può essere connesso al sistema nello stesso momento, ognuno con la propria
         sessione ServiceAccessGUI. Non tutte le informazioni che il Servizio manda sono di interesse per tutti i Driver.
         Ad esempio, chi effettua una richiesta di scarico vorrà essere l'unico a vedere il Ticket corrispondente, in
@@ -262,7 +264,8 @@
             </tbody>
         </table>
         <div class="remark keypoint">
-        È necessario che venga garantito l'invio al solo client interessato nel caso di informazioni "private".</div>
+            È necessario che venga garantito l'invio al solo client interessato nel caso di informazioni "private".
+        </div>
 
         <h3>ColdStorageService</h3>
         Questo componente può rimanere invariato nella logica operativa, una volta aggiornato il metodo di generazione e
@@ -272,7 +275,8 @@
 
         <h3>ServiceAccessGUI</h3>
         L'architettura logica del sistema vedrà l'introduzione di un componente
-        che si comporti da intermediario per qualunque scelta tecnica venga presa in merito alla realizzazione della GUI.
+        che si comporti da intermediario per qualunque scelta tecnica venga presa in merito alla realizzazione della
+        GUI.
         Questo componente si dovrà porre tra il ColdStorageService e la GUI vera e propria gestendo la comunicazione da
         entrambi i lati, diventando un ponte tra le tecnologie: da una parte il sistema QaK e dall'altro il server che
         gestirà i client ServiceAccess. L'utilità di questo componente sta quindi nell'adattare il modello a stati e a
@@ -287,7 +291,8 @@
         <h3>Interazioni</h3>
         Le interazioni precedentemente definite nello Sprint1 trovano riscontro anche in questo Sprint2, con poche
         differenze:<ul>
-            <li>Vengono mantenute le interazioni storerequest e insertticket, come richiesto dai requisiti del committente</li>
+            <li>Vengono mantenute le interazioni storerequest e insertticket, come richiesto dai requisiti del
+                committente</li>
             <li>L'interazione coldroomdata viene rinominata coapUpdate, in quanto la ServiceAccessGui sarà un
                 observer di ColdStorageService.</li>
         </ul>
@@ -410,16 +415,15 @@
         <center>
             <div class="piccola"><img src="sprint2/QakSpring.png"></div>
         </center>
-        Lo scambio di messaggi sia tra i componenti della GUI che con il ColdStorageService avverrà sempre con dispatch. In questo
-        modo, non avremo richieste bloccanti e il sistema risulterà più permissivo. Ciò vuol però dire che è necessario
-        associare ai messaggi anche un identificativo di chi effettua la richiesta, in maniera tale da fornire la
-        risposta solo al client giusto. Questa informazione dovrà arrivare al ColdStorageService, che invece gestisce i messaggi di Storerequest e
-        Insertticket come Request-Reply.<br>
-        A ogni richiesta effettuata dai Client verrà abbinato un RequestId, a sua volta associato alla sessione di
+        Lo scambio di messaggi tra i componenti della GUI avverrà sempre con dispatch mentre la comunicazione con il
+        ColdStorageService utilizzerà delle Request. È necessario però associare ai messaggi anche un identificativo di
+        chi effettua la richiesta, in maniera tale da fornire la risposta solo al client giusto. A ogni richiesta effettuata dai Client verrà abbinato un RequestId, a sua volta associato alla sessione di
         pertinenza.
         <br><br>
-        Il server <b>Spring</b> non è un Attore QaK, quindi la comunicazione con l'attore ColdStorageService deve avvenire in maniera
-        diversa dal solito. Una connessione tramite WebSocket è creata dal ColdStorageService al Server, mentre una normale
+        Il server <b>Spring</b> non è un Attore QaK, quindi la comunicazione con l'attore ColdStorageService deve
+        avvenire in maniera
+        diversa dal solito. Una connessione tramite WebSocket è creata dal ColdStorageService al Server, mentre una
+        normale
         connessione TCP dal Server al ColdStorageService.<br>
         Il ColdStorageService manderà al Server i messaggi nella forma <i>tipo</i><b>/</b><i>contenuto</i>[<b>/</b><i>id
             richiesta</i>]. Questo modello viene scelto anche per la comunicazione tra Server e Client. <br>

@@ -14,6 +14,12 @@ public class StatusGuiController {
     @GetMapping("/")
     public String homePage(Model model) {
         model.addAttribute("arg", appName);
+        return "interfaccia";
+    }
+
+    @GetMapping("/old")
+    public String old(Model model) {
+        model.addAttribute("arg", appName);
         return "serviceStatusGUI";
     }
 }

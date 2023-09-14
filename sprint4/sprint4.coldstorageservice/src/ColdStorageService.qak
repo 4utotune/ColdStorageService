@@ -50,7 +50,7 @@ Reply		ticketaccepted		: 	chargetaken(INFO)
 Reply		ticketrejected		: 	ticketrejected(REASON)
 
 //Observer TT -> Led
-Dispatch	coapUpdate			:	coapUpdate(SOURCE,ARG)
+Dispatch	coapUpdate			:	coapUpdate(SOURCE,ARG) // TODO: ridondante?
 
 //Sonar DistanceFilter e SonarCleaner
 Event 		sonardata 			: 	distance(D)   	// emitted  by distancefilter
@@ -359,7 +359,7 @@ QActor transporttrolley context ctx_coldstorage { // ctx_trolley {
 	
 	State loadTheCharge {
 		[# stato = "inIndoor" #]
-		forward basicrobot -m setdirection : dir(down)		
+		//forward basicrobot -m setdirection : dir(down)		
 		updateResource [# "azione(STOPPED)"#]
 		updateResource [# "stato($stato)"#]
 		println("$name | sono in INDOOR") color magenta
@@ -373,7 +373,7 @@ QActor transporttrolley context ctx_coldstorage { // ctx_trolley {
 		println("$name | vado verso la cold room") color magenta
 		updateResource [# "azione(MOVING)"#]
 		updateResource [# "stato($stato)"#]
-		request basicrobot -m moverobot: moverobot (4,3) 
+		request basicrobot -m moverobot : moverobot (4,3) 
 	}
 	Transition t0 whenReply moverobotdone -> storeTheCharge
 			      whenEvent alarm -> sonarobstacle

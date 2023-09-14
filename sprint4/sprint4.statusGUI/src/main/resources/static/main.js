@@ -12,7 +12,7 @@ function connect() {
     socket = new WebSocket(addr); // CONNESSIONE
 
     socket.onopen = function (event) {
-        addMessageToWindow("Connessione al server avvenuta con successo");
+        console.log("Connessione al server avvenuta con successo");
     };
 
     socket.onmessage = function (event) { // RICEZIONE

@@ -18,7 +18,8 @@
 
     <div class="body">
         <h2>Introduction</h2>
-        Lo <b>Sprint4</b> è il naturale proseguo di quanto realizzato nello Sprint2.
+        Lo <b>Sprint4</b> va a completare gli elementi principali del sistema individuati nello <b>Sprint0</b>,
+        introducendo la StatusGui e testando in toto il servizio.
 
         <h2>Requirements</h2>
 
@@ -26,8 +27,8 @@
             <a target="_blank" href="http://calendar.altervista.org/TemaFinale23.pdf">Descrizione del
                 TemaFinale23</a><br>
 
-            <bc>Goals Sprint 4</bc>
-            Si possono definire in seguito i goal relativi allo Sprint4:<br>
+            <bc>Goals Sprint 4</bc><br>
+            Si definiscono in seguito i goal relativi allo Sprint4, come delineati alla fine dello Sprint3:<br>
             <ol>
                 <li>Identificare ed analizzare tutti i problemi relativi ai requisiti che coinvolgono la
                     <b>ServiceStatusGUI</b>
@@ -38,28 +39,31 @@
             </ol>
         </div>
 
+        <h4>Chiarimenti del committente</h4>
+        L'interazione con il committente e altri analisti ha messo alla luce un problema: l'attesa troppo lunga tra
+        l'inserimento del Ticket da parte di un Truck Driver e la risposta di presa in carico del Transport Trolley. Per
+        affrontarla, aggiungiamo allo <b>Sprint4</b> un goal: analizzare la problematica e implementare un modo per
+        risolverla.<br>
+
         <h2>Requirement analysis</h2>
 
-        <h4>Chiarimenti del committente</h4>
-        L'interazione con il committente ha permesso di chiarire alcuni aspetti del progetto:
-        <ul>
-            <li></li>
-        </ul>
-
         <h3>Sistema</h3>
-        Questo ultimo Sprint ha come prodotto finale il sistema identificato dallo Sprint0. Nella seguente foto vengono riportati i macro-componenti del sistema complessivo:</b>:
+        Questo ultimo Sprint ha come prodotto finale il sistema identificato dallo Sprint0. Nella seguente foto vengono
+        riportati i macro-componenti del sistema complessivo:<br><br>
         <center>
             <div class="piccola">
                 <img src="sprint4/sistemasprint4.png" alt="sistema">
             </div>
         </center>
-        In questo caso viene introdotta la <b>ServiceStatusGUI</b> che si impegnerà a mostrare lo stato del servizio <b>ColdStorageService</b>.
+        <br>In questo caso viene introdotta la <b>ServiceStatusGUI</b> che si impegnerà a mostrare lo stato del servizio
+        <b>ColdStorageService</b>.
 
         <h3>Analisi</h3>
         Dai requisiti espressi nel <a target="_blank" href="http://calendar.altervista.org/TemaFinale23.pdf">Tema
             Finale</a> e dalle analisi
-        già effettuate negli Sprint0, Sprint1, Sprint2 e Sprint3, in questo Sprint occorre analizzare la <b>ServiceStatusGUI</b> che è definita come
-        interfaccia utile per mostrare all'addetto della supervisione, detto <b>Service Manager</b>, i dati utili per monitorare il sistema.
+        già effettuate nei precedenti sprint, in questo Sprint4 occorre analizzare la
+        <b>ServiceStatusGUI</b> che è definita come interfaccia utile per mostrare all'addetto della supervisione, detto
+        <b>Service Manager</b>, i dati utili per monitorare il sistema.
         <br><br>
         Ai fini di sorveglianza si ritengono valide mostrare le seguenti informazioni:
         <ul>
@@ -69,54 +73,90 @@
             <li>Lo stato del <b>TransportTrolley</b></li>
             <li>Numero di <b>richieste di store rifiutate</b> dall'avvio del sistema</li>
         </ul>
-        <div class="remark keypoint">La <b>ServiceStatusGUI</b> dovrà mostrare: il peso fisico corrente, il peso prenotato,
-            la posizione e lo stato del <b>TransportTrolley</b>, numero di richieste store rifiutate dall'avvio del sistema.
+        <div class="remark keypoint">La <b>ServiceStatusGUI</b> dovrà mostrare: il peso fisico corrente, il peso
+            prenotato,
+            la posizione e lo stato del <b>TransportTrolley</b>, numero di richieste store rifiutate dall'avvio del
+            sistema.
         </div>
-
 
         <h2>Analisi del Problema</h2>
         <bc>Problema: come raccogliere le informazioni del sistema?</bc><br>
-        <u>Soluzione:</u> per la comunicazione delle informazioni che descrivono lo stato del nostro sistema si adotta il <b>pattern Observer</b>. <br>
-        <div class="remark keypoint">La <b>ServiceStatusGUI</b> adotta il <b>pattern Observer</b> per ascoltare gli aggiornamenti prodotti dagli attori 
+        <u>Soluzione:</u> per la comunicazione delle informazioni che descrivono lo stato del nostro sistema si adotta
+        il <b>pattern Observer</b>. <br>
+        <div class="remark keypoint">La <b>ServiceStatusGUI</b> adotta il <b>pattern Observer</b> per ascoltare gli
+            aggiornamenti prodotti dagli attori
             di suo interesse
         </div>
         <br>
         <bc>Problema: come rappresentare la posizione del <b>Transport Trolley</b>?</bc><br>
-        <u>Soluzione:</u> tutti i dati che vengono comunicati permettono di informare il <b>Service Manager</b> in modo completo dello stato del sistema, tranne per quanto 
-        riguarda la posizione in tempo reale del <b>transportrolley</b>. Questo succede perchè non avendo accesso diretto all'attore <b>robotpos</b>, 
-        presente all'interno del <b>basicrobot23</b> offerto dal committente, le uniche informazioni che si riescono a raccogliere sono le posizioni 
-        del <b>TransportTrolley</b> sulla mappa <u>solo all'inizio e alla fine</u> di una mossa <b>moverobot(coordinate)</b>.<br><br>
+        <u>Soluzione:</u> tutti i dati che vengono comunicati permettono di informare il <b>Service Manager</b> in modo
+        completo dello stato del sistema, tranne per quanto
+        riguarda la posizione in tempo reale del <b>transportrolley</b>. Questo succede perchè non avendo accesso
+        diretto all'attore <b>robotpos</b>,
+        presente all'interno del <b>basicrobot23</b> offerto dal committente, le uniche informazioni che si riescono a
+        raccogliere sono le posizioni
+        del <b>TransportTrolley</b> sulla mappa <u>solo all'inizio e alla fine</u> di una mossa
+        <b>moverobot(coordinate)</b>.<br><br>
         Esposti questi fatti si può agire in due modi differenti:<br>
         <ol>
-            <li>Essere soddisfatti di questo livello di precisione e mostrare in modo accurato la posizione del <b>TransportTrolley</b>> quando questo è fermo, e qualora si trovi 
-                in movimento ci si limita a comunicare la partenza e la destinazione, potenzialmente con l'aggiunta di una notifica ogni volta che questo effettua uno step.
+            <li>Essere soddisfatti di questo livello di precisione e mostrare in modo accurato la posizione del
+                <b>TransportTrolley</b>> quando questo è fermo, e qualora si trovi
+                in movimento ci si limita a comunicare la partenza e la destinazione, potenzialmente con l'aggiunta di
+                una notifica ogni volta che questo effettua uno step.
             </li>
-            <li>Se si fosse a conoscenza del percorso da effettuare grazie al <b>planner</b>, e conoscendo quando il <b>TransportTrolley</b> 
-                effettua uno step, si potrebbe ricostruire la sua posizione in coordinate sulla mappa.</li>
+            <li>Se si fosse a conoscenza del percorso da effettuare grazie al <b>planner</b>, e conoscendo quando il
+                <b>TransportTrolley</b>
+                effettua uno step, si potrebbe ricostruire la sua posizione in coordinate sulla mappa.
+            </li>
         </ol>
-        Per il contesto che si sta analizzando si ritiene sufficiente adottare il primo metodo. Il secondo metodo comporterebbe costi maggiori, in particolare:
+        Per il contesto che si sta analizzando si ritiene sufficiente adottare il primo metodo. Il secondo metodo
+        comporterebbe costi maggiori, in particolare:
         <ul>
-            <li>Se si può modificare il basicrobot23: si aggiungerebbe al Qak relativo le <b>updateResources</b> quando viene fatta ogni mossa.</li>
-            <li>Se non si può toccare il basicrobot23 e quindi svolgere il punto 2. Un ostacolo che non ci permette i seguire questa strada è che 
-                data la attuale situazione il piano del che il <b>TransportTrolley</b> dovrà eseguire viene reso noto solo a posteriori.</li>
+            <li>Se si può modificare il basicrobot23: si aggiungerebbe al Qak relativo le <b>updateResources</b> quando
+                viene fatta ogni mossa.</li>
+            <li>Se non si può toccare il basicrobot23 e quindi svolgere il punto 2. Un ostacolo che non ci permette i
+                seguire questa strada è che
+                data la attuale situazione il piano del che il <b>TransportTrolley</b> dovrà eseguire viene reso noto
+                solo a posteriori.</li>
         </ul>
-        <div class="remark keypoint">La posizione del <b>TransportTrolley</b> durante il suo movimento saranno mostrare solo partenza e destinazione, con 
+        <div class="remark keypoint">La posizione del <b>TransportTrolley</b> durante il suo movimento saranno mostrare
+            solo partenza e destinazione, con
             l'aggiunta di una notifica ogni volta che uno step viene effettuato.
         </div>
 
-        <br><br>
+        <br>
         <bc>Problema: quali sono gli stati del <b>TransportTrolley</b>?</bc><br>
-        <u>Soluzione:</u> il <b>TransportTrolley</b> avrà gli stessi stati identificati durante l'analisi dello Sprint3, quindi:
+        <u>Soluzione:</u> il <b>TransportTrolley</b> avrà gli stessi stati identificati durante l'analisi dello Sprint3,
+        quindi:
         <ol>
-            <li><b>In HOME</b></li>
-            <li><b>In movimento</b></li>
-            <li><b>Fermo</b></li>
+            <li><b>In HOME</b> -> <i>HOME</i></li>
+            <li><b>In movimento</b> -> <i>MOVING</i></li>
+            <li><b>Fermo</b> -> <i>STOPPED</i></li>
         </ol>
-        <div class="remark keypoint">Il <b>TransportTrolley</b> si potrà trovare in tre stati: HOME, movimento, Fermo.
+        <div class="remark keypoint">Il <b>TransportTrolley</b> si potrà trovare in tre stati: HOME, MOVING, STOPPED.
         </div>
 
+        <br>
+        <bc>Problema: come abbattere i tempi di attesa del Truck Driver per il messaggio <i>charge taken</i>?</bc><br>
+        Non è pensabile che l'autista debba aspettare che il DDR Robot compia il tragitto per raggiungere la Indoor e
+        che carichi il carico prima di ricevere una risposta affermativa di corretto inserimento del Ticket (rischiando
+        che un errore o un guasto nel processo blocchi il sistema).<br>
+        Separare in due momenti questa interazione porterebbe a una maggiore chiarezza del servizio, che potrebbe così
+        confermare la validità del Ticket subito e confermare l'avvenuto carico in seguito.
+        <br><u>Soluzione:</u> va ripensata l'interazione tra <b>ColdStorageService</b> e <b>ServiceAccessGUI</b>,
+        lasciando
+        che la Reply all'inserimento del Ticket sia semplicmente una conferma della corretezza dello stesso. Per
+        comunicare che il carico è stato correttamente caricato e che il driver può allontanarsi, si invia questa
+        informazione con un update che verrà osservato dalla gui e poi smistato al giusto client connesso. Così facendo
+        si solleva la Gui (o il driver stesso) dalla responsabilità di interrogare potenzialmente più volte il servizio
+        per sapere se l'operazione è andata a buon fine.<br>
+        Si sceglie di non usare un Dispatch perchè l'informazione <i>ChargeTaken</i> potrebbe essere di interesse anche
+        ad altri componenti, come ad esempio la StatusGUI.
+        <div class="remark keypoint">La <b>ServiceAccessGUI</b> riceve una Reply che comunica se il Ticket inserito è
+            corretto, e un Update quando il TransportTrolley ha terminato di caricare.</div>
+
         <h3>Informazioni osservate</h3>
-        Tutti i seguenti messaggi sono prodotti grazie al 
+        Tutti i seguenti messaggi sono prodotti grazie al
         <b>pattern Observer</b>:
         <table id="myTable">
             <thead>
@@ -153,14 +193,16 @@
                     <td>coapUpdate</td>
                     <td>ColdStorageService</td>
                     <td>Dispatch</td>
-                    <td>Informa la <b>ServiceStatusGUI</b> del peso prenotato ma ancora non presente nella <b>ColdRoom</b>
+                    <td>Informa la <b>ServiceStatusGUI</b> del peso prenotato ma ancora non presente nella
+                        <b>ColdRoom</b>
                     </td>
                 </tr>
                 <tr>
                     <td>coapUpdate</td>
                     <td>ColdStorageService</td>
                     <td>Dispatch</td>
-                    <td>Informa la <b>ServiceStatusGUI</b> della quantità di richieste di storage rifiutate dall'avvio del sistema
+                    <td>Informa la <b>ServiceStatusGUI</b> della quantità di richieste di storage rifiutate dall'avvio
+                        del sistema
                     </td>
                 </tr>
             </tbody>
@@ -194,7 +236,8 @@
                 <tr>
                     <td>TestAlarm</td>
                     <td>ServiceStatusGUI</td>
-                    <td>Il <b>sonar</b> rileva una distanza minore di <b>DLIMT</b> e viene scatenato l'evento alarm per fermare il <b>TransportTrolley</b></td>
+                    <td>Il <b>sonar</b> rileva una distanza minore di <b>DLIMT</b> e viene scatenato l'evento alarm per
+                        fermare il <b>TransportTrolley</b></td>
                     <td>La <b>ServiceStatusGUI</b> mostra che il robot si è fermato</td>
                 </tr>
                 <tr>
@@ -207,39 +250,78 @@
                     <td>TestInsertTicket</td>
                     <td>ServiceStatusGUI</td>
                     <td>Viene effettuata una richiesta <u>isolata</u> di insertticket</td>
-                    <td>Ci si aspetta che il robot giunga alla posizione di <b>INDOOR</b>, direzionarsi po alla <b>PORT</b>, aggiornare sia il peso prenotato che quello 
-                    fisico, ed infine dirigersi verso alla <b>HOME</b></td>
+                    <td>Ci si aspetta che il robot giunga alla posizione di <b>INDOOR</b>, direzionarsi po alla
+                        <b>PORT</b>, aggiornare sia il peso prenotato che quello
+                        fisico, ed infine dirigersi verso alla <b>HOME</b>
+                    </td>
                 </tr>
                 <tr>
                     <td>TestRefusedRequest</td>
                     <td>ServiceStatusGUI</td>
-                    <td>La <b>ColdRoom</b> si trova con lo spazio esaurito ed una richiesta di storage viene effettuata</td>
+                    <td>La <b>ColdRoom</b> si trova con lo spazio esaurito ed una richiesta di storage viene effettuata
+                    </td>
                     <td>Il contatore di richieste di storage rifiutate deve essere incrementato di 1</td>
                 </tr>
             </tbody>
         </table>
 
         <h2>Project</h2>
-        [QUI DESCRIVERE A PAROLE CON IMMAGINE COME SI E' REALIZZATA L'INTERFACCIA GRAFICA]
-
-        Nell'occasione di questo Sprint si è corretto un comportamento anomalo riguardante il conteggio del peso prenotato. A tal fine si 
-        è modificata la business logic dell'attore <b>coldstorageservice</b> e aggiunti dei metodi alla classe di rappresentazione dei <b>Ticket</b>. 
+        Per progettare la ServiceStatusGUI si è fatto tesoro del lavoro già svolto per la AccessGUI, con cui condivide
+        la tecnologia di base: Spring.<br>
+        Delineiamo anche pe questo componente due tipi diversi di connessioni: quelle tra Client e Server Spring e
+        quelle tra il Server Spring e
+        ColdStorageService.<br>
+        Le classi che ci serviranno saranno quindi:<ul>
+            <li><b>Application</b>, il main del programma che istruirà Spring di avviare l'applicazione</li>
+            <li><b>WebSocketConfiguration</b>, dove definiremo due tipi di Handler: Client (comunicazione C/S) e Actor
+                (comunicazione Server/QaK)</li>
+            <li><b>ClientHandler</b>, che manterrà le sessioni con i Client connessi, intercettando le richieste e
+                inoltrando le risposte</li>
+            <li><b>ActorHandler</b>, che scambierà messaggi con il ColdStorageService
+            </li>
+            <li><b>Controller</b>, che gestirà le pagine web mostrate ai client (path degli url, eventuali variabili,
+                etc...)</li>
+        </ul>
+        In aggiunta a questi componenti che si occupano principalmente delle connessioni e della struttura imposta da
+        Spring, all'interno del Server avremo bisogno anche di un componente <b>StatusGUI</b> che gestisca la
+        logica operativa. <br>
+        Le informazioni non verranno inviate direttamente dal ColdStorageService, bensì aggiornate nel corso
+        dell'esecuzione e osservate dalla statusGUI.
+        <br><br>
+        Come per la ServiceAccessGUI, un file JavaScript renderà l'interfaccia web in grado di interagire con Spring.
+        <br><br>
+        Alcune modifiche sono state poi necessarie per quanto riguarda la <b>ServiceAccessGUI</b>, in particolare per
+        supportare la nuova interazione relativa al messaggio ChargeTaken. Oltre a supportare la funzionalità descritta
+        in sede di analisi, è stata riscritta la logica di gestione Ticket rendendola più precisa per quanto riguarda i
+        possibili scenari e i messaggi scambiati, risolvendo così anche un comportamento anomalo riscontrato riguardante
+        il
+        conteggio del peso prenotato.
 
         <h2>Conclusioni</h2>
-        Questo Sprint produce il sistema finale richiesto dal committente nel  <a target="_blank" href="http://calendar.altervista.org/TemaFinale23.pdf">TemaFinale23</a>
-
+        Questo Sprint produce il sistema finale richiesto dal committente nel <a target="_blank"
+            href="http://calendar.altervista.org/TemaFinale23.pdf">TemaFinale23</a>
         <br>
-        [Vogliamo fare delle conclusioni più corpose? siccome è la conculsione delle conclusioni]
+        I componenti dialogano e interoperano in maniera coerente ai requisiti, fornendo un servizio che riteniamo
+        completo di tutte le feature richieste.
+        <br><br>
+        Oltre a una serie di ulteriori test operativi per verificare la robustezza del sistema, possono essere identificati alcuni sviluppi futuri:
+        <ul>
+            <li>Aggiunta supporto a gestione esterna o condivisa della ColdRoom</li>
+            <li>Migliore estindibilità del sistema, ad esempio aggiungendo il supporto a un numero qualunque di Robot e zone di carico/scarico</li>
+            <li>Introduzione sistema di autenticazione per Driver e Service Manager</li>
+            <li>Miglioramento generale delle interfacce grafiche</li>
+        </ul>
+
         <div class="remark">
-            Gli output dello sprint3 sono:<br>
+            Gli output dello sprint4 sono:<br>
             <ul>
                 <li>ServiceStatusGUI</li>
+                <li>Versione aggiornata ServiceAccessGUI</li>
+                <li>Versione aggiornata ColdStorageService</li>
             </ul>
         </div>
 
-        
-
-        <br/><br/>
+        <br /><br />
 
         <div style="background-color:rgba(86, 56, 253, 0.9); width:60%; text-align:left;color:white">
             By <br>Tassinari Gabriele, email: gabriele.tassinari2@studio.unibo.it<br>

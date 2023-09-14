@@ -17,27 +17,26 @@ function connect() {
 
     socket.onmessage = function (event) { // RICEZIONE
         let [type, payload, info] = event.data.split("/");
-        if (payload !== undefined)
-            switch (type) {
-                case "update":
-                    setPeso(...payload.split(","))
-                    break;
-                case "ticket":
-                    addMessageToWindow("Ticket: " + payload)
-                    break;
-                case "notify":
-                    addMessageToWindow("Ticket accettato! " + info)
-                    break;
-                case "chargetaken":
-                    addMessageToWindow("Charge taken!");
-                    break;
-                case "error":
-                    addMessageToWindow("Errore! " + payload + " " + info)
-                    break;
-                default:
-                    addMessageToWindow("" + `${event.data}`)
-                    break;
-            }
+        switch (type) {
+            case "update":
+                setPeso(...payload.split(","))
+                break;
+            case "ticket":
+                addMessageToWindow("Ticket: " + payload)
+                break;
+            case "notify":
+                addMessageToWindow("Ticket accettato! " + info)
+                break;
+            case "chargetaken":
+                addMessageToWindow("Charge taken!")
+                break;
+            case "error":
+                addMessageToWindow("Errore! " + payload + " " + info)
+                break;
+            default:
+                addMessageToWindow("" + `${event.data}`)
+                break;
+        }
     };
     return socket;
 }

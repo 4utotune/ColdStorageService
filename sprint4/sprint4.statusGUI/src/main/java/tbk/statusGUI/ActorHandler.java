@@ -22,3 +22,7 @@ public class ActorHandler extends AbstractWebSocketHandler {
                 .observeResource(new CoapObserver(this.guiManager, actor));
     }
 }
+
+
+
+

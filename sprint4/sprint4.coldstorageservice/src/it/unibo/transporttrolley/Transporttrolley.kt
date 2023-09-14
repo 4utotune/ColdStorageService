@@ -77,7 +77,6 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("loadTheCharge") { //this:State
 					action { //it:State
 						 stato = "inIndoor"  
-						forward("setdirection", "dir(down)" ,"basicrobot" ) 
 						updateResourceRep( "azione(STOPPED)" 
 						)
 						updateResourceRep( "stato($stato)" 
