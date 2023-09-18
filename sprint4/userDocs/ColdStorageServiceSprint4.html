@@ -100,7 +100,7 @@
         Esposti questi fatti si può agire in due modi differenti:<br>
         <ol>
             <li>Essere soddisfatti di questo livello di precisione e mostrare in modo accurato la posizione del
-                <b>TransportTrolley</b>> quando questo è fermo, e qualora si trovi
+                <b>TransportTrolley</b> quando questo è fermo, e qualora si trovi
                 in movimento ci si limita a comunicare la partenza e la destinazione, potenzialmente con l'aggiunta di
                 una notifica ogni volta che questo effettua uno step.
             </li>
@@ -155,6 +155,11 @@
         <div class="remark keypoint">La <b>ServiceAccessGUI</b> riceve una Reply che comunica se il Ticket inserito è
             corretto, e un Update quando il TransportTrolley ha terminato di caricare.</div>
 
+        <br>
+        <bc>Problema: aggiornamento periodico spazio occupato</bc><br>
+        
+
+
         <h3>Informazioni osservate</h3>
         Tutti i seguenti messaggi sono prodotti grazie al
         <b>pattern Observer</b>:
@@ -163,7 +168,6 @@
                 <tr>
                     <th>Messaggio</th>
                     <th>Attore ascoltato</th>
-                    <th>Semantica messaggio</th>
                     <th>Descrizione</th>
                 </tr>
             </thead>
@@ -171,28 +175,28 @@
                 <tr>
                     <td>coapUpdate</td>
                     <td>transportrolley</td>
-                    <td>Dispatch</td>
+
                     <td>Informa la <b>ServiceStatusGUI</b> dello stato del <b>TransportTrolley</b>
                     </td>
                 </tr>
                 <tr>
                     <td>coapUpdate</td>
                     <td>basicrobot23</td>
-                    <td>Dispatch</td>
+
                     <td>Informa la <b>ServiceStatusGUI</b> della posizione del <b>TransportTrolley</b> sulla mappa
                     </td>
                 </tr>
                 <tr>
                     <td>coapUpdate</td>
                     <td>ColdStorageService</td>
-                    <td>Dispatch</td>
+
                     <td>Informa la <b>ServiceStatusGUI</b> del peso fisico presente all'interno della <b>ColdRoom</b>
                     </td>
                 </tr>
                 <tr>
                     <td>coapUpdate</td>
                     <td>ColdStorageService</td>
-                    <td>Dispatch</td>
+
                     <td>Informa la <b>ServiceStatusGUI</b> del peso prenotato ma ancora non presente nella
                         <b>ColdRoom</b>
                     </td>
@@ -200,7 +204,7 @@
                 <tr>
                     <td>coapUpdate</td>
                     <td>ColdStorageService</td>
-                    <td>Dispatch</td>
+
                     <td>Informa la <b>ServiceStatusGUI</b> della quantità di richieste di storage rifiutate dall'avvio
                         del sistema
                     </td>
@@ -268,7 +272,7 @@
         <h2>Project</h2>
         Per progettare la ServiceStatusGUI si è fatto tesoro del lavoro già svolto per la AccessGUI, con cui condivide
         la tecnologia di base: Spring.<br>
-        Delineiamo anche pe questo componente due tipi diversi di connessioni: quelle tra Client e Server Spring e
+        Delineiamo anche per questo componente due tipi diversi di connessioni: quelle tra Client e Server Spring e
         quelle tra il Server Spring e
         ColdStorageService.<br>
         Le classi che ci serviranno saranno quindi:<ul>
@@ -304,10 +308,12 @@
         I componenti dialogano e interoperano in maniera coerente ai requisiti, fornendo un servizio che riteniamo
         completo di tutte le feature richieste.
         <br><br>
-        Oltre a una serie di ulteriori test operativi per verificare la robustezza del sistema, possono essere identificati alcuni sviluppi futuri:
+        Oltre a una serie di ulteriori test operativi per verificare la robustezza del sistema, possono essere
+        identificati alcuni sviluppi futuri:
         <ul>
             <li>Aggiunta supporto a gestione esterna o condivisa della ColdRoom</li>
-            <li>Migliore estindibilità del sistema, ad esempio aggiungendo il supporto a un numero qualunque di Robot e zone di carico/scarico</li>
+            <li>Migliore estindibilità del sistema, ad esempio aggiungendo il supporto a un numero qualunque di Robot e
+                zone di carico/scarico</li>
             <li>Introduzione sistema di autenticazione per Driver e Service Manager</li>
             <li>Miglioramento generale delle interfacce grafiche</li>
         </ul>
