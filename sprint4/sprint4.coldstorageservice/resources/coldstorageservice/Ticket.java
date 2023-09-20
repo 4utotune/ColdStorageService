@@ -14,6 +14,7 @@ public class Ticket {
     private final Float FW;
     private final String id;
     private boolean Approved = false;
+    private boolean Expired = false;
 
     public Ticket(Float weight, Integer timeout, String format) {
         FW = weight;
@@ -41,6 +42,14 @@ public class Ticket {
 
     public void approve() {
         Approved = true;
+    }
+
+    public boolean isExpired() {
+        return Expired;
+    }
+
+    public void hasExpired() {
+        Expired = true;
     }
 
     public Boolean isValid() {

@@ -66,8 +66,12 @@ function submitPressedPeso() {
 }
 
 function submitPressedTicket() {
-    sendMessage("insertticket/" + ticket.value);
-    ticket.value = "";
+    if (ticket.value.length === 0) {
+        addMessageToWindow("Inserisci un ticket valido")
+    } else {
+        sendMessage("insertticket/" + ticket.value);
+        ticket.value = "";
+    }
 }
 
 function sendMessage(message) {

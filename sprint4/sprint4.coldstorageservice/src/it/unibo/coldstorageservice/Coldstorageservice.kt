@@ -48,6 +48,13 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("idle") { //this:State
 					action { //it:State
+						 
+									for (ticket in ticketManager.tickets.values) {
+										if (!ticket.isValid && !ticket.isExpired) {
+											ReservedWeight -= ticket.weight
+											ticket.hasExpired()
+										}
+									}	
 						CommUtils.outgreen("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight")
 						updateResourceRep( "'weight(cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom)'"  
 						)
@@ -105,15 +112,15 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 												val Received = payloadArg(0).toString()
 												val TICKET = ticketManager.getTicket(Received)
 								if(  (TICKET != null)  
-								 ){if(  (TICKET.isValid)  
-								 ){if(  (ticketManager.isWaiting())  
+								 ){if(  (TICKET.isValid && !TICKET.isExpired)  
+								 ){if( (!TICKET.isApproved()) 
+								 ){ TICKET.approve()  
+								if(  (ticketManager.isWaiting())  
 								 ){CommUtils.outgreen("$name | Rejected ticket [ $Received ] - service full. Waiting for [ ${ticketManager.waiting} ] to be handled")
 								answer("insertticket", "ticketrejected", "ticketrejected(full)"   )  
 								}
 								else
-								 {if( (!TICKET.isApproved()) 
-								  ){ TICKET.approve()  
-								 if(  (ticketManager.isWorking)  
+								 {if(  (ticketManager.isWorking)  
 								  ){CommUtils.outgreen("$name | Approved ticket [ $Received ]. Currenty working on [ ${ticketManager.working} ]")
 								 answer("insertticket", "ticketaccepted", "ticketaccepted(wait)"   )  
 								 }
@@ -124,17 +131,16 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 								  }
 								   ticketManager.setWaiting(Received)  
 								 }
-								 else
-								  {CommUtils.outgreen("$name | Rejected ticket [ $Received ] - already inserted")
-								  answer("insertticket", "ticketrejected", "ticketrejected(duplicate)"   )  
-								  }
+								}
+								else
+								 {CommUtils.outgreen("$name | Rejected ticket [ $Received ] - already inserted")
+								 answer("insertticket", "ticketrejected", "ticketrejected(duplicate)"   )  
 								 }
 								}
 								else
 								 {
 								 						ticketManager.remove(TICKET)
-								 						ReservedWeight -= TICKET.weight
-								 CommUtils.outgreen("$name | Rejected ticket [ $Received ] - timedout")
+								 CommUtils.outgreen("$name | Rejected ticket [ $Received ] - timedout")
 								 answer("insertticket", "ticketrejected", "ticketrejected(timedout)"   )  
 								 }
 								}

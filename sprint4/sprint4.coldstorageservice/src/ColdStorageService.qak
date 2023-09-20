@@ -110,6 +110,14 @@ QActor coldstorageservice context ctx_coldstorage {
 	Goto idle	
 	
 	State idle {
+		[# 
+			for (ticket in ticketManager.tickets.values) {
+				if (!ticket.isValid && !ticket.isExpired) {
+					ReservedWeight -= ticket.weight
+					ticket.hasExpired()
+				}
+			}	
+		#]
 		println("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight") color green
 		updateResource [# "'weight(cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom)'" #]
 	}
@@ -156,14 +164,15 @@ QActor coldstorageservice context ctx_coldstorage {
 			
 			if [# (TICKET != null) #] // ticket esiste
 			{
-				if [# (TICKET.isValid) #] // ticket non è scaduto
+				if [# (TICKET.isValid && !TICKET.isExpired) #] // ticket non è scaduto
 				{	
-					if [# (ticketManager.isWaiting()) #] { // c'è già un ticket in attesa
-						println("$name | Rejected ticket [ $Received ] - service full. Waiting for [ ${ticketManager.waiting} ] to be handled") color green
-						replyTo insertticket with ticketrejected: ticketrejected(full)				
-					} else {
-						if [#(!TICKET.isApproved())#] { // ticket non ancora approvato
-							[# TICKET.approve() #]	
+					if [#(!TICKET.isApproved())#] { // ticket non ancora approvato
+						[# TICKET.approve() #]
+						if [# (ticketManager.isWaiting()) #] { // c'è già un ticket in attesa
+							println("$name | Rejected ticket [ $Received ] - service full. Waiting for [ ${ticketManager.waiting} ] to be handled") color green
+							replyTo insertticket with ticketrejected: ticketrejected(full)				
+						} else {
+						
 							if [# (ticketManager.isWorking) #] { // trolley occupato
 								println("$name | Approved ticket [ $Received ]. Currenty working on [ ${ticketManager.working} ]") color green
 								replyTo insertticket with ticketaccepted: ticketaccepted(wait)					
@@ -173,17 +182,17 @@ QActor coldstorageservice context ctx_coldstorage {
 								request transporttrolley -m gotoindoor: gotoindoor(_)
 							}
 							[#  ticketManager.setWaiting(Received) #]
-						} else { // ticket già approvvato
-							println("$name | Rejected ticket [ $Received ] - already inserted") color green
-							replyTo insertticket with ticketrejected: ticketrejected(duplicate)					
-						}	
+						
+						}
+					} else { // ticket già approvato
+						println("$name | Rejected ticket [ $Received ] - already inserted") color green
+						replyTo insertticket with ticketrejected: ticketrejected(duplicate)					
 					}
 				} else { // ticket scaduto
 					[#
 						ticketManager.remove(TICKET)
-						ReservedWeight -= TICKET.weight
 					#]
-					println("$name | Rejected ticket [ $Received ] - timedout") color green
+					println("$name | Rejected ticket [ $Received ] - timedout") color green
 					replyTo insertticket with ticketrejected: ticketrejected(timedout)					
 				}	
 			} else { // ticket non esiste

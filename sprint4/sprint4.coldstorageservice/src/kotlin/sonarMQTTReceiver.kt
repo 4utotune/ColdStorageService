@@ -7,6 +7,7 @@ import kotlinx.coroutines.runBlocking
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.MqttCallback
 import org.eclipse.paho.client.mqttv3.MqttClient
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import unibo.basicomm23.interfaces.IApplMessage
 import unibo.basicomm23.utils.CommUtils
@@ -28,33 +29,40 @@ class SonarMQTTReceiver(name: String) : ActorBasic(name) {
     }
 
     private fun startMqttReceiver() {
-        client = MqttClient(brokerip, clientId)
-        client.connect()
-        client.subscribe(sonartopic)
-        client.setCallback(object : MqttCallback {
-            override fun connectionLost(cause: Throwable) {
-                //connectionStatus = false
-                // Give your callback on failure here
-            }
+        try {
+            client = MqttClient(brokerip, clientId)
+            val opt = MqttConnectOptions()
+            opt.connectionTimeout = 5
 
-            override fun messageArrived(topic: String, message: MqttMessage) {
-                try {
-                    val data = String(message.payload, charset("UTF-8"))
-                    val event = CommUtils.buildEvent(name, "sonardata", data)
-                    //System.out.println("creo:"+data)
-
-                    GlobalScope.launch {
-                        emitLocalStreamEvent(event)
-                    }
-                } catch (e: Exception) {
-                    // Give your callback on error here
+            client.connect(opt)
+            client.subscribe(sonartopic)
+            client.setCallback(object : MqttCallback {
+                override fun connectionLost(cause: Throwable) {
+                    //connectionStatus = false
+                    // Give your callback on failure here
                 }
-            }
 
-            override fun deliveryComplete(token: IMqttDeliveryToken) {
-                // Acknowledgement on delivery complete
-            }
-        })
+                override fun messageArrived(topic: String, message: MqttMessage) {
+                    try {
+                        val data = String(message.payload, charset("UTF-8"))
+                        val event = CommUtils.buildEvent(name, "sonardata", data)
+                        //System.out.println("creo:"+data)
+
+                        GlobalScope.launch {
+                            emitLocalStreamEvent(event)
+                        }
+                    } catch (e: Exception) {
+                        // Give your callback on error here
+                    }
+                }
+
+                override fun deliveryComplete(token: IMqttDeliveryToken) {
+                    // Acknowledgement on delivery complete
+                }
+            })
+        } catch (e: Exception) {
+            CommUtils.outred("sonarMQTTReceiver | Failed to connect to MQTT client")
+        }
     }
 }
 
