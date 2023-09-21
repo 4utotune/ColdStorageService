@@ -108,6 +108,7 @@ body {
     width: 100%;
     height: auto;
     border-radius: 5px;
+    max-width: 550px;
 }
 
 .dati input {
@@ -136,6 +137,7 @@ body {
     color: white;
     font-size: medium;
     display: flex;
+    max-width: 550px;
     justify-content: center;
     align-items: center;
     text-align: center;
