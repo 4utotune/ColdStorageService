@@ -112,12 +112,13 @@
         Per il contesto che si sta analizzando si ritiene sufficiente adottare il primo metodo. Il secondo metodo
         comporterebbe costi maggiori, in particolare:
         <ul>
-            <li>Se si può modificare il basicrobot23: si aggiungerebbe al Qak relativo le <b>updateResources</b> quando
-                viene fatta ogni mossa.</li>
-            <li>Se non si può toccare il basicrobot23 e quindi svolgere il punto 2. Un ostacolo che non ci permette i
-                seguire questa strada è che
-                data la attuale situazione il piano del che il <b>TransportTrolley</b> dovrà eseguire viene reso noto
-                solo a posteriori.</li>
+            <li>Se si può modificare il basicrobot23: si aggiungerebbe al Qak relativo una serie di messaggi
+                <b>updateResources</b> quando
+                viene fatta ogni mossa.
+            </li>
+            <li>Se non si può intervenire sul basicrobot23 e quindi svolgere il punto 2: un ostacolo che non ci permette
+                di seguire questa strada è che data la attuale situazione il piano che il <b>TransportTrolley</b> dovrà
+                eseguire viene reso noto solo a posteriori.</li>
         </ul>
         <div class="remark keypoint">La posizione del <b>TransportTrolley</b> durante il suo movimento saranno mostrare
             solo partenza e destinazione, con
@@ -157,22 +158,29 @@
 
         <br>
         <bc>Problema: aggiornamento periodico spazio occupato</bc><br>
-        <u>Soluzione:</u> 
+        <u>Soluzione:</u>
         Alla richiesta di un <b>Ticket</b> viene prenotato del peso all'interno della ColdRoom.
-        Dal momento che i requisiti impongono una scadenza del <b>Ticket</b> dopo <b>TICKETTIME secondi</b>, è già stato implementato
-        un meccanismo che valida i ticket giudicando scaduti quelli che hanno superato il tempo limite. Tuttavia questo controllo avviene
-        quando viene effettuata l'operazione <b>Send Ticket</b>, ciò fa si che se un <b>Truck Driver</b> non dovesse mai presentarsi
-        il peso rimarrebbe prenotato senza mai essere effettivamente occupato. Per risolvere questo problema si è deciso, ogni qualvolta la <b>ColdStorageService</b>
-        va nello stato "IDLE", di controllare tutti i Ticket in attesa liberando lo spazio occupato dai <b>Ticket</b> scaduti, lasciandoli tuttavia logicamente ancora validi. 
-        Questa decisione è stata effettuata poichè se un <b>Truck Driver</b> dovesse presentarsi dopo che il suo <b>Ticket</b> è stato invalidato, ottiene il corretto messaggio di errore,
-        al contrario se il <b>Ticket</b> venisse eliminato, otterrebbe un errore non corretto.
-        <div class="remark keypoint">Ogni volta che la <b>ColdStorageService</b> si trova nello stato IDLE, viene effettuato un controllo di tutti i <b>Ticket</b> validi per identificare quelli scaduti e liberare lo spazio (prenotato) nella <b>ColdRoom</b></div>
-        
+        Dal momento che i requisiti impongono una scadenza del <b>Ticket</b> dopo <b>TICKETTIME secondi</b>, è già stato
+        implementato un meccanismo che valida i ticket giudicando scaduti quelli che hanno superato il tempo limite.
+        Tuttavia dato che questo controllo avviene quando viene effettuata l'operazione <b>Send Ticket</b>, ciò fa si
+        che se un
+        <b>Truck Driver</b> non dovesse mai presentarsi il peso rimarrebbe prenotato senza mai essere effettivamente
+        occupato (o liberato). Per risolvere questo problema si è deciso di effettuare un controllo periodico sui Ticket
+        in attesa. Per non ripetere questo controllo troppo spesso, si è scelto di effettuarlo ogni qualvolta la
+        <b>ColdStorageService</b> va nello stato "IDLE", verificando tutti i Ticket in attesa e liberando lo spazio
+        occupato dai <b>Ticket</b> scaduti, lasciandoli tuttavia ancora presenti nel sistema.
+        Questa è necessario poichè se un <b>Truck Driver</b> si presenta dopo che il suo <b>Ticket</b> è stato
+        invalidato, deve ottenere il corretto messaggio di errore; al contrario se il <b>Ticket</b> venisse eliminato,
+        otterrebbe un errore non corretto.
+
+        <div class="remark keypoint">Ogni volta che la <b>ColdStorageService</b> si trova nello stato IDLE, viene
+            effettuato un controllo di tutti i <b>Ticket</b> validi per identificare quelli scaduti e liberare lo spazio
+            (prenotato) nella <b>ColdRoom</b></div>
+
 
 
         <h3>Informazioni osservate</h3>
-        Tutti i seguenti messaggi sono prodotti grazie al
-        <b>pattern Observer</b>:
+        I seguenti messaggi seguono tutti il <b>pattern Observer</b>:
         <table id="myTable">
             <thead>
                 <tr>
@@ -219,8 +227,9 @@
 
         <h3>Architettura logica</h3>
         <div class="remark">
-            Codice QAK per la modellazione del sistema: <a href="./sprint3.coldstorageservice/src/SonarLed.qak"
-                target="_blank">SonarLed.qak</a>
+            Codice QAK per la modellazione del sistema: <a
+                href="../sprint4.coldstorageservice/src/ColdStorageService.qak"
+                target="_blank">ColdStorageService.qak</a>
         </div>
 
         Il sistema da noi modellato presenta la seguente architettura logica:
@@ -250,7 +259,7 @@
                     <td>La <b>ServiceStatusGUI</b> mostra che il robot si è fermato</td>
                 </tr>
                 <tr>
-                    <td>TestRquestStorage</td>
+                    <td>TestRequestStorage</td>
                     <td>ServiceStatusGUI</td>
                     <td>Viene effettuata una richiesta di storage</td>
                     <td>Il peso prenotato si aggiorna di una quantità pari a quella della storerequest</td>
