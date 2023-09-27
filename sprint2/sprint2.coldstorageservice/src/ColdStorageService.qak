@@ -59,7 +59,7 @@ QActor coldstorageservice context ctx_coldstorage {
 				  whenRequest chargedeposited		-> handle_deposited
 				  whenMsg	  chargetaken			-> handle_charge_taken
 					
-	State handle_store {
+	State handle_store { 
 		onMsg(storerequest: storerequest(FW)) {
 			println("$name | Received store request for ${payloadArg(0)} kg") color green
 		

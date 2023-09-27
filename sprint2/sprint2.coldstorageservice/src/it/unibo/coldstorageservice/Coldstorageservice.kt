@@ -20,7 +20,7 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 		val interruptedStateTransitions = mutableListOf<Transition>()
 			
 				val MaxWeightDDR = 50.0f
-				val MaxWeightcoldroom = 100.0f
+				val MaxWeightcoldroom = 200.0f
 				val TicketTimeout = 20000
 				val TicketFormat = "yyyyMMddHHmmss"; // yyyy.MM.dd.HH.mm.ss
 				
@@ -47,26 +47,25 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("idle") { //this:State
 					action { //it:State
+						delay(100) 
 						CommUtils.outgreen("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight")
-						updateResourceRep( "'cur:$CurrentWeight|res:$ReservedWeight|max:$MaxWeightcoldroom'"  
+						updateResourceRep( "weight(cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom)"  
 						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t01",targetState="handle_store",cond=whenRequest("storerequest"))
-					transition(edgeName="t02",targetState="handle_ticket",cond=whenRequest("insertticket"))
-					transition(edgeName="t03",targetState="handle_deposited",cond=whenRequest("chargedeposited"))
-					transition(edgeName="t04",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
+					 transition(edgeName="t00",targetState="handle_store",cond=whenRequest("storerequest"))
+					transition(edgeName="t01",targetState="handle_ticket",cond=whenRequest("insertticket"))
+					transition(edgeName="t02",targetState="handle_deposited",cond=whenRequest("chargedeposited"))
+					transition(edgeName="t03",targetState="handle_charge_taken",cond=whenDispatch("chargetaken"))
 				}	 
 				state("handle_store") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("storerequest(FW)"), Term.createTerm("storerequest(FW)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								CommUtils.outgreen("$name | Received store request for ${payloadArg(0)} kg")
-								updateResourceRep( "Storing ${payloadArg(0)}"  
-								)
 								 val FW = payloadArg(0).toFloat()  
 								if(  (FW > MaxWeightDDR)  
 								 ){ RejectedRequests++  
@@ -81,8 +80,9 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 								  {
 								  						val TICKET = ticketManager.newTicket(FW)
 								  					  	ReservedWeight += FW
-								  					  	val Timestamp = TICKET.timestamp
-								  answer("storerequest", "storeaccepted", "storeaccepted($Timestamp)"   )  
+								  					  	val TicketId = TICKET.id
+								  CommUtils.outgreen("$name | Store request accepted. Ticket: [ $TicketId ]")
+								  answer("storerequest", "storeaccepted", "storeaccepted($TicketId)"   )  
 								  }
 								 }
 						}
@@ -107,13 +107,12 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 								else
 								 {if(  (!ticketManager.isWorking)  
 								  ){CommUtils.outgreen("$name | Approved ticket [ $Received ]. Requesting charge")
-								 forward("gotoindoor", "gotoindoor(_)" ,"transporttrolley" ) 
+								 forward("gotoindoor", "gotoindoor(_)" ,"transporttrolley_mock" ) 
 								 }
 								 else
 								  {CommUtils.outgreen("$name | Approved ticket [ $Received ]. Currenty working on [ ${ticketManager.working} ]. Please wait")
 								  }
 								   ticketManager.setWaiting(Received)  
-								 answer("insertticket", "ticketaccepted", "ticketaccepted(_)"   )  
 								 }
 								}
 								else
@@ -140,9 +139,9 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				state("handle_charge_taken") { //this:State
 					action { //it:State
 						 			
-									val Timestamp = ticketManager.waitingNowWorking()
-						CommUtils.outgreen("$name | Charge taken for ticket [ $Timestamp ]")
-						forward("chargetaken", "chargetaken(_)" ,"accessgui_proxy" ) 
+									val TicketId = ticketManager.waitingNowWorking()
+						CommUtils.outgreen("$name | Charge taken for ticket [ $TicketId ]")
+						answer("insertticket", "chargetaken", "chargetaken(_)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

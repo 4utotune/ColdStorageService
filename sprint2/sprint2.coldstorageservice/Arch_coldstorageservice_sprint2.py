@@ -20,13 +20,9 @@ with Diagram('coldstorageservice_sprint2Arch', show=False, outformat='png', grap
   with Cluster('env'):
      sys = Custom('','./qakicons/system.png')
      with Cluster('ctx_coldstorage', graph_attr=nodeattr):
-          accessgui_proxy=Custom('accessgui_proxy','./qakicons/symActorSmall.png')
           coldstorageservice=Custom('coldstorageservice','./qakicons/symActorSmall.png')
-          transporttrolley=Custom('transporttrolley','./qakicons/symActorSmall.png')
-     with Cluster('ctx_prova', graph_attr=nodeattr):
-          prova=Custom('prova(ext)','./qakicons/externalQActor.png')
-     coldstorageservice >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> accessgui_proxy
-     accessgui_proxy >> Edge(color='blue', style='solid', xlabel='test', fontcolor='blue') >> prova
-     coldstorageservice >> Edge(color='blue', style='solid', xlabel='gotoindoor', fontcolor='blue') >> transporttrolley
-     coldstorageservice >> Edge(color='blue', style='solid', xlabel='chargetaken', fontcolor='blue') >> accessgui_proxy
+          transporttrolley_mock=Custom('transporttrolley_mock','./qakicons/symActorSmall.png')
+     coldstorageservice >> Edge(color='blue', style='solid', xlabel='gotoindoor', fontcolor='blue') >> transporttrolley_mock
+     transporttrolley_mock >> Edge(color='blue', style='solid', xlabel='chargetaken', fontcolor='blue') >> coldstorageservice
+     transporttrolley_mock >> Edge(color='magenta', style='solid', xlabel='chargedeposited', fontcolor='magenta') >> coldstorageservice
 diag
