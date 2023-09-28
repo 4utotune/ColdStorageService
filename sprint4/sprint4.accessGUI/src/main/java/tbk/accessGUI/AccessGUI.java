@@ -1,6 +1,11 @@
 package tbk.accessGUI;
 
 
+import org.eclipse.californium.core.CoapHandler;
+import org.eclipse.californium.core.CoapResponse;
+import unibo.basicomm23.coap.CoapConnection;
+import unibo.basicomm23.interfaces.IApplMessage;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,16 +25,30 @@ public class AccessGUI {
 
     public AccessGUI(ClientHandler clientHandler) {
         this.clientHandler = clientHandler;
-        this.actorHandler = new ActorHandler(this, "handler", "coldstorageservice");
+        this.actorHandler = new ActorHandler("127.0.0.1", 11802, "handler", "coldstorageservice");
 
         this.clientHandler.setManager(this);
+
+        CoapConnection coapConn = new CoapConnection("127.0.0.1:11802", "ctx_coldstorage/coldstorageservice");
+        coapConn.observeResource(new CoapHandler() {
+            @Override
+            public void onLoad(CoapResponse response) {
+                System.out.println("AC | Got update " + response.getResponseText());
+                parseActorResponse(response.getResponseText(), "");
+            }
+
+            @Override
+            public void onError() {
+                System.out.println("AC | Error while receiving update");
+            }
+        });
     }
 
     protected boolean hasUpdate() {
         return CurrentWeight != 0 || ReservedWeight != 0 || MaxWeight != 0;
     }
 
-    public void responseFromActor(String msg, String requestId) {
+    public void parseActorResponse(String msg, String requestId) {
         String value = extractFromMsg(msg);
         if (requestId.equals("")) {
             if (msg.contains("chargetaken")) {
@@ -57,7 +76,7 @@ public class AccessGUI {
         }
     }
 
-    public String extractFromMsg(String msg) {
+    public static String extractFromMsg(String msg) {
         Pattern pattern = Pattern.compile("\\((.*?)\\)");
         Matcher matcher = pattern.matcher(msg);
 
@@ -121,11 +140,14 @@ public class AccessGUI {
     }
 
     private void storerequest(String weight, String requestId) {
-        this.actorHandler.storerequest(weight, requestId);
+        IApplMessage resp = this.actorHandler.storerequest(weight);
+        parseActorResponse(resp.msgContent(), requestId);
     }
 
     private void insertticket(String ticket, String requestId) {
-        this.actorHandler.insertticket(ticket, requestId);
+        IApplMessage resp = this.actorHandler.insertticket(ticket);
+        parseActorResponse(resp.msgContent(), requestId);
+
     }
 
     private String ticketAssociatedWithRequest(String requestId) {
