@@ -22,7 +22,7 @@ class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 		return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
-						 subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar")  
+						 subscribeToLocalActor("distancefilter").subscribeToLocalActor("sonar")  
 						CommUtils.outyellow("$name | init")
 						//genTimer( actor, state )
 					}
@@ -39,15 +39,17 @@ class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handleobstacle",cond=whenEvent("obstacle"))
+					 transition(edgeName="t4",targetState="handleobstacle",cond=whenEvent("obstacle"))
 				}	 
 				state("handleobstacle") { //this:State
 					action { //it:State
+						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
+						 	   
 						if( checkMsgContent( Term.createTerm("obstacle(D)"), Term.createTerm("obstacle(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								CommUtils.outyellow("$name | handleobstacle ALARM ${payloadArg(0)}")
+								CommUtils.outyellow("$name | obstacle -> ALARM")
 								emit("alarm", "alarm(_)" ) 
-								updateResourceRep( "$name(ON)" 
+								updateResourceRep( "azione(STOPPED)"  
 								)
 						}
 						//genTimer( actor, state )
@@ -61,10 +63,8 @@ class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("obstaclefree(D)"), Term.createTerm("obstaclefree(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								CommUtils.outyellow("$name | obstaclefree RESUME ${payloadArg(0)}")
 								emit("resume", "resume(_)" ) 
-								CommUtils.outyellow("$name | aspetto DLMIT prima di poter gestire un successivo stop")
-								 delay(MINT)  
+								CommUtils.outyellow("$name | obstaclefree -> RESUME. Aspetto DLMIT prima di gestire un successivo stop")
 								CommUtils.outyellow("$name | sono di nuovo pronto per poter gestire uno stop")
 						}
 						//genTimer( actor, state )

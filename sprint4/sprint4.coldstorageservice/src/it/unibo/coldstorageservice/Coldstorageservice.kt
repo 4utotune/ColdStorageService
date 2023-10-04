@@ -50,9 +50,10 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					action { //it:State
 						 
 									for (ticket in ticketManager.tickets.values) {
-										if (!ticket.isValid && !ticket.isExpired) {
+										if (!ticket.isValid && !ticket.isExpired && !ticket.isApproved) {
 											ReservedWeight -= ticket.weight
 											ticket.hasExpired()
+											println("Riduco peso")
 										}
 									}	
 						CommUtils.outgreen("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight")
@@ -115,7 +116,7 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 								 ){if(  (TICKET.isValid && !TICKET.isExpired)  
 								 ){if( (!TICKET.isApproved()) 
 								 ){ TICKET.approve()  
-								if(  (ticketManager.isWaiting())  
+								if(  (ticketManager.isWaiting)  
 								 ){CommUtils.outgreen("$name | Rejected ticket [ $Received ] - service full. Waiting for [ ${ticketManager.waiting} ] to be handled")
 								answer("insertticket", "ticketrejected", "ticketrejected(full)"   )  
 								}
@@ -178,12 +179,13 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(transporttrolley,deposited)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-												if (ticketManager.isWorking) {
+												if (ticketManager.isWorking) {  
+								CommUtils.outgreen("$name | Deposit confirmation received")
+								
 													CurrentWeight += ticketManager.workingTicket().weight
 													ReservedWeight -= ticketManager.workingTicket().weight
 													ticketManager.stopWorking()	// also removes ticket	
 												}
-								CommUtils.outgreen("$name | Deposit confirmation received")
 								if(  (ticketManager.isWaiting)  
 								 ){CommUtils.outgreen("$name | Next ticket: [ ${ticketManager.waiting} ]")
 								request("gotoindoor", "gotoindoor(_)" ,"transporttrolley" )  

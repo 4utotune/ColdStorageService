@@ -21,6 +21,7 @@ class ledMQTTSender(name: String) : ActorBasic(name) {
             opt.connectionTimeout = 5
 
             client.connect(opt)
+            CommUtils.outblue("ledMQTTSender | Connected to MQTT client")
         } catch (e: Exception) {
             CommUtils.outred("ledMQTTSender | Failed to connect to MQTT client")
         }
@@ -36,7 +37,7 @@ class ledMQTTSender(name: String) : ActorBasic(name) {
     private suspend fun elabData(msg: IApplMessage) { //OPTIMISTIC
 
         if (client.isConnected) {
-            System.out.println("$name | mando: " + msg.msgContent())
+            //System.out.println("$name | mando: " + msg.msgContent())
             var status = -1
             if (msg.msgContent().contains("ledoff")) status = 0
             else if (msg.msgContent().contains("ledon")) status = 1

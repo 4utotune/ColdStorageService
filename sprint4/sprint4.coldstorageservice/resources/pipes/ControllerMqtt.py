@@ -18,7 +18,7 @@ for line in sys.stdin:
 	try:
 		vf = float(line)
 		v  = int( vf )
-		if v <= 10 :
+		if v <= 200 : # distance filter
 			n = n + 1
 			client.publish("unibo/sonar/events", msg.replace("D",str(v)).replace("N", str(n)))
 			print ( 'on', flush=True ) 

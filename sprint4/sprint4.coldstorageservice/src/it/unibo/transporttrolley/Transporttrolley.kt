@@ -45,9 +45,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("idle") { //this:State
 					action { //it:State
 						 stato = "inHome"  
-						updateResourceRep( "azione(HOME)" 
+						updateResourceRep( "azione(HOME)"  
 						)
-						updateResourceRep( "stato($stato)" 
+						updateResourceRep( "stato($stato)"  
 						)
 						//genTimer( actor, state )
 					}
@@ -60,9 +60,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("moveToIndoor") { //this:State
 					action { //it:State
 						 stato = "toIndoor"  
-						updateResourceRep( "azione(MOVING)" 
+						updateResourceRep( "azione(MOVING)"  
 						)
-						updateResourceRep( "stato($stato)" 
+						updateResourceRep( "stato($stato)"  
 						)
 						CommUtils.outmagenta("$name | vado all'INDOOR")
 						request("moverobot", "moverobot(0,4)" ,"basicrobot" )  
@@ -77,9 +77,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("loadTheCharge") { //this:State
 					action { //it:State
 						 stato = "inIndoor"  
-						updateResourceRep( "azione(STOPPED)" 
+						updateResourceRep( "azione(STOPPED)"  
 						)
-						updateResourceRep( "stato($stato)" 
+						updateResourceRep( "stato($stato)"  
 						)
 						CommUtils.outmagenta("$name | sono in INDOOR")
 						//genTimer( actor, state )
@@ -89,17 +89,26 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				 	 		stateTimer = TimerActor("timer_loadTheCharge", 
 				 	 					  scope, context!!, "local_tout_transporttrolley_loadTheCharge", 3000.toLong() )
 					}	 	 
-					 transition(edgeName="t13",targetState="moveToColdroom",cond=whenTimeout("local_tout_transporttrolley_loadTheCharge"))   
+					 transition(edgeName="t13",targetState="loadDone",cond=whenTimeout("local_tout_transporttrolley_loadTheCharge"))   
 					transition(edgeName="t14",targetState="sonarobstacle",cond=whenEvent("alarm"))
+				}	 
+				state("loadDone") { //this:State
+					action { //it:State
+						answer("gotoindoor", "chargetaken", "chargetaken(_)"   )  
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="moveToColdroom", cond=doswitch() )
 				}	 
 				state("moveToColdroom") { //this:State
 					action { //it:State
 						 stato = "toColdroom"  
-						answer("gotoindoor", "chargetaken", "chargetaken(_)"   )  
 						CommUtils.outmagenta("$name | vado verso la cold room")
-						updateResourceRep( "azione(MOVING)" 
+						updateResourceRep( "azione(MOVING)"  
 						)
-						updateResourceRep( "stato($stato)" 
+						updateResourceRep( "stato($stato)"  
 						)
 						request("moverobot", "moverobot(4,3)" ,"basicrobot" )  
 						//genTimer( actor, state )
@@ -113,9 +122,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("storeTheCharge") { //this:State
 					action { //it:State
 						 stato = "inColdroom"  
-						updateResourceRep( "azione(STOPPED)" 
+						updateResourceRep( "azione(STOPPED)"  
 						)
-						updateResourceRep( "stato($stato)" 
+						updateResourceRep( "stato($stato)"  
 						)
 						CommUtils.outmagenta("$name | sono in Cold Room")
 						//genTimer( actor, state )
@@ -130,6 +139,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("chargeDeposited") { //this:State
 					action { //it:State
+						 stato = "deposited"  
 						CommUtils.outmagenta("$name | terminato deposito. Aspetto istruzioni")
 						updateResourceRep( "deposited"  
 						)
@@ -144,9 +154,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("moveToHome") { //this:State
 					action { //it:State
 						 stato = "toHome"  
-						updateResourceRep( "azione(MOVING)" 
+						updateResourceRep( "azione(MOVING)"  
 						)
-						updateResourceRep( "stato($stato)" 
+						updateResourceRep( "stato($stato)"  
 						)
 						CommUtils.outmagenta("$name | vado alla posizione HOME")
 						request("moverobot", "moverobot(0,0)" ,"basicrobot" )  
@@ -160,9 +170,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("trolleyathome") { //this:State
 					action { //it:State
-						updateResourceRep( "azione(HOME)" 
+						updateResourceRep( "azione(HOME)"  
 						)
-						updateResourceRep( "stato($stato)" 
+						updateResourceRep( "stato($stato)"  
 						)
 						CommUtils.outmagenta("$name | trolley at HOME")
 						forward("setdirection", "dir(down)" ,"basicrobot" ) 
@@ -176,8 +186,6 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("sonarobstacle") { //this:State
 					action { //it:State
 						discardMessages = true
-						updateResourceRep( "$name(STOPPED)" 
-						)
 						CommUtils.outmagenta("$name | Sono fermo per ostacolo sonar")
 						//genTimer( actor, state )
 					}
@@ -188,13 +196,15 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					}))
 					transition(edgeName="t024",targetState="moveToIndoor",cond=whenEventGuarded("resume",{ stato == "toIndoor"  
 					}))
-					transition(edgeName="t025",targetState="moveToColdroom",cond=whenEventGuarded("resume",{ stato == "inIndoor"  
+					transition(edgeName="t025",targetState="loadTheCharge",cond=whenEventGuarded("resume",{ stato == "inIndoor"  
 					}))
-					transition(edgeName="t026",targetState="loadTheCharge",cond=whenEventGuarded("resume",{ stato == "toColdroom"  
+					transition(edgeName="t026",targetState="moveToColdroom",cond=whenEventGuarded("resume",{ stato == "toColdroom"  
 					}))
 					transition(edgeName="t027",targetState="storeTheCharge",cond=whenEventGuarded("resume",{ stato == "inColdroom"  
 					}))
-					transition(edgeName="t028",targetState="moveToHome",cond=whenEventGuarded("resume",{ stato == "toHome"  
+					transition(edgeName="t028",targetState="chargeDeposited",cond=whenEventGuarded("resume",{ stato == "deposited"  
+					}))
+					transition(edgeName="t029",targetState="moveToHome",cond=whenEventGuarded("resume",{ stato == "toHome"  
 					}))
 				}	 
 				state("quit") { //this:State

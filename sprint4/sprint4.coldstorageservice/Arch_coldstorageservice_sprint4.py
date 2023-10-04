@@ -1,3 +1,4 @@
+### conda install diagrams
 from diagrams import Cluster, Diagram, Edge
 from diagrams.custom import Custom
 import os
@@ -19,6 +20,7 @@ eventedgeattr = {
 with Diagram('coldstorageservice_sprint4Arch', show=False, outformat='png', graph_attr=graphattr) as diag:
   with Cluster('env'):
      sys = Custom('','./qakicons/system.png')
+### see https://renenyffenegger.ch/notes/tools/Graphviz/attributes/label/HTML-like/index
      with Cluster('ctxbasicrobot', graph_attr=nodeattr):
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      with Cluster('ctx_coldstorage', graph_attr=nodeattr):
@@ -27,24 +29,18 @@ with Diagram('coldstorageservice_sprint4Arch', show=False, outformat='png', grap
           warningdevice=Custom('warningdevice','./qakicons/symActorSmall.png')
           transporttrolley=Custom('transporttrolley','./qakicons/symActorSmall.png')
           sonar=Custom('sonar(coded)','./qakicons/codedQActor.png')
-          datacleaner=Custom('datacleaner(coded)','./qakicons/codedQActor.png')
           distancefilter=Custom('distancefilter(coded)','./qakicons/codedQActor.png')
           ledMQTTSender=Custom('ledMQTTSender(coded)','./qakicons/codedQActor.png')
-     transporttrolley >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> coldstorageservice
-     coldstorageservice >> Edge(color='magenta', style='solid', xlabel='gotoindoor', fontcolor='magenta') >> transporttrolley
-     coldstorageservice >> Edge(color='blue', style='solid', xlabel='gohome', fontcolor='blue') >> transporttrolley
-     sys >> Edge(color='red', style='dashed', xlabel='obstacle', fontcolor='red') >> alarmdevice
-     alarmdevice >> Edge( xlabel='alarm', **eventedgeattr, fontcolor='red') >> sys
-     sys >> Edge(color='red', style='dashed', xlabel='obstaclefree', fontcolor='red') >> alarmdevice
-     alarmdevice >> Edge( xlabel='resume', **eventedgeattr, fontcolor='red') >> sys
-     transporttrolley >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> warningdevice
-     warningdevice >> Edge( xlabel='ledoff', **eventedgeattr, fontcolor='red') >> sys
-     warningdevice >> Edge( xlabel='ledon', **eventedgeattr, fontcolor='red') >> sys
-     warningdevice >> Edge( xlabel='ledblink', **eventedgeattr, fontcolor='red') >> sys
-     transporttrolley >> Edge(color='magenta', style='solid', xlabel='engage', fontcolor='magenta') >> basicrobot
-     sys >> Edge(color='red', style='dashed', xlabel='alarm', fontcolor='red') >> transporttrolley
-     transporttrolley >> Edge(color='magenta', style='solid', xlabel='moverobot', fontcolor='magenta') >> basicrobot
-     transporttrolley >> Edge(color='blue', style='solid', xlabel='setdirection', fontcolor='blue') >> basicrobot
-     sys >> Edge(color='red', style='dashed', xlabel='resume', fontcolor='red') >> transporttrolley
-     transporttrolley >> Edge(color='blue', style='solid', xlabel='disengage', fontcolor='blue') >> basicrobot
+     alarmdevice >> Edge( label='alarm', **eventedgeattr, fontcolor='red') >> sys
+     alarmdevice >> Edge( label='resume', **eventedgeattr, fontcolor='red') >> sys
+     warningdevice >> Edge( label='ledoff', **eventedgeattr, fontcolor='red') >> sys
+     warningdevice >> Edge( label='ledon', **eventedgeattr, fontcolor='red') >> sys
+     warningdevice >> Edge( label='ledblink', **eventedgeattr, fontcolor='red') >> sys
+     coldstorageservice >> Edge(color='magenta', style='solid', decorate='true', label='<gotoindoor<font color="darkgreen"> chargetaken</font> &nbsp; >',  fontcolor='magenta') >> transporttrolley
+     transporttrolley >> Edge(color='magenta', style='solid', decorate='true', label='<engage<font color="darkgreen"> engagedone engagerefused</font> &nbsp; moverobot<font color="darkgreen"> moverobotdone moverobotfailed</font> &nbsp; >',  fontcolor='magenta') >> basicrobot
+     coldstorageservice >> Edge(color='blue', style='solid',  label='<gohome &nbsp; >',  fontcolor='blue') >> transporttrolley
+     transporttrolley >> Edge(color='blue', style='solid',  label='<setdirection &nbsp; disengage &nbsp; >',  fontcolor='blue') >> basicrobot
+     alarmdevice >> Edge(color='blue', style='solid',  label='<coapUpdate &nbsp; >',  fontcolor='blue') >> warningdevice
+     transporttrolley >> Edge(color='blue', style='solid',  label='<coapUpdate &nbsp; >',  fontcolor='blue') >> warningdevice
+     transporttrolley >> Edge(color='blue', style='solid',  label='<coapUpdate &nbsp; >',  fontcolor='blue') >> coldstorageservice
 diag

@@ -18,14 +18,12 @@ class Warningdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
-		 
-				var state = 0
-				var stato1 = "0"
 		return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
 						CommUtils.outblue("$name | init")
 						CoapObserverSupport(myself, "localhost","11802","ctx_coldstorage","transporttrolley")
+						CoapObserverSupport(myself, "localhost","11802","ctx_coldstorage","alarmdevice")
 						CommUtils.outblue("$name | LED IS OFF")
 						//genTimer( actor, state )
 					}
@@ -46,41 +44,25 @@ class Warningdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 				state("doObserve") { //this:State
 					action { //it:State
 						discardMessages = false
-						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(azione,ARG)"), 
+						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(RES,ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 var stato1 = payloadArg(1)  
-								if(  (stato1 == "azione(HOME)")  
-								 ){CommUtils.outblue("$name | HOME | ricevuto dal TT")
-								 state = 0  
+								 var caller = payloadArg(0) 
+											   var stato = payloadArg(1)  
+								if(  (stato == "azione(HOME)")  
+								 ){CommUtils.outblue("$name | HOME da $caller -> OFF")
 								emit("ledoff", "ledoff(_)" ) 
 								}
 								else
-								 {if(  (stato1 == "azione(STOPPED)")  
-								  ){CommUtils.outblue("$name | STOPPED | ricevuto dal TT")
-								  state = 1  
+								 {if(  (stato == "azione(STOPPED)")  
+								  ){CommUtils.outblue("$name | STOPPED da $caller -> ON")
 								 emit("ledon", "ledon(_)" ) 
 								 }
 								 else
-								  {if(  (stato1 == "azione(MOVING)")  
-								   ){CommUtils.outblue("$name | MOVING | ricevuto dal TT")
-								   state = 2  
+								  {if(  (stato == "azione(MOVING)")  
+								   ){CommUtils.outblue("$name | MOVING da $caller -> BLINK")
 								  emit("ledblink", "ledblink(_)" ) 
 								  }
-								  else
-								   {CommUtils.outblue("$name | $stato1 | sconosciuto | ricevuto dal TT")
-								   }
 								  }
-								 }
-						}
-						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(alarmdevice,ARG)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								 var stato2 = payloadArg(1)  
-								if(  (stato2 == "ON")  
-								 ){CommUtils.outblue("$name | led on | ricevuto dal sonar")
-								 state = 1  
-								}
-								else
-								 {CommUtils.outblue("$name | sconosciuto | ricevuto dal sonar")
 								 }
 						}
 						//genTimer( actor, state )

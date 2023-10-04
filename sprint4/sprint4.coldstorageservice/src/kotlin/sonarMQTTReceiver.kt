@@ -14,9 +14,9 @@ import unibo.basicomm23.utils.CommUtils
 
 
 class SonarMQTTReceiver(name: String) : ActorBasic(name) {
-    val brokerip = "tcp://mqtt.eclipseprojects.io"
-    val sonartopic = "unibo/sonar/events"
-    val clientId = "sonarReceiver"
+    private val brokerip = "tcp://mqtt.eclipseprojects.io"
+    private val sonartopic = "unibo/sonar/events"
+    private val clientId = "sonarReceiver"
     private lateinit var client: MqttClient
 
     init {
@@ -33,26 +33,28 @@ class SonarMQTTReceiver(name: String) : ActorBasic(name) {
             client = MqttClient(brokerip, clientId)
             val opt = MqttConnectOptions()
             opt.connectionTimeout = 5
+            opt.isCleanSession = true
 
             client.connect(opt)
+
+            CommUtils.outblue("sonarMQTTReceiver | Connected to MQTT client")
             client.subscribe(sonartopic)
             client.setCallback(object : MqttCallback {
                 override fun connectionLost(cause: Throwable) {
-                    //connectionStatus = false
-                    // Give your callback on failure here
+                    CommUtils.outred("sonarMQTTReceiver | Lost Connection ")
                 }
 
                 override fun messageArrived(topic: String, message: MqttMessage) {
                     try {
                         val data = String(message.payload, charset("UTF-8"))
+                        //println(data)
                         val event = CommUtils.buildEvent(name, "sonardata", data)
-                        //System.out.println("creo:"+data)
 
                         GlobalScope.launch {
                             emitLocalStreamEvent(event)
                         }
                     } catch (e: Exception) {
-                        // Give your callback on error here
+                        CommUtils.outred("sonarMQTTReceiver | Error on message arrival ")
                     }
                 }
 
