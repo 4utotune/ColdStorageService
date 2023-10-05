@@ -210,9 +210,8 @@
         <bc>Problema: come gestire i dati prodotti dal <b>sonar</b>?</bc><br>
         In particolare si valuta di adottare più attori, ognuno con uno scopo ben preciso:
         <ul>
-            <li><b>SonarMQTTSender</b>, che dal Raspberry invia i dati letti dal sonar</li>
+            <li><b>SonarMQTTSender</b>, che dal Raspberry invia i dati letti dal sonar, filtrando solamente valori interessanti(compresi tra 1 e 200)</li>
             <li><b>SonarMQTTReceiver</b>, che riceve le distanze</li>
-            <li><b>DataCleaner</b>, che lascia passare soltanto valori in un certo range di valori realistici</li>
             <li><b>DistanceFilter</b>, che confronta la distanza misurata con quella limite</li>
             <li><b>Alarm Device</b>, che emette gli eventi di Stop e Resume</li>
         </ul>
