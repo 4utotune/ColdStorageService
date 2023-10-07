@@ -55,7 +55,7 @@ Reply		ticketrejected		: 	ticketrejected(REASON)
 //Observer TT -> Led
 Dispatch	coapUpdate			:	coapUpdate(SOURCE,ARG)
 
-//Sonar DistanceFilter e SonarCleaner
+//Sonar DistanceFilter
 Event 		sonardata 			: 	distance(D)   	//emitted  by distancefilter
 Event 		obstacle  			: 	obstacle(D)   	//emitted as stream by distancefilter
 Event 		obstaclefree		:	obstaclefree(D)	//emitted as stream by distancefilter
@@ -82,7 +82,6 @@ ExternalQActor basicrobot 	context ctxbasicrobot
 
 //CodedQActor sonar  context ctx_coldstorage className "sonarSimulator"           //IN LOCALE
 CodedQActor sonar  			context ctx_coldstorage className "rx.SonarMQTTReceiver"
-CodedQActor datacleaner    	context ctx_coldstorage className "rx.DataCleaner"
 CodedQActor distancefilter 	context ctx_coldstorage className "rx.DistanceFilter"
 CodedQActor ledMQTTSender  	context ctx_coldstorage className "rx.ledMQTTSender"
 
@@ -221,7 +220,7 @@ QActor alarmdevice context ctx_coldstorage {
 	[# var MINT = 10000L #]
 	
 	State init initial { 
-		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
+		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("sonar") #]
 		println ("$name | init") color yellow
 	}
 	Goto work

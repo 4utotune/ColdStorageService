@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ColdStorageService</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <div class="header">
+        <div class="titolo">
+            <div class="text">
+                <h1>ColdStorageService</h1>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="grande">
+            <div class="admin">
+                This is the ADMIN page:
+            </div>
+            <div class="doppio">
+                <div class="titles">
+                    <h4>Dati:</h4>
+                </div>
+                <div class="info">
+                    <div class="data-item">
+                        <div class="label">Peso massimo</div>
+                        <div class="value"><span id="maxVal" style="color: limegreen">0</span></div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Peso Corrente</div>
+                        <div class="value"><span id="curVal" style="color: limegreen">0</span></div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Peso prenotato</div>
+                        <div class="value"><span id="resVal" style="color: limegreen">0</span></div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Posizione TransportTrolley</div>
+                        <div class="value"><span id="posVal" style="color: limegreen">0</span></div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Stato TransportTrolley</div>
+                        <div class="value"><span id="stateVal" style="color: limegreen">0</span></div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Numero richieste rifiutate</div>
+                        <div class="value"><span id="rejVal" style="color: limegreen">0</span></div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Debug</div>
+                        <div class="value"><span id="otherVal" style="color: limegreen">0</span></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script src="../main.js"></script>
+    <script>connect()</script>
+</body>
+
+</html>

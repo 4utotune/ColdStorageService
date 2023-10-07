@@ -1,6 +1,0 @@
-{"actor":"transporttrolley_mock", "msgType":"dispatch", "sender":"coldstorageservice", "msgId":"gotoindoor"}
-{"actor":"coldstorageservice", "msgType":"dispatch", "sender":"transporttrolley_mock", "msgId":"chargetaken"}
-{"actor":"coldstorageservice", "msgType":"request", "sender":"transporttrolley_mock", "msgId":"chargedeposited"}
-{"actor":"transporttrolley_mock", "msgType":"dispatch", "sender":"coldstorageservice", "msgId":"gotoindoor"}
-{"actor":"coldstorageservice", "msgType":"dispatch", "sender":"transporttrolley_mock", "msgId":"chargetaken"}
-{"actor":"coldstorageservice", "msgType":"request", "sender":"transporttrolley_mock", "msgId":"chargedeposited"}

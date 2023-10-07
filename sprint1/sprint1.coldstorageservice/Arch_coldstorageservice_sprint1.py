@@ -1,3 +1,4 @@
+### conda install diagrams
 from diagrams import Cluster, Diagram, Edge
 from diagrams.custom import Custom
 import os
@@ -19,6 +20,7 @@ eventedgeattr = {
 with Diagram('coldstorageservice_sprint1Arch', show=False, outformat='png', graph_attr=graphattr) as diag:
   with Cluster('env'):
      sys = Custom('','./qakicons/system.png')
+### see https://renenyffenegger.ch/notes/tools/Graphviz/attributes/label/HTML-like/index
      with Cluster('ctx_basicrobot', graph_attr=nodeattr):
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      with Cluster('ctx_coldstorage', graph_attr=nodeattr):
@@ -26,19 +28,15 @@ with Diagram('coldstorageservice_sprint1Arch', show=False, outformat='png', grap
           accessguimock=Custom('accessguimock','./qakicons/symActorSmall.png')
           coldstorageservice=Custom('coldstorageservice','./qakicons/symActorSmall.png')
           transporttrolley=Custom('transporttrolley','./qakicons/symActorSmall.png')
-     test_suite >> Edge(color='blue', style='solid', xlabel='next_test', fontcolor='blue') >> test_suite
-     test_suite >> Edge(color='blue', style='solid', xlabel='mock_store_request', fontcolor='blue') >> accessguimock
-     test_suite >> Edge(color='blue', style='solid', xlabel='mock_ticket_input', fontcolor='blue') >> accessguimock
-     accessguimock >> Edge(color='magenta', style='solid', xlabel='storerequest', fontcolor='magenta') >> coldstorageservice
-     accessguimock >> Edge(color='blue', style='solid', xlabel='test_gotticket', fontcolor='blue') >> test_suite
-     accessguimock >> Edge(color='magenta', style='solid', xlabel='insertticket', fontcolor='magenta') >> coldstorageservice
-     coldstorageservice >> Edge(color='blue', style='solid', xlabel='gotoindoor', fontcolor='blue') >> transporttrolley
-     coldstorageservice >> Edge(color='blue', style='solid', xlabel='chargetaken', fontcolor='blue') >> accessguimock
-     transporttrolley >> Edge(color='magenta', style='solid', xlabel='engage', fontcolor='magenta') >> basicrobot
-     transporttrolley >> Edge(color='magenta', style='solid', xlabel='moverobot', fontcolor='magenta') >> basicrobot
-     transporttrolley >> Edge(color='blue', style='solid', xlabel='chargetaken', fontcolor='blue') >> coldstorageservice
-     transporttrolley >> Edge(color='magenta', style='solid', xlabel='chargedeposited', fontcolor='magenta') >> coldstorageservice
-     transporttrolley >> Edge(color='blue', style='solid', xlabel='setdirection', fontcolor='blue') >> basicrobot
-     transporttrolley >> Edge(color='blue', style='solid', xlabel='next_test', fontcolor='blue') >> test_suite
-     transporttrolley >> Edge(color='blue', style='solid', xlabel='disengage', fontcolor='blue') >> basicrobot
+     transporttrolley >> Edge(color='magenta', style='solid', decorate='true', label='<engage &nbsp; moverobot &nbsp; >',  fontcolor='magenta') >> basicrobot
+     transporttrolley >> Edge(color='magenta', style='solid', decorate='true', label='<chargedeposited &nbsp; >',  fontcolor='magenta') >> coldstorageservice
+     accessguimock >> Edge(color='magenta', style='solid', decorate='true', label='<storerequest &nbsp; insertticket &nbsp; >',  fontcolor='magenta') >> coldstorageservice
+     coldstorageservice >> Edge(color='blue', style='solid',  label='<chargetaken &nbsp; >',  fontcolor='blue') >> accessguimock
+     coldstorageservice >> Edge(color='blue', style='solid',  label='<gotoindoor &nbsp; >',  fontcolor='blue') >> transporttrolley
+     transporttrolley >> Edge(color='blue', style='solid',  label='<next_test &nbsp; >',  fontcolor='blue') >> test_suite
+     transporttrolley >> Edge(color='blue', style='solid',  label='<setdirection &nbsp; disengage &nbsp; >',  fontcolor='blue') >> basicrobot
+     test_suite >> Edge(color='blue', style='solid',  label='<next_test &nbsp; >',  fontcolor='blue') >> test_suite
+     accessguimock >> Edge(color='blue', style='solid',  label='<test_gotticket &nbsp; >',  fontcolor='blue') >> test_suite
+     transporttrolley >> Edge(color='blue', style='solid',  label='<chargetaken &nbsp; >',  fontcolor='blue') >> coldstorageservice
+     test_suite >> Edge(color='blue', style='solid',  label='<mock_store_request &nbsp; mock_ticket_input &nbsp; >',  fontcolor='blue') >> accessguimock
 diag

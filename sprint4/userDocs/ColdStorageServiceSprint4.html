@@ -177,8 +177,6 @@
             effettuato un controllo di tutti i <b>Ticket</b> validi per identificare quelli scaduti e liberare lo spazio
             (prenotato) nella <b>ColdRoom</b></div>
 
-
-
         <h3>Informazioni osservate</h3>
         I seguenti messaggi seguono tutti il <b>pattern Observer</b>:
         <table id="myTable">
@@ -268,9 +266,9 @@
                     <td>TestInsertTicket</td>
                     <td>ServiceStatusGUI</td>
                     <td>Viene effettuata una richiesta <u>isolata</u> di insertticket</td>
-                    <td>Ci si aspetta che il robot giunga alla posizione di <b>INDOOR</b>, direzionarsi po alla
-                        <b>PORT</b>, aggiornare sia il peso prenotato che quello
-                        fisico, ed infine dirigersi verso alla <b>HOME</b>
+                    <td>Ci si aspetta che il robot giunga alla posizione di <b>INDOOR</b>, si direzioni verso la
+                        <b>PORT</b>, aggiorni sia il peso prenotato che quello
+                        fisico, ed infine si diriga verso la <b>HOME</b>
                     </td>
                 </tr>
                 <tr>
@@ -287,8 +285,7 @@
         Per progettare la ServiceStatusGUI si è fatto tesoro del lavoro già svolto per la AccessGUI, con cui condivide
         la tecnologia di base: Spring.<br>
         Delineiamo anche per questo componente due tipi diversi di connessioni: quelle tra Client e Server Spring e
-        quelle tra il Server Spring e
-        ColdStorageService.<br>
+        quelle tra il Server Spring e ColdStorageService.<br>
         Le classi che ci serviranno saranno quindi:<ul>
             <li><b>Application</b>, il main del programma che istruirà Spring di avviare l'applicazione</li>
             <li><b>WebSocketConfiguration</b>, dove definiremo due tipi di Handler: Client (comunicazione C/S) e Actor
@@ -312,8 +309,7 @@
         supportare la nuova interazione relativa al messaggio ChargeTaken. Oltre a supportare la funzionalità descritta
         in sede di analisi, è stata riscritta la logica di gestione Ticket rendendola più precisa per quanto riguarda i
         possibili scenari e i messaggi scambiati, risolvendo così anche un comportamento anomalo riscontrato riguardante
-        il
-        conteggio del peso prenotato.
+        il conteggio del peso prenotato.
 
         <h2>Conclusioni</h2>
         Questo Sprint produce il sistema finale richiesto dal committente nel <a target="_blank"

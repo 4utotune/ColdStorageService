@@ -22,7 +22,7 @@ class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 		return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
-						 subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar")  
+						 subscribeToLocalActor("distancefilter").subscribeToLocalActor("sonar")  
 						CommUtils.outyellow("$name | init")
 						//genTimer( actor, state )
 					}

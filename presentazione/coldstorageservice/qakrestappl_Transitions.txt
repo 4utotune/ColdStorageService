@@ -1,0 +1,3 @@
+{"actor":"coldstorageservice", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_update", "msgId":"coapUpdate"}
+{"actor":"warningdevice", "msgType":"dispatch", "curstate":"work", "nextstate":"doObserve", "msgId":"coapUpdate"}
+{"actor":"transporttrolley", "msgType":"dispatch", "curstate":"chargeDeposited", "nextstate":"moveToHome", "msgId":"gohome"}

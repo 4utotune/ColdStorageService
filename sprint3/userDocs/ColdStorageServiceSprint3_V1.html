@@ -210,7 +210,8 @@
         <bc>Problema: come gestire i dati prodotti dal <b>sonar</b>?</bc><br>
         In particolare si valuta di adottare più attori, ognuno con uno scopo ben preciso:
         <ul>
-            <li><b>SonarMQTTSender</b>, che dal Raspberry invia i dati letti dal sonar, filtrando solamente valori interessanti(compresi tra 1 e 200)</li>
+            <li><b>SonarMQTTSender</b>, che dal Raspberry invia i dati letti dal sonar, filtrando solamente valori
+                interessanti(compresi tra 1 e 200)</li>
             <li><b>SonarMQTTReceiver</b>, che riceve le distanze</li>
             <li><b>DistanceFilter</b>, che confronta la distanza misurata con quella limite</li>
             <li><b>Alarm Device</b>, che emette gli eventi di Stop e Resume</li>
@@ -265,7 +266,8 @@
                     <td>Parte della pipeline dei gestori delle misurazioni del
                         <b>sonar</b>, che in questo caso notifica ad <b>alarmdevice</b> che la distanza misurata è
                         inferiore alla
-                        soglia prestabilita <b>DLIMT</b>. Semantica <u>Event</u> perchè obstacle può interessare a più ascoltatori
+                        soglia prestabilita <b>DLIMT</b>. Semantica <u>Event</u> perchè obstacle può interessare a più
+                        ascoltatori
                     </td>
                 </tr>
                 <tr>
@@ -276,7 +278,8 @@
                     <td>Parte della pipeline dei gestori delle misurazioni del
                         <b>sonar</b> che in questo caso notifica ad <b>alarmdevice</b> che la distanza misurata è
                         superiore alla
-                        soglia prestabilita <b>DLIMT</b>. Semantica <u>Event</u> perchè obstaclefree può interessare a più ascoltatori
+                        soglia prestabilita <b>DLIMT</b>. Semantica <u>Event</u> perchè obstaclefree può interessare a
+                        più ascoltatori
                     </td>
                 </tr>
 
@@ -293,7 +296,8 @@
 
         <h3>Architettura logica</h3>
         <div class="remark">
-            Codice QAK per la modellazione del sistema: <a href="../sprint3.coldstorageservice/src/ColdStorageService.qak"
+            Codice QAK per la modellazione del sistema: <a
+                href="../sprint3.coldstorageservice/src/ColdStorageService.qak"
                 target="_blank">ColdStorageService.qak</a>
         </div>
 
@@ -379,13 +383,10 @@
         <br>
         Prima di essere considerati da <b>ColdStorageService</b>, i dati vengono filtrati da:
         <ul>
-            <li><b>SonarMQTTReceiver</b>: si impegna a ricevere i dati "grezzi" del <b>sonar</b> tramite MQTT e poi
+            <li><b>SonarMQTTReceiver</b>: si impegna a ricevere i dati letti dal <b>sonar</b> tramite MQTT e poi
                 propaga l'evento all'interno del contesto ctx_coldstorage</li>
-            <li><b>DataCleaner</b>: pulisce i valori scartando le misurazioni che non sono comprese in un range che va
-                da 2 a 150 cm</li>
-            <li><b>DistanceFilter</b>: riceve i dati puliti dal <b>DataCleaner</b> e invia un evento <b>obstacle</b> o
-                <b>obstaclefree</b> qualora le misurazioni rispettivamente siano inferiori di <b>DLIMT</b>
-                oppure maggiori
+            <li><b>DistanceFilter</b>: riceve i dati e invia un evento <b>obstacle</b> o <b>obstaclefree</b> qualora le
+                misurazioni rispettivamente siano inferiori di <b>DLIMT</b> oppure maggiori
             </li>
         </ul>
         Per completare la catena: gli eventi <b>obstacle</b> e <b>obstaclefree</b> sono captabili da <b>alarm device</b>
@@ -452,7 +453,7 @@
             <li>Testare il sistema</li>
         </ol>
 
-        <br/><br/>
+        <br /><br />
 
         <div style="background-color:rgba(86, 56, 253, 0.9); width:60%; text-align:left;color:white">
             By <br>Tassinari Gabriele, email: gabriele.tassinari2@studio.unibo.it<br>
