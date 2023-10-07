@@ -1,0 +1,479 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<!--
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+
+<link rel="stylesheet" type="text/css" href="../../common/sprintstyle.css">
+
+<head>
+    <title>Sprint3 - V1</title>
+</head>
+
+<body>
+    <div id="top">
+        <h1>LABORATORIO DI INGEGNERIA DEI SISTEMI SOFTWARE<font size="5"></font>
+        </h1>
+    </div>
+
+    <div class="body">
+        <h2>Introduction</h2>
+        Considerando sufficiente per adesso il lavoro svolto sul componente ServiceAccessGUI presentato nello Sprint2,
+        lo <b>Sprint3</b> si impegna a soddisfare gli <b>Alarm Requirements</b>, introducendo i componenti <b>Alarm
+            Device</b> e <b>Warning Device</b>.
+
+        <h2>Requirements</h2>
+
+        <div class="remark">
+            <a target="_blank" href="http://calendar.altervista.org/TemaFinale23.pdf">Descrizione del
+                TemaFinale23</a><br>
+
+            <bc>Goals Sprint 3</bc>
+            <ol>
+                <li>Identificare ed analizzare tutti i problemi relativi ai requisiti che coinvolgono la
+                    <b>Alarm Device</b> e il <b>Warning Device</b>
+                </li>
+                <li>Integrare al sistema realizzato nello Sprint2 la <b>Alarm Device</b> e il <b>Warning Device</b>,
+                    verificando che soddisfino gli <u>Alarm Requirements</u></li>
+                <li>Sviluppare il software da collocare sulla scheda Raspberry Pi con i componenti hardware collegati
+                    (sonar e led)
+                </li>
+                <li>Testare il sistema</li>
+            </ol>
+        </div>
+
+        <h2>Requirement analysis</h2>
+
+        <h4>Chiarimenti del committente</h4>
+        L'interazione con il committente ha permesso di chiarire alcuni aspetti del progetto:
+        <ul>
+            <li>Il <b>Led</b> e il <b>Sonar</b> possono non essere montati a bordo del <b>DDR Robot</b></li>
+            <li>Il <b>Transport Trolley</b> deve fermarsi il prima possibile alla ricezione di un Alarm</li>
+        </ul>
+
+        <h3>Sistema</h3>
+        Il macro-componente identificato che si va ad aggiungere al prodotto degli sprint precedenti è <b>warning ed
+            alarm devices</b>:
+        <center>
+            <div class="piccola">
+                <img src="sprint3/sysSprint3.png" alt="sistema">
+            </div>
+        </center>
+        In questo caso si andrà a lavorare con componenti fisici come:
+        <ul>
+            <li>un <b>Led</b></li>
+            <li>un <b>Sonar</b></li>
+            <li>una scheda <b>Raspberry Pi</b> che identificherà il nodo computazionale dei due device</li>
+            <li>cavetti jumper femmina-femmina per permettere i collegamenti tra <b>Sonar</b>, <b>Led</b> e
+                <b>Raspberry Pi</b>
+            </li>
+        </ul>
+
+        <h3>Analisi</h3>
+        Dai requisiti espressi nel <a target="_blank" href="http://calendar.altervista.org/TemaFinale23.pdf">Tema
+            Finale</a> e dalle analisi
+        già effettuate negli Sprint0, Sprint1 e Sprint2, in questo Sprint occorre analizzare le entità:
+        <ul>
+            <li><b>Alarm Device</b>, che si occupa di notificare quando viene rilevato un oggetto a una distanza sotto
+                la soglia <b>DLIMT</b>, al fine
+                di fermare il <b>Transport Trolley</b></li>
+            <li><b>Warning Device</b>, che si occupa di mostrare lo stato del <b>Transport Trolley</b> tramite un
+                <b>Led</b>
+            </li>
+        </ul>
+        Entrambi dovranno eseguire all'interno di una scheda <b>Raspberry Pi</b>.<br>
+        Inoltre questi rappresentano gli <b>Alarm Requirements</b> che dovranno essere sempre soddisfatti per fare in
+        modo che il <b>Transport Trolley</b> si comporti in linea con i requisiti forniti dal committente.
+        <br>
+
+        <h4>alarm device</h4>
+        L'<b>alarm device</b> è un componente costituito da un <b>Sonar</b> che è in grado di misurare la distanza tra
+        sè ed un ostacolo posto di fronte.
+        Quando il <b>Sonar</b> rileva una distanza minore di una soglia <b>DLIMT</b> il <b>Transport Trolley</b> deve
+        essere fermato, fino a che non viene rilevata una distanza maggiore a <b>DLIMT</b>.<br>
+        <div class="remark keypoint">Il <b>Transport Trolley</b> si deve fermare quando il <b>sonar rileva una distanza
+                minore di
+                una soglia <b>DLIMT</b>.
+            </b>
+        </div>
+        Nota importante è che il <b>Transport Trolley</b> non può essere fermato due volte consecutive entro un lasso di
+        tempo pari a <b>MINT</b> millisecondi (ovvero deve intercorrere un tempo <b>MINT</b> millisecondi tra uno stop
+        e quello successivo).
+        <div class="remark keypoint">Il <b>Transport Trolley</b> non può essere fermato due volte consecutive entro un
+            lasso di
+            tempo pari a <b>MINT</b> millisecondi.
+        </div>
+
+
+        <h4>warning device</h4>
+        Il <b>warning device</b> è un componente costituito da un <b>Led</b> che comunica lo stato del <b>Transport
+            trolley</b>.
+        Il <b>Led</b> può rappresentare 3 stati diversi:
+        <ul>
+            <li><b>Transport Trolley in HOME</b>: il <b>Led</b> è spento</li>
+            <li><b>Transport Trolley in movimento</b>: il <b>Led</b> lampeggia con un intervallo costante</li>
+            <li><b>Transport Trolley è fermo</b>: il <b>Led</b> è acceso</li>
+        </ul>
+        <div class="remark keypoint">Gli stati del <b>Led</b> sono tre: spento se il <b>TransportTrolley</b> è in
+            <b>HOME</b>, acceso se
+            fermo, lampeggiante se in movimento.
+        </div>
+
+        <h2>Analisi del Problema</h2>
+
+        <bc>Problema: come comunicare al <b>basicrobot23</b> di fermarsi?</bc><br>
+        <u>Soluzione:</u> il <b>basicrobot23</b> a nostra disposizione è già in ascolto di un evento <b>alarm</b> il cui
+        effetto è quello di
+        interrompere l'azione che stava compiendo, quindi si può utilizzare questo sistema.
+        <br><br>
+        <bc>Problema: come fermare il TransportTrolley?</bc><br>
+        L'evento alarm viene recepito direttamente dal <b>basicrobot23</b> ma bisogna occuparsi
+        comunque di inviare al <b>Transport Trolley</b> tale informazione per
+        informarlo dell'accaduto, siccome la reply del <b>moverobot(coordinate)</b> in casi di fallimento non
+        restituisce la loro causa.
+        <div class="remark keypoint">Per soddisfare gli <b>Alarm Requirements</b> l'<b>alarm device</b> emetterà un
+            <b>alarm</b>
+            per fermare direttamente il <b>transportrolley</b>
+        </div>
+        Per quanto riguarda invece la resume, quando il <b>Sonar</b> rileverà di nuovo una distanza che permetterà lo
+        sblocco del <b>Transport Trolley</b>, verrà emesso un evento che il <b>Transport Trolley</b> riceverà e si
+        impegnerà a sbloccare il robot dall'operazione su cui si era fermato, riprendendo così la sua routine.
+        <div class="remark keypoint">L'<b>alarm device</b> emetterà un evento <b>resume</b>, ed il
+            <b>TransportTrolley</b> si impegnerà a riattivare il robot.
+        </div>
+        <br>
+        <bc>Problema: cosa deve fare il <b>Transport Trolley terminato un allarme?</b></bc><br>
+        <u>Soluzione:</u> quando il <b>Transport Trolley</b> verrà rimesso in movimento dopo uno stop, dovrà riprendere
+        dal punto dove si era fermato, concludendo correttamente la richiesta a cui stava lavorando.
+        <div class="remark keypoint">Il <b>Transport Trolley</b> fermato per via della soglia violata tornerà a svolgere
+            il compito su cui stava lavorando una volta conclusosi l'allarme.
+        </div>
+        <br>
+        <bc>Problema: come far tornare il <b>TransportTrolley</b> a svolgere il compito che stava facendo all'arrivo
+            dello stop?</bc><br>
+        Dato che il <b>Transport Trolley</b> comunica con <b>basicrobot23</b> tramite il solo comando
+        <b>moverobot(coordinate)</b>, la
+        risoluzione della casisitica risulta agevolata: quando il <b>Transport Trolley</b> viene fermato da un
+        <b>alarm</b> per
+        riprendere ciò che stava facendo è sufficiente ripetere
+        lo stesso comando <b>moverobot(coordinate)</b> che non era andato a buon fine per via dell'evento straordinario.
+        Questo è dovuto dal fatto che indipendentemente dalla
+        posizione del <b>Transport Trolley</b>, comunicando a questo ultimo <b>moverobot(coordinate)</b> il risultato
+        sarà il medesimo, ovvero raggiungere la posizione richiesta.
+        <div class="remark keypoint">Per continuare il compito che il <b>TransportTrolley</b> aveva lasciato in sospeso
+            per via dello stop è necessario ripetere l'ultimo comando (quello non andato a buon fine).
+        </div>
+        <br>
+        <bc>Problema: quando bisogna far partire il conteggio di <b>MINT</b>?</bc><br>
+        <u>Soluzione:</u> leggendo con attenzione il <a target="_blank"
+            href="http://calendar.altervista.org/TemaFinale23.pdf">Tema
+            Finale</a> il <b>Transport Trolley</b> una volta ripresa l'esecuzione a seguito di uno stop può subirne un
+        altro solo dopo
+        <b>MINT</b> millisecondi dalla ultima <b>resume</b>. Si possono presentare 3 scenari:
+        <ol>
+            <li>Arriva uno stop <u>dopo</u> <b>MINT</b> millisecondi e il <b>Transport Trolley</b> è in movimento</li>
+            <li>Arriva uno stop <u>prima</u> di <b>MINT</b> millisecondi e il <b>Transport Trolley</b> è in movimento
+            </li>
+            <li>Arriva uno stop e il <b>Transport Trolley</b> è ancora fermo dallo stop precedente</li>
+        </ol>
+        Solo nel primo scenario il <b>TransportTrolley</b> seguirà il comportamento previsto. Negli scenari 2 e 3
+        l'evento di Stop andrà ignorato.
+        <center>
+            <div class="piccola">
+                <img src="sprint3/diagrammaeventi.png" alt="architettura logica">
+            </div>
+        </center>
+        <div class="remark keypoint">Il <b>TransportTrolley</b> non si può fermare prima di <b>MINT</b> millisecondi
+            dall'ultima resume.
+        </div>
+        <br>
+        <bc>Problema: chi si occupa di gestire il <b>Led</b>?</bc><br>
+        Si adotta il <b>pattern Observer</b> che permette al <b>Led</b> di venire notificato ogni volta che un cambio di
+        stato del <b>TransportTrolley</b>
+        a lui interessante succede. Il <b>warning device</b> implementa la logica di gestione. Il <b>led</b> deve
+        considerare anche quando il robot è fermo perché sta caricando/scaricando il carico.
+        <div class="remark keypoint">Il <b>warning device</b> viene notificato ad ogni cambiamento di stato del
+            <b>TransportTrolley</b>.
+        </div>
+        <br>
+        <bc>Problema: come gestire gli invii al <b>led</b>?</bc><br>
+        La comunicazione verso il <b>Raspberry</b> avviene tramite protocollo MQTT, seguendo la seguente catena di
+        attori:
+        <ul>
+            <li><b>Warning Device</b>, che osserva cambiamenti nel TransportTrolley </li>
+            <li><b>LedMQTTSender</b>, che invia i comandi al Raspberry</li>
+            <li><b>LedMQTTReceiver</b>, che riceve i comandi e li attua</li>
+        </ul>
+        <div class="remark keypoint">La gestione del <b>led</b> coinvolge tre attori
+        </div>
+        <br>
+        <bc>Problema: come gestire i dati prodotti dal <b>sonar</b>?</bc><br>
+        In particolare si valuta di adottare più attori, ognuno con uno scopo ben preciso:
+        <ul>
+            <li><b>SonarMQTTSender</b>, che dal Raspberry invia i dati letti dal sonar, filtrando solamente valori
+                interessanti(compresi tra 1 e 200)</li>
+            <li><b>SonarMQTTReceiver</b>, che riceve le distanze</li>
+            <li><b>DistanceFilter</b>, che confronta la distanza misurata con quella limite</li>
+            <li><b>Alarm Device</b>, che emette gli eventi di Stop e Resume</li>
+        </ul>
+        Questi attori messi assieme adottano il <b>pattern pipeline</b>, dove l'attore successivo consuma l'output di
+        quello precedente.
+        <div class="remark keypoint">Gestione delle misurazioni <b>sonar</b> ripartita tra cinque attori</div>
+        <br>
+
+        <h3>Sonar Simulator</h3>
+        Ai fini di test per il momento si può adottare un <b>sonar</b> simulatore che genera misurazioni prestabilite,
+        per poi successivamente passare a un <b>sonar</b> fisico.
+
+        <h3>Interazioni</h3>
+        <table id="myTable">
+            <thead>
+                <tr>
+                    <th>Messaggio</th>
+                    <th>Mittente</th>
+                    <th>Destinatario</th>
+                    <th>Semantica messaggio</th>
+                    <th>Descrizione</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>coapUpdate</td>
+                    <td>transportrolley</td>
+                    <td>warning device</td>
+                    <td>Dispatch</td>
+                    <td>Informa il <b>warning device</b> dello stato che il
+                        <b>led</b> deve assumere adottando il <b>pattern Observer</b>. Semantica <u>Dispatch</u> per via
+                        del fatto che
+                        si adotta un pattern Observer.
+                    </td>
+                </tr>
+                <tr>
+                    <td>alarm</td>
+                    <td>alarmdevice</td>
+                    <td>transportrolley <br> basicrobot
+                    </td>
+                    <td>Event</td>
+                    <td>Informa chi è interessato che il DDR Robot si deve fermare. Semantica <u>Event</u>
+                        perchè alarm può interessare a più ascoltatori</td>
+                </tr>
+
+                <tr>
+                    <td>obstacle</td>
+                    <td>distancefilter</td>
+                    <td>alarm device</td>
+                    <td>Event</td>
+                    <td>Parte della pipeline dei gestori delle misurazioni del
+                        <b>sonar</b>, che in questo caso notifica ad <b>alarmdevice</b> che la distanza misurata è
+                        inferiore alla
+                        soglia prestabilita <b>DLIMT</b>. Semantica <u>Event</u> perchè obstacle può interessare a più
+                        ascoltatori
+                    </td>
+                </tr>
+                <tr>
+                    <td>obstaclefree</td>
+                    <td>distancefilter</td>
+                    <td>alarm device</td>
+                    <td>Event</td>
+                    <td>Parte della pipeline dei gestori delle misurazioni del
+                        <b>sonar</b> che in questo caso notifica ad <b>alarmdevice</b> che la distanza misurata è
+                        superiore alla
+                        soglia prestabilita <b>DLIMT</b>. Semantica <u>Event</u> perchè obstaclefree può interessare a
+                        più ascoltatori
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>resume</td>
+                    <td>alarm device</td>
+                    <td>transportrolley</td>
+                    <td>Event</td>
+                    <td>Il <b>transportrolley</b> riceve istruzione di far ripartire il robot. Semantica <u>Event</u>
+                        perchè<b>########</b></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Architettura logica</h3>
+        <div class="remark">
+            Codice QAK per la modellazione del sistema: <a
+                href="../sprint3.coldstorageservice/src/ColdStorageService.qak"
+                target="_blank">ColdStorageService.qak</a>
+        </div>
+
+        Il sistema da noi modellato presenta la seguente architettura logica:
+        <center>
+            <div class="piccola">
+                <img src="sprint3/coldstorageservice_sprint3arch_v1.png" alt="architettura logica">
+            </div>
+        </center>
+
+        <br>
+        In seguito viene riportata la stessa immagine con l'annessa integrazione dell'architettura logica lato Raspberry.
+        <br><br>
+        <center>
+            <div class="piccola">
+                <img src="sprint3/coldstorageservice_sprint3arch_v2.png" alt="architettura logica">
+            </div>
+        </center>
+
+        <h2>Test plans</h2>
+        <table id="myTable1">
+            <thead>
+                <tr>
+                    <th>Test</th>
+                    <th>Entità coinvolte</th>
+                    <th>Scenario</th>
+                    <th>Comportamento atteso</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>testObstacle</td>
+                    <td>alarm device</td>
+                    <td>Il <b>TransportTrolley</b> sta eseguendo le sue mansioni ed all'improvviso il <b>sonar</b>
+                        rileva una distanza minore di <b>DLIMT</b></td>
+                    <td>Un evento <b>alarm</b> viene scatenato da <b>alarmdevice</b></td>
+                </tr>
+                <tr>
+                    <td>testConsecutiveObstacleGreaterDLIMT</td>
+                    <td>alarm device</td>
+                    <td>Il <b>TransportTrolley</b> sta eseguendo le sue mansioni ed all'improvviso il <b>sonar</b>
+                        rileva una distanza minore di <b>DLIMT</b> e il <b>transportrolley</b> si ferma.
+                        Dopo un tempo pari ad 1/3 di <b>MINT</b> viene effettauta la resume, riattivando il
+                        <b>transportrolley</b>. Successivamente dopo <b>MINT</b>
+                        millisecondi dal precedente stop il <b>sonar</b> rileva di nuovo una distanza minore di
+                        <b>DLIMT</b>.
+                    </td>
+                    <td>In entrambi gli stop vengono emessi gli eventi <b>alarm</b>.</td>
+                </tr>
+                <tr>
+                    <td>testConsecutiveObstacleLowerDLIMT</td>
+                    <td>alarm device</td>
+                    <td>Il <b>TransportTrolley</b> sta eseguendo le sue mansioni ed all'improvviso il <b>sonar</b>
+                        rileva una distanza minore di <b>DLIMT</b> e il <b>transportrolley</b> si ferma.
+                        Dopo un tempo pari ad 1/3 di <b>MINT</b> viene effettauta la resume, riattivando il
+                        <b>transportrolley</b>. Successivamente entro <b>MINT</b>
+                        millisecondi dal precedente stop il <b>sonar</b> rileva di nuovo una distanza minore di
+                        <b>DLIMT</b>, ma immediatamente dopo ritorna a misurare una distanza maggiore di <b>DLIMT</b>.
+                    </td>
+                    <td>Al primo stop viene emesso l'evento <b>alarm</b>, ma al secondo l'evento <b>alarm</b> non viene
+                        scatenato.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Project</h2>
+
+        Per inviare gli eventi tra il servizio ed il <b>led</b> e <b>sonar</b> si sceglie di utilizzare il protocollo
+        MQTT.
+        <br>Questa scelta è motivata dal pensiero lungimirante e a favore dell'estendibilità di permettere in futuro
+        molteplici <b>Transport Trolley</b>: i dati dovrebbero in quel caso essere a disposizione di più entità. La
+        nostra software house è già in possesso di materiale utilizzabile per questo scopo, proprio tramite il
+        protocollo <a href="https://mqtt.org/">MQTT</a>. Trattasi di un protocollo
+        adatto per contesti IoT dove sono coinvolti sensori, attuatori e microcontrollori di potenza ridotta.
+        <br>La strategia è fare sì che il <b>Raspberry</b> invii esternamente tutti i valori che rileva; sarà il
+        <b>ColdStorageService</b> a sfoltirli ed elaborarli, evitando di appesantire il <b>Raspberry</b> con ulteriori
+        operazioni.
+        <br><br>
+        Siccome nell'analisi del problema si è utilizzato un simulatore del <b>sonar</b> per creare il QAK, il passo
+        successivo è quello di integrarne uno fisico. Per fare ciò per il momento adottiamo un broker gratuito e a
+        disposizione di tutti come <u>tcp://mqtt.eclipseprojects.io</u> che permette l'invio e la ricezione di eventi
+        tra dispositivi fisicamente non collegati ma connessi alla rete internet. In futuro si potrà decidere di passare
+        a un broker privato.<br>
+        Per comunicare dati utilizzando <b>MQTT</b> bisogna definire un topic che definisce il canale di utilizzo, utile
+        per distinguere categorie di eventi che vogliamo raggruppare.
+        Nel nostro caso si è adottato <b>unibo/sonar/events</b> come topic per comunicare i dati
+        dal <b>Raspberry</b> al Servizio.
+        <div class="remark keypoint">Topic MQTT per il <b>sonar</b>: <b>unibo/sonar/events</b>
+        </div>
+        <br>
+        Prima di essere considerati da <b>ColdStorageService</b>, i dati vengono filtrati da:
+        <ul>
+            <li><b>SonarMQTTReceiver</b>: si impegna a ricevere i dati letti dal <b>sonar</b> tramite MQTT e poi
+                propaga l'evento all'interno del contesto ctx_coldstorage</li>
+            <li><b>DistanceFilter</b>: riceve i dati e invia un evento <b>obstacle</b> o <b>obstaclefree</b> qualora le
+                misurazioni rispettivamente siano inferiori di <b>DLIMT</b> oppure maggiori
+            </li>
+        </ul>
+        Per completare la catena: gli eventi <b>obstacle</b> e <b>obstaclefree</b> sono captabili da <b>alarm device</b>
+        e, qualora le condizioni riguardanti il tempo <b>MINT</b> tra uno stop e l'altro siano soddisfatte, emette un
+        evento alarm che verrà ricevuto sia da <b>basicrobot23</b> sia dal <b>Transport Trolley</b>.
+        <br><br>
+        Anche per comunicare con il <b>led</b> si utilizza MQTT, mandando un messaggio con l'ausilio dell'attore
+        <b>LedMQTTSender</b> ed utilizzando <b>unibo/led/events</b> come topic.
+        <div class="remark keypoint">Topic MQTT per il <b>led</b>: <b>unibo/led/events</b>
+        </div>
+        <br>
+        Per la fase di prototipazione il <b>sonar</b> e <b>led</b> saranno collegati ad un <b>Raspberry</b> tramite dei
+        cavetti jumper femmina-femmina.
+        <br>
+        Il software lato <b>Raspberry</b> sarà organizzato nella seguente maniera:
+        <ul>
+            <li>Un programma python che si occupa di utilizzare il <b>sonar</b> per estrapolare le distanze misurate
+            </li>
+            <li>Un programma python che cattura tali dati da standard input e li inoltra al broker nel corretto topic
+            </li>
+            <li>Un programma python che riceve dal broker i comandi e li inoltra su standard input</li>
+            <li>Un programma python che legge da standard input e comanda il led</li>
+
+        </ul>
+        Per definizione i programmi devono essere eseguiti in pipe, ad es. (per il sonar): <u>python sonar.py | python
+            controllerMQTT.py</u>
+        <br><br>
+        I file che definiscono il software necessario per il <b>Raspberry</b> sono: <a
+            href="sprint3/sonar.py">sonar.py</a>, <a href="sprint3/ControllerMqtt.py">controllerMQTT.py</a>,
+        <a href="sprint3/LedDevice.py">LedDevice.py</a>, <a href="sprint3/mqttReceiver.py">mqttReceiver.py</a>
+        <br><br>
+        La scelta di Python è motivata dal fatto che è un linguaggio ideale per la prototipazione: rapido,
+        con molte librerie di supporto e ben documentato.
+        Successivamente se si desiderano performace migliori si può pensare di ottimizzare scrivendo codice di più basso
+        livello.
+        <div class="remark keypoint">Per i programmi da eseguire su <b>Raspberry</b> si adotta <b>Python</b>
+        </div>
+        <br>
+        I pin del <b>Raspberry</b> coinvolti sono:
+        <ul>
+            <li><b>GPIO 4</b>: pin TRIG sonar</li>
+            <li><b>GPIO 27</b>: pin ECHO sonar</li>
+            <li><b>GPIO 25</b>: pin led</li>
+        </ul>
+
+        <h2>Conclusioni</h2>
+
+        <div class="remark">
+            Gli output dello sprint3 sono:<br>
+            <ul>
+                <li><b>Warning Device</b> e relativi attori e file python</li>
+                <li><b>Alarm Device</b> e relativi attori e file python</li>
+            </ul>
+        </div>
+
+        <h4>Goals Sprint 4</h4>
+        Si possono definire in seguito i goal relativi allo Sprint4:<br>
+        <ol>
+            <li>Identificare ed analizzare tutti i problemi relativi ai requisiti che coinvolgono la
+                <b>ServiceStatusGUI</b>
+            </li>
+            <li>Integrare al sistema realizzato nello Sprint3 la <b>ServiceStatusGUI</b></li>
+            <li>Realizzare l'interfaccia grafica</li>
+            <li>Testare il sistema</li>
+        </ol>
+
+        <br /><br />
+
+        <div style="background-color:rgba(86, 56, 253, 0.9); width:60%; text-align:left;color:white">
+            By <br>Tassinari Gabriele, email: gabriele.tassinari2@studio.unibo.it<br>
+            Baraldi Leonardo, email: leonardo.baraldi@studio.unibo.it<br>
+            Koss Krystian, email: krystian.koss@studio.unibo.it<br>
+            <div class="foto">
+                <img src="../../common/gabriele.jpeg" alt="mbot" width="15%" height="15%">
+                <img src="../../common/Baraldi.jpeg" alt="mbot" width="15%" height="15%">
+                <img src="../../common/kriss.jpeg" alt="mbot" width="15%" height="15%">
+            </div>
+            <br>
+            GIT repo: https://github.com/4utotune/ColdStorageService/ <br>
+        </div>
+</body>
+
+</html>
