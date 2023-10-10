@@ -1,4 +1,4 @@
-package rx
+package kotlin
 
 import it.unibo.kactor.ActorBasic
 import kotlinx.coroutines.GlobalScope
@@ -20,6 +20,7 @@ class SonarMQTTReceiver(name: String) : ActorBasic(name) {
     private lateinit var client: MqttClient
 
     init {
+        println("????")
         runBlocking { autoMsg("sonarstart", "do") } // autostart
     }
 
