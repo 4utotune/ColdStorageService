@@ -10,19 +10,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-	
-class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
+import it.unibo.kactor.sysUtil.createActor   //Sept2023
+class Alarmdevice ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
 	override fun getInitialState() : String{
 		return "init"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
-		 var MINT = 10000L  
-		return { //this:ActionBasciFsm
+		 var MINT = 5000L  
+				return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
-						 subscribeToLocalActor("distancefilter").subscribeToLocalActor("sonar")  
+						 subscribeToLocalActor("distancefilter").subscribeToLocalActor("sonarreceiver")  
 						CommUtils.outyellow("$name | init")
 						//genTimer( actor, state )
 					}
@@ -39,7 +39,7 @@ class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t4",targetState="handleobstacle",cond=whenEvent("obstacle"))
+					 transition(edgeName="t0",targetState="handleobstacle",cond=whenEvent("obstacle"))
 				}	 
 				state("handleobstacle") { //this:State
 					action { //it:State
@@ -57,14 +57,15 @@ class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t05",targetState="handleobstaclefree",cond=whenEvent("obstaclefree"))
+					 transition(edgeName="t01",targetState="handleobstaclefree",cond=whenEvent("obstaclefree"))
 				}	 
 				state("handleobstaclefree") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("obstaclefree(D)"), Term.createTerm("obstaclefree(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								emit("resume", "resume(_)" ) 
-								CommUtils.outyellow("$name | obstaclefree -> RESUME. Aspetto DLMIT prima di gestire un successivo stop")
+								CommUtils.outyellow("$name | obstaclefree -> RESUME. Aspetto MINT prima di gestire un successivo stop")
+								 delay(MINT)  
 								CommUtils.outyellow("$name | sono di nuovo pronto per poter gestire uno stop")
 						}
 						//genTimer( actor, state )
@@ -76,4 +77,4 @@ class Alarmdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 				}	 
 			}
 		}
-}
+} 

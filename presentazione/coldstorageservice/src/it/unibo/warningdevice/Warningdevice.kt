@@ -10,15 +10,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-	
-class Warningdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
+import it.unibo.kactor.sysUtil.createActor   //Sept2023
+class Warningdevice ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
 	override fun getInitialState() : String{
 		return "init"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
-		return { //this:ActionBasciFsm
+				return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
 						CommUtils.outblue("$name | init")
@@ -39,7 +39,7 @@ class Warningdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t06",targetState="doObserve",cond=whenDispatch("coapUpdate"))
+					 transition(edgeName="t02",targetState="doObserve",cond=whenDispatch("coapUpdate"))
 				}	 
 				state("doObserve") { //this:State
 					action { //it:State
@@ -74,4 +74,4 @@ class Warningdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 				}	 
 			}
 		}
-}
+} 

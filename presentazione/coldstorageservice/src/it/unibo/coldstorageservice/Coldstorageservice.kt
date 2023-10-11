@@ -10,8 +10,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-	
-class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
+import it.unibo.kactor.sysUtil.createActor   //Sept2023
+class Coldstorageservice ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
 	override fun getInitialState() : String{
 		return "s0"
@@ -28,8 +28,8 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				
 				var CurrentWeight = 0.0f
 				var ReservedWeight = 0.0f
-				var RejectedRequests = 0 
-		return { //this:ActionBasciFsm
+				var RejectedRequests = 0
+				return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						 
@@ -53,7 +53,7 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 										if (!ticket.isValid && !ticket.isExpired && !ticket.isApproved) {
 											ReservedWeight -= ticket.weight
 											ticket.hasExpired()
-											println("Riduco peso")
+											println("Ticket $ticket scaduto, rimuovo peso")
 										}
 									}	
 						CommUtils.outgreen("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight")
@@ -64,10 +64,10 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="handle_store",cond=whenRequest("storerequest"))
-					transition(edgeName="t01",targetState="handle_ticket",cond=whenRequest("insertticket"))
-					transition(edgeName="t02",targetState="handle_update",cond=whenDispatch("coapUpdate"))
-					transition(edgeName="t03",targetState="handle_charge_taken",cond=whenReply("chargetaken"))
+					 transition(edgeName="t030",targetState="handle_store",cond=whenRequest("storerequest"))
+					transition(edgeName="t031",targetState="handle_ticket",cond=whenRequest("insertticket"))
+					transition(edgeName="t032",targetState="handle_update",cond=whenDispatch("coapUpdate"))
+					transition(edgeName="t033",targetState="handle_charge_taken",cond=whenReply("chargetaken"))
 				}	 
 				state("handle_store") { //this:State
 					action { //it:State
@@ -115,13 +115,13 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 								if(  (TICKET != null)  
 								 ){if(  (TICKET.isValid && !TICKET.isExpired)  
 								 ){if( (!TICKET.isApproved()) 
-								 ){ TICKET.approve()  
-								if(  (ticketManager.isWaiting)  
+								 ){if(  (ticketManager.isWaiting)  
 								 ){CommUtils.outgreen("$name | Rejected ticket [ $Received ] - service full. Waiting for [ ${ticketManager.waiting} ] to be handled")
 								answer("insertticket", "ticketrejected", "ticketrejected(full)"   )  
 								}
 								else
-								 {if(  (ticketManager.isWorking)  
+								 { TICKET.approve()  
+								 if(  (ticketManager.isWorking)  
 								  ){CommUtils.outgreen("$name | Approved ticket [ $Received ]. Currenty working on [ ${ticketManager.working} ]")
 								 answer("insertticket", "ticketaccepted", "ticketaccepted(wait)"   )  
 								 }
@@ -140,6 +140,7 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 								}
 								else
 								 {
+								 						ReservedWeight -= TICKET.weight
 								 						ticketManager.remove(TICKET)
 								 CommUtils.outgreen("$name | Rejected ticket [ $Received ] - timedout")
 								 answer("insertticket", "ticketrejected", "ticketrejected(timedout)"   )  
@@ -178,8 +179,7 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(transporttrolley,deposited)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								
-												if (ticketManager.isWorking) {  
+								 if (ticketManager.isWorking) {  
 								CommUtils.outgreen("$name | Deposit confirmation received")
 								
 													CurrentWeight += ticketManager.workingTicket().weight
@@ -204,4 +204,4 @@ class Coldstorageservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 			}
 		}
-}
+} 

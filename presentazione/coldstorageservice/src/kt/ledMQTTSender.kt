@@ -1,6 +1,8 @@
-package rx
+package kt
 
 import it.unibo.kactor.ActorBasic
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
 import org.eclipse.paho.client.mqttv3.MqttClient
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttMessage
@@ -8,7 +10,7 @@ import unibo.basicomm23.interfaces.IApplMessage
 import unibo.basicomm23.utils.CommUtils
 
 
-class ledMQTTSender(name: String) : ActorBasic(name) {
+class ledMQTTSender(name: String, scope: CoroutineScope = GlobalScope, confined: Boolean = false) : ActorBasic(name, scope, confined) {
     val brokerip = "tcp://mqtt.eclipseprojects.io"
     val ledtopic = "unibo/led/events"
     val clientId = "ledSender"

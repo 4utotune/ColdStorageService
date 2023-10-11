@@ -1,6 +1,7 @@
-package kotlin
+package kt
 
 import it.unibo.kactor.ActorBasic
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -13,14 +14,13 @@ import unibo.basicomm23.interfaces.IApplMessage
 import unibo.basicomm23.utils.CommUtils
 
 
-class SonarMQTTReceiver(name: String) : ActorBasic(name) {
+class SonarMQTTReceiver(name: String, scope: CoroutineScope = GlobalScope, confined: Boolean = false) : ActorBasic(name, scope, confined) {
     private val brokerip = "tcp://mqtt.eclipseprojects.io"
     private val sonartopic = "unibo/sonar/events"
     private val clientId = "sonarReceiver"
     private lateinit var client: MqttClient
 
     init {
-        println("????")
         runBlocking { autoMsg("sonarstart", "do") } // autostart
     }
 

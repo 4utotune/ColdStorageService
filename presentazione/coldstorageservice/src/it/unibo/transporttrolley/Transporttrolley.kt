@@ -10,16 +10,18 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-	
-class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
+import it.unibo.kactor.sysUtil.createActor   //Sept2023
+class Transporttrolley ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
 	override fun getInitialState() : String{
 		return "s0"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
-		 var stato: String = ""  
-		return { //this:ActionBasciFsm
+		 
+				var stato: String = ""
+			   	var pending: Boolean = false   	
+				return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("$name | init e engage basicrobot")
@@ -29,21 +31,12 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t07",targetState="engaged",cond=whenReply("engagedone"))
-					transition(edgeName="t08",targetState="quit",cond=whenReply("engagerefused"))
+					 transition(edgeName="t03",targetState="engaged",cond=whenReply("engagedone"))
+					transition(edgeName="t04",targetState="quit",cond=whenReply("engagerefused"))
 				}	 
 				state("engaged") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("$name | basicrobot engaged")
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
-				}	 
-				state("idle") { //this:State
-					action { //it:State
 						 stato = "inHome"  
 						updateResourceRep( "azione(HOME)"  
 						)
@@ -54,12 +47,25 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t09",targetState="moveToIndoor",cond=whenRequest("gotoindoor"))
-					transition(edgeName="t010",targetState="sonarobstacle",cond=whenEvent("alarm"))
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
+				}	 
+				state("idle") { //this:State
+					action { //it:State
+						CommUtils.outmagenta("$name | idle")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t05",targetState="moveToIndoor",cond=whenRequest("gotoindoor"))
+					transition(edgeName="t06",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
 				state("moveToIndoor") { //this:State
 					action { //it:State
 						 stato = "toIndoor"  
+						if(  (pending)  
+						 ){ pending = false  
+						}
 						updateResourceRep( "azione(MOVING)"  
 						)
 						updateResourceRep( "stato($stato)"  
@@ -71,8 +77,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t011",targetState="loadTheCharge",cond=whenReply("moverobotdone"))
-					transition(edgeName="t012",targetState="sonarobstacle",cond=whenEvent("alarm"))
+					 transition(edgeName="t07",targetState="loadTheCharge",cond=whenReply("moverobotdone"))
+					transition(edgeName="t08",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
 				state("loadTheCharge") { //this:State
 					action { //it:State
@@ -89,8 +95,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				 	 		stateTimer = TimerActor("timer_loadTheCharge", 
 				 	 					  scope, context!!, "local_tout_transporttrolley_loadTheCharge", 3000.toLong() )
 					}	 	 
-					 transition(edgeName="t13",targetState="loadDone",cond=whenTimeout("local_tout_transporttrolley_loadTheCharge"))   
-					transition(edgeName="t14",targetState="sonarobstacle",cond=whenEvent("alarm"))
+					 transition(edgeName="t9",targetState="loadDone",cond=whenTimeout("local_tout_transporttrolley_loadTheCharge"))   
+					transition(edgeName="t10",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
 				state("loadDone") { //this:State
 					action { //it:State
@@ -116,8 +122,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t015",targetState="storeTheCharge",cond=whenReply("moverobotdone"))
-					transition(edgeName="t016",targetState="sonarobstacle",cond=whenEvent("alarm"))
+					 transition(edgeName="t011",targetState="storeTheCharge",cond=whenReply("moverobotdone"))
+					transition(edgeName="t012",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
 				state("storeTheCharge") { //this:State
 					action { //it:State
@@ -134,8 +140,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				 	 		stateTimer = TimerActor("timer_storeTheCharge", 
 				 	 					  scope, context!!, "local_tout_transporttrolley_storeTheCharge", 3000.toLong() )
 					}	 	 
-					 transition(edgeName="t017",targetState="chargeDeposited",cond=whenTimeout("local_tout_transporttrolley_storeTheCharge"))   
-					transition(edgeName="t018",targetState="sonarobstacle",cond=whenEvent("alarm"))
+					 transition(edgeName="t013",targetState="chargeDeposited",cond=whenTimeout("local_tout_transporttrolley_storeTheCharge"))   
+					transition(edgeName="t014",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
 				state("chargeDeposited") { //this:State
 					action { //it:State
@@ -148,8 +154,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t019",targetState="moveToIndoor",cond=whenRequest("gotoindoor"))
-					transition(edgeName="t020",targetState="moveToHome",cond=whenDispatch("gohome"))
+					 transition(edgeName="t015",targetState="moveToIndoor",cond=whenRequest("gotoindoor"))
+					transition(edgeName="t016",targetState="moveToHome",cond=whenDispatch("gohome"))
 				}	 
 				state("moveToHome") { //this:State
 					action { //it:State
@@ -165,11 +171,13 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t021",targetState="trolleyathome",cond=whenReply("moverobotdone"))
-					transition(edgeName="t022",targetState="sonarobstacle",cond=whenEvent("alarm"))
+					 transition(edgeName="t017",targetState="requestDuringHome",cond=whenRequest("gotoindoor"))
+					transition(edgeName="t018",targetState="trolleyathome",cond=whenReply("moverobotdone"))
+					transition(edgeName="t019",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
 				state("trolleyathome") { //this:State
 					action { //it:State
+						 stato = "inHome"  
 						updateResourceRep( "azione(HOME)"  
 						)
 						updateResourceRep( "stato($stato)"  
@@ -181,7 +189,10 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
+					 transition( edgeName="goto",targetState="moveToIndoor", cond=doswitchGuarded({ pending  
+					}) )
+					transition( edgeName="goto",targetState="idle", cond=doswitchGuarded({! ( pending  
+					) }) )
 				}	 
 				state("sonarobstacle") { //this:State
 					action { //it:State
@@ -192,20 +203,50 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t023",targetState="idle",cond=whenEventGuarded("resume",{ stato == "inHome"  
+					 transition(edgeName="t020",targetState="requestDuringAlarm",cond=whenRequest("gotoindoor"))
+					transition(edgeName="t021",targetState="idle",cond=whenEventGuarded("resume",{ stato == "inHome"  
 					}))
-					transition(edgeName="t024",targetState="moveToIndoor",cond=whenEventGuarded("resume",{ stato == "toIndoor"  
+					transition(edgeName="t022",targetState="moveToIndoor",cond=whenEventGuarded("resume",{ stato == "toIndoor"  
 					}))
-					transition(edgeName="t025",targetState="loadTheCharge",cond=whenEventGuarded("resume",{ stato == "inIndoor"  
+					transition(edgeName="t023",targetState="loadTheCharge",cond=whenEventGuarded("resume",{ stato == "inIndoor"  
 					}))
-					transition(edgeName="t026",targetState="moveToColdroom",cond=whenEventGuarded("resume",{ stato == "toColdroom"  
+					transition(edgeName="t024",targetState="moveToColdroom",cond=whenEventGuarded("resume",{ stato == "toColdroom"  
 					}))
-					transition(edgeName="t027",targetState="storeTheCharge",cond=whenEventGuarded("resume",{ stato == "inColdroom"  
+					transition(edgeName="t025",targetState="storeTheCharge",cond=whenEventGuarded("resume",{ stato == "inColdroom"  
 					}))
-					transition(edgeName="t028",targetState="chargeDeposited",cond=whenEventGuarded("resume",{ stato == "deposited"  
+					transition(edgeName="t026",targetState="chargeDeposited",cond=whenEventGuarded("resume",{ stato == "deposited"  
 					}))
-					transition(edgeName="t029",targetState="moveToHome",cond=whenEventGuarded("resume",{ stato == "toHome"  
+					transition(edgeName="t027",targetState="moveToHome",cond=whenEventGuarded("resume",{ stato == "toHome"  
 					}))
+				}	 
+				state("requestDuringAlarm") { //this:State
+					action { //it:State
+						 stato = "toIndoor"  
+						updateResourceRep( "stato($stato)"  
+						)
+						CommUtils.outmagenta("$name | trolley deve andare alla INDOOR quando l'alarm è terminato")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="sonarobstacle", cond=doswitch() )
+				}	 
+				state("requestDuringHome") { //this:State
+					action { //it:State
+						 
+									stato = "toHome"
+									pending = true
+						updateResourceRep( "stato($stato)"  
+						)
+						CommUtils.outmagenta("$name | trolley deve andare alla INDOOR una volta a casa")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t28",targetState="trolleyathome",cond=whenReply("moverobotdone"))
+					transition(edgeName="t29",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
 				state("quit") { //this:State
 					action { //it:State
@@ -219,4 +260,4 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 			}
 		}
-}
+} 

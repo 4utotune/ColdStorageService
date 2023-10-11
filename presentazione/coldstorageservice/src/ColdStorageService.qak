@@ -30,7 +30,6 @@ Dispatch 	setdirection		: 	dir(D) // up, down, left, right
 Request 	getrobotstate		: 	getrobotstate(ARG)
 Reply 		robotstate			: 	robotstate(POS,DIR) for getrobotstate
 
-
 // per observer
 Dispatch 	coapUpdate			: 	coapUpdate(RESOURCE, VALUE)
 
@@ -73,174 +72,18 @@ Context	ctx_coldstorage ip	[host="localhost" port=11802]
 // ACTORS
 ExternalQActor basicrobot context ctxbasicrobot
 
-CodedQActor sonar  			context ctx_coldstorage className "rx.SonarMQTTReceiver"
-CodedQActor distancefilter 	context ctx_coldstorage className "rx.DistanceFilter"
-CodedQActor ledMQTTSender  	context ctx_coldstorage className "rx.ledMQTTSender"
-
-
-QActor coldstorageservice context ctx_coldstorage{
-	[#	
-		val MaxWeightDDR = 50.0f
-		val MaxWeightcoldroom = 200.0f
-		val TicketTimeout = 20000
-		val TicketFormat = "yyyyMMddHHmmss"; // yyyy.MM.dd.HH.mm.ss
-		
-		var ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
-		
-		var CurrentWeight = 0.0f
-		var ReservedWeight = 0.0f
-		var RejectedRequests = 0 
-	#]
-	
-	State s0 initial {
-		[# 
-			ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
-			CurrentWeight = 0.0f 
-			ReservedWeight = 0.0f
-			RejectedRequests = 0
-		#]
-		observeResource transporttrolley
-		println("$name | init") color green
-	}
-	Goto idle	
-	
-	State idle {
-		[# 
-			for (ticket in ticketManager.tickets.values) {
-				if (!ticket.isValid && !ticket.isExpired && !ticket.isApproved) {
-					ReservedWeight -= ticket.weight
-					ticket.hasExpired()
-					println("Riduco peso")
-				}
-			}	
-		#]
-		println("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight") color green
-		updateResource [# "'weight(cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom)'" #]
-	}
-	Transition t0 whenRequest storerequest		-> handle_store
-				  whenRequest insertticket		-> handle_ticket
-				  whenMsg	  coapUpdate		-> handle_update
-				  whenReply	  chargetaken		-> handle_charge_taken
-					
-	State handle_store {
-		onMsg(storerequest: storerequest(FW)) {
-			println("$name | Received store request for ${payloadArg(0)} kg") color green
-		
-			[# val FW = payloadArg(0).toFloat() #]
-			
-			if [# (FW > MaxWeightDDR) #] {
-				[# RejectedRequests++ #]
-				updateResource [# "'rejected($RejectedRequests)'" #]				
-				replyTo storerequest with storerejected: storerejected(tooheavy)
-			} else {
-				if [# ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom) #] {
-					[# RejectedRequests++ #]
-					updateResource [# "'rejected($RejectedRequests)'" #]
-					replyTo storerequest with storerejected: storerejected(full)
-				} else {
-					[#
-						val TICKET = ticketManager.newTicket(FW)
-					  	ReservedWeight += FW
-					  	val TicketId = TICKET.id
-					#]
-					println("$name | Store request accepted. Ticket: [ $TicketId ]") color green					
-					replyTo storerequest with storeaccepted: storeaccepted($TicketId)
-				}	
-			}
-		}
-	}
-	Goto idle
-	
-	State handle_ticket {
-		onMsg(insertticket: insertticket(TICKET)) {
-			[# 
-				val Received = payloadArg(0).toString()
-				val TICKET = ticketManager.getTicket(Received)
-			#]
-			
-			if [# (TICKET != null) #] // ticket esiste
-			{
-				if [# (TICKET.isValid && !TICKET.isExpired) #] // ticket non è scaduto
-				{	
-					if [#(!TICKET.isApproved())#] { // ticket non ancora approvato
-						[# TICKET.approve() #]
-						if [# (ticketManager.isWaiting) #] { // c'è già un ticket in attesa
-							println("$name | Rejected ticket [ $Received ] - service full. Waiting for [ ${ticketManager.waiting} ] to be handled") color green
-							replyTo insertticket with ticketrejected: ticketrejected(full)				
-						} else {
-						
-							if [# (ticketManager.isWorking) #] { // trolley occupato
-								println("$name | Approved ticket [ $Received ]. Currenty working on [ ${ticketManager.working} ]") color green
-								replyTo insertticket with ticketaccepted: ticketaccepted(wait)					
-							} else {
-								println("$name | Approved ticket [ $Received ]. Requesting charge") color green
-								replyTo insertticket with ticketaccepted: ticketaccepted(ok)
-								request transporttrolley -m gotoindoor: gotoindoor(_)
-							}
-							[#  ticketManager.setWaiting(Received) #]
-						
-						}
-					} else { // ticket già approvato
-						println("$name | Rejected ticket [ $Received ] - already inserted") color green
-						replyTo insertticket with ticketrejected: ticketrejected(duplicate)					
-					}
-				} else { // ticket scaduto
-					[#
-						ticketManager.remove(TICKET)
-					#]
-					println("$name | Rejected ticket [ $Received ] - timedout") color green
-					replyTo insertticket with ticketrejected: ticketrejected(timedout)					
-				}	
-			} else { // ticket non esiste
-				println("$name | Rejected ticket [ $Received ] - doesn't exist") color green
-				replyTo insertticket with ticketrejected: ticketrejected(invalid)	
-			}
-		}
-	}
-	Goto idle
-	
-	State handle_charge_taken {
-		onMsg(chargetaken: chargetaken(_)) {
-			[# 			
-				val TicketId = ticketManager.waitingNowWorking()
-			#]
-			println("$name | Charge taken for ticket [ $TicketId ]") color green
-			updateResource [# "'chargetaken($TicketId)'" #]
-		}
-	}
-	Goto idle
-	
-	State handle_update {
-		onMsg(coapUpdate: coapUpdate(transporttrolley, deposited)) {
-			[#
-				if (ticketManager.isWorking) { #]
-					println("$name | Deposit confirmation received") color green
-			[#
-					CurrentWeight += ticketManager.workingTicket().weight
-					ReservedWeight -= ticketManager.workingTicket().weight
-					ticketManager.stopWorking()	// also removes ticket	
-				}
-			#]
-			if [# (ticketManager.isWaiting) #] {
-				println("$name | Next ticket: [ ${ticketManager.waiting} ]") color green
-				request transporttrolley -m gotoindoor: gotoindoor(_)
-			} else {
-				println("$name | No tickets are waiting. Sending trolley home") color green
-				forward transporttrolley -m gohome: gohome(_)
-			}
-		}
-	}
-	Goto idle
-}
+CodedQActor sonarreceiver	context ctx_coldstorage className "kt.SonarMQTTReceiver"
+CodedQActor distancefilter 	context ctx_coldstorage className "kt.DistanceFilter"
+CodedQActor ledMQTTSender  	context ctx_coldstorage className "kt.ledMQTTSender"
 
 
 //sonar
 QActor alarmdevice context ctx_coldstorage {
 	
-	[# var MINT = 10000L #]
+	[# var MINT = 5000L #]
 	
 	State init initial {		
-		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("sonar") #]
+		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("sonarreceiver") #]
 		println ("$name | init") color yellow
 	}
 	Goto work
@@ -263,8 +106,8 @@ QActor alarmdevice context ctx_coldstorage {
 	State handleobstaclefree {
 		onMsg( obstaclefree : obstaclefree(D)){			
 			emit resume : resume(_) //resume transporttrolley
-			println("$name | obstaclefree -> RESUME. Aspetto DLMIT prima di gestire un successivo stop") color yellow
-			//[# delay(MINT) #]
+			println("$name | obstaclefree -> RESUME. Aspetto MINT prima di gestire un successivo stop") color yellow
+			[# delay(MINT) #]
 			println("$name | sono di nuovo pronto per poter gestire uno stop") color yellow
 		}
 	}
@@ -312,10 +155,11 @@ QActor warningdevice context ctx_coldstorage {
 	Goto work
 }
 
-
-
 QActor transporttrolley context ctx_coldstorage { // ctx_trolley {
-	[# var stato: String = "" #]
+	[# 
+		var stato: String = ""
+	   	var pending: Boolean = false   	
+	#]
 	State s0 initial {
 		println("$name | init e engage basicrobot") color magenta
 	
@@ -326,19 +170,23 @@ QActor transporttrolley context ctx_coldstorage { // ctx_trolley {
 	
 	State engaged {
 		println("$name | basicrobot engaged") color magenta		
+		[# stato = "inHome" #]
+		updateResource [# "azione(HOME)" #]
+		updateResource [# "stato($stato)" #]
 	}
 	Goto idle
 	
 	State idle{
-		[# stato = "inHome" #]
-		updateResource [# "azione(HOME)" #]
-		updateResource [# "stato($stato)" #]
+		println("$name | idle") color magenta
 	}
 	Transition t0 whenRequest 	gotoindoor 	-> moveToIndoor
 				  whenEvent 	alarm 		-> sonarobstacle
 
 	State moveToIndoor {
 		[# stato = "toIndoor" #]
+		if [# (pending) #] {
+			[# pending = false #]
+		}
 		updateResource [# "azione(MOVING)" #]
 		updateResource [# "stato($stato)" #]
 		println("$name | vado all'INDOOR") color magenta
@@ -396,22 +244,25 @@ QActor transporttrolley context ctx_coldstorage { // ctx_trolley {
 		println("$name | vado alla posizione HOME") color magenta
 		request basicrobot -m moverobot : moverobot (0,0)
 	}
-	Transition t0 whenReply moverobotdone -> trolleyathome
-				  whenEvent alarm -> sonarobstacle
+	Transition t0 whenRequest gotoindoor 	-> requestDuringHome
+				  whenReply moverobotdone 	-> trolleyathome
+			  	  whenEvent alarm 			-> sonarobstacle	
 	
 	State trolleyathome {
+		[# stato = "inHome" #]
 		updateResource [# "azione(HOME)" #]
 		updateResource [# "stato($stato)" #]
 		println("$name | trolley at HOME") color magenta
 		forward basicrobot -m setdirection : dir(down)
 	}
-	Goto idle
+	Goto moveToIndoor if [# pending #] else idle
 	
 	State sonarobstacle {
 		discardMsg On
 		println("$name | Sono fermo per ostacolo sonar") color magenta
 	}
-	Transition t0 whenEvent resume and [# stato == "inHome" #] 		-> idle
+	Transition t0 whenRequest gotoindoor 							-> requestDuringAlarm
+				  whenEvent resume and [# stato == "inHome" #] 		-> idle
 				  whenEvent resume and [# stato == "toIndoor" #] 	-> moveToIndoor
 				  whenEvent resume and [# stato == "inIndoor" #] 	-> loadTheCharge
 				  whenEvent resume and [# stato == "toColdroom" #] 	-> moveToColdroom
@@ -419,8 +270,181 @@ QActor transporttrolley context ctx_coldstorage { // ctx_trolley {
 				  whenEvent resume and [# stato == "deposited" #] 	-> chargeDeposited
 				  whenEvent resume and [# stato == "toHome" #] 		-> moveToHome
 	
+	State requestDuringAlarm {
+		[# stato = "toIndoor" #]
+		updateResource [# "stato($stato)" #]
+		println("$name | trolley deve andare alla INDOOR quando l'alarm è terminato") color magenta		
+	}
+	Goto sonarobstacle
+	
+	State requestDuringHome {
+		[# 
+			stato = "toHome"
+			pending = true
+		#]
+		updateResource [# "stato($stato)" #]
+		println("$name | trolley deve andare alla INDOOR una volta a casa") color magenta
+	}
+	Transition t whenReply moverobotdone 	-> trolleyathome
+				 whenEvent alarm 			-> sonarobstacle	
+	
 	State quit {
 		forward basicrobot -m disengage : disengage(transporttrolley)
 		[# System.exit(0) #]
 	}
+}
+
+
+QActor coldstorageservice context ctx_coldstorage {
+	[#	
+		val MaxWeightDDR = 50.0f
+		val MaxWeightcoldroom = 200.0f
+		val TicketTimeout = 20000
+		val TicketFormat = "yyyyMMddHHmmss"; // yyyy.MM.dd.HH.mm.ss
+		
+		var ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
+		
+		var CurrentWeight = 0.0f
+		var ReservedWeight = 0.0f
+		var RejectedRequests = 0
+	#]
+	
+	State s0 initial {
+		[# 
+			ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
+			CurrentWeight = 0.0f 
+			ReservedWeight = 0.0f
+			RejectedRequests = 0
+		#]
+		observeResource transporttrolley
+		println("$name | init") color green
+	}
+	Goto idle	
+	
+	State idle {
+		[# 
+			for (ticket in ticketManager.tickets.values) {
+				if (!ticket.isValid && !ticket.isExpired && !ticket.isApproved) {
+					ReservedWeight -= ticket.weight
+					ticket.hasExpired()
+					println("Ticket $ticket scaduto, rimuovo peso")
+				}
+			}	
+		#]
+		println("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight") color green
+		updateResource [# "'weight(cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom)'" #]
+	}
+	Transition t0 whenRequest storerequest		-> handle_store
+				  whenRequest insertticket		-> handle_ticket
+				  whenMsg	  coapUpdate		-> handle_update
+				  whenReply	  chargetaken		-> handle_charge_taken
+					
+	State handle_store {
+		onMsg(storerequest: storerequest(FW)) {
+			println("$name | Received store request for ${payloadArg(0)} kg") color green
+		
+			[# val FW = payloadArg(0).toFloat() #]
+			
+			if [# (FW > MaxWeightDDR) #] {
+				[# RejectedRequests++ #]
+				updateResource [# "'rejected($RejectedRequests)'" #]				
+				replyTo storerequest with storerejected: storerejected(tooheavy)
+			} else {
+				if [# ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom) #] {
+					[# RejectedRequests++ #]
+					updateResource [# "'rejected($RejectedRequests)'" #]
+					replyTo storerequest with storerejected: storerejected(full)
+				} else {
+					[#
+						val TICKET = ticketManager.newTicket(FW)
+					  	ReservedWeight += FW
+					  	val TicketId = TICKET.id
+					#]
+					println("$name | Store request accepted. Ticket: [ $TicketId ]") color green					
+					replyTo storerequest with storeaccepted: storeaccepted($TicketId)
+				}	
+			}
+		}
+	}
+	Goto idle
+	
+	State handle_ticket {
+		onMsg(insertticket: insertticket(TICKET)) {
+			[# 
+				val Received = payloadArg(0).toString()
+				val TICKET = ticketManager.getTicket(Received)
+			#]
+			
+			if [# (TICKET != null) #] // ticket esiste
+			{
+				if [# (TICKET.isValid && !TICKET.isExpired) #] // ticket non è scaduto
+				{	
+					if [#(!TICKET.isApproved())#] { // ticket non ancora approvato
+						if [# (ticketManager.isWaiting) #] { // c'è già un ticket in attesa
+							println("$name | Rejected ticket [ $Received ] - service full. Waiting for [ ${ticketManager.waiting} ] to be handled") color green
+							replyTo insertticket with ticketrejected: ticketrejected(full)				
+						} else { // indoor libera
+							[# TICKET.approve() #]												
+							if [# (ticketManager.isWorking) #] { // trolley occupato
+								println("$name | Approved ticket [ $Received ]. Currenty working on [ ${ticketManager.working} ]") color green
+								replyTo insertticket with ticketaccepted: ticketaccepted(wait)					
+							} else { // trolley libero
+								println("$name | Approved ticket [ $Received ]. Requesting charge") color green
+								replyTo insertticket with ticketaccepted: ticketaccepted(ok)
+								request transporttrolley -m gotoindoor: gotoindoor(_)
+							}
+							[#  ticketManager.setWaiting(Received) #]
+						
+						}
+					} else { // ticket già approvato
+						println("$name | Rejected ticket [ $Received ] - already inserted") color green
+						replyTo insertticket with ticketrejected: ticketrejected(duplicate)					
+					}
+				} else { // ticket scaduto
+					[#
+						ReservedWeight -= TICKET.weight
+						ticketManager.remove(TICKET)
+					#]
+					println("$name | Rejected ticket [ $Received ] - timedout") color green
+					replyTo insertticket with ticketrejected: ticketrejected(timedout)					
+				}	
+			} else { // ticket non esiste
+				println("$name | Rejected ticket [ $Received ] - doesn't exist") color green
+				replyTo insertticket with ticketrejected: ticketrejected(invalid)	
+			}
+		}
+	}
+	Goto idle
+	
+	State handle_charge_taken {
+		onMsg(chargetaken: chargetaken(_)) {
+			[# 			
+				val TicketId = ticketManager.waitingNowWorking()
+			#]
+			println("$name | Charge taken for ticket [ $TicketId ]") color green
+			updateResource [# "'chargetaken($TicketId)'" #]
+		}
+	}
+	Goto idle
+	
+	State handle_update {
+		onMsg(coapUpdate: coapUpdate(transporttrolley, deposited)) {
+			[# if (ticketManager.isWorking) { #]
+					println("$name | Deposit confirmation received") color green
+			[#
+					CurrentWeight += ticketManager.workingTicket().weight
+					ReservedWeight -= ticketManager.workingTicket().weight
+					ticketManager.stopWorking()	// also removes ticket	
+				}
+			#]
+			if [# (ticketManager.isWaiting) #] {
+				println("$name | Next ticket: [ ${ticketManager.waiting} ]") color green
+				request transporttrolley -m gotoindoor: gotoindoor(_)
+			} else {
+				println("$name | No tickets are waiting. Sending trolley home") color green
+				forward transporttrolley -m gohome: gohome(_)
+			}
+		}
+	}
+	Goto idle
 }

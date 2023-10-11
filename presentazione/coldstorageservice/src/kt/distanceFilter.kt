@@ -1,14 +1,16 @@
-package rx
+package kt
 
 import alice.tuprolog.Struct
 import alice.tuprolog.Term
 import it.unibo.kactor.ActorBasic
 import it.unibo.kactor.MsgUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
 import unibo.basicomm23.interfaces.IApplMessage
 import unibo.basicomm23.utils.CommUtils.outyellow
 
 
-class DistanceFilter(name: String) : ActorBasic(name) {
+class DistanceFilter(name: String, scope: CoroutineScope = GlobalScope, confined: Boolean = false) : ActorBasic(name, scope, confined) {
     private val DLIMIT = 8
 
     private var lastMeasurement = 0

@@ -24,11 +24,11 @@ with Diagram('coldstorageserviceArch', show=False, outformat='png', graph_attr=g
      with Cluster('ctxbasicrobot', graph_attr=nodeattr):
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      with Cluster('ctx_coldstorage', graph_attr=nodeattr):
-          coldstorageservice=Custom('coldstorageservice','./qakicons/symActorSmall.png')
           alarmdevice=Custom('alarmdevice','./qakicons/symActorSmall.png')
           warningdevice=Custom('warningdevice','./qakicons/symActorSmall.png')
           transporttrolley=Custom('transporttrolley','./qakicons/symActorSmall.png')
-          sonar=Custom('sonar(coded)','./qakicons/codedQActor.png')
+          coldstorageservice=Custom('coldstorageservice','./qakicons/symActorSmall.png')
+          sonarreceiver=Custom('sonarreceiver(coded)','./qakicons/codedQActor.png')
           distancefilter=Custom('distancefilter(coded)','./qakicons/codedQActor.png')
           ledMQTTSender=Custom('ledMQTTSender(coded)','./qakicons/codedQActor.png')
      alarmdevice >> Edge( label='alarm', **eventedgeattr, fontcolor='red') >> sys
