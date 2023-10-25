@@ -49,8 +49,6 @@ class Alarmdevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								CommUtils.outyellow("$name | obstacle -> ALARM")
 								emit("alarm", "alarm(_)" ) 
-								updateResourceRep( "azione(STOPPED)"  
-								)
 						}
 						//genTimer( actor, state )
 					}

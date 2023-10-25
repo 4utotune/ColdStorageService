@@ -197,6 +197,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope, isconfined: Boolea
 				state("sonarobstacle") { //this:State
 					action { //it:State
 						discardMessages = true
+						updateResourceRep( "azione(STOPPED)"  
+						)
 						CommUtils.outmagenta("$name | Sono fermo per ostacolo sonar")
 						//genTimer( actor, state )
 					}

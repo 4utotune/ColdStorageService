@@ -98,7 +98,6 @@ QActor alarmdevice context ctx_coldstorage {
 		onMsg( obstacle : obstacle(D)){
 			println("$name | obstacle -> ALARM") color yellow
 			emit alarm : alarm(_)			
-			updateResource [# "azione(STOPPED)" #]
 		}	
 	}
 	Transition t0 whenEvent obstaclefree -> handleobstaclefree	               
@@ -120,7 +119,6 @@ QActor warningdevice context ctx_coldstorage {
 	State init initial {
 		println ("$name | init") color blue
 		observeResource transporttrolley
-		observeResource alarmdevice
 		println("$name | LED IS OFF") color blue
 	}
 	Goto work
@@ -259,6 +257,7 @@ QActor transporttrolley context ctx_coldstorage { // ctx_trolley {
 	
 	State sonarobstacle {
 		discardMsg On
+		updateResource [# "azione(STOPPED)" #]		
 		println("$name | Sono fermo per ostacolo sonar") color magenta
 	}
 	Transition t0 whenRequest gotoindoor 							-> requestDuringAlarm

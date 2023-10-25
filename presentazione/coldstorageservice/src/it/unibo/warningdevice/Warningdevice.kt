@@ -23,7 +23,6 @@ class Warningdevice ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					action { //it:State
 						CommUtils.outblue("$name | init")
 						CoapObserverSupport(myself, "localhost","11802","ctx_coldstorage","transporttrolley")
-						CoapObserverSupport(myself, "localhost","11802","ctx_coldstorage","alarmdevice")
 						CommUtils.outblue("$name | LED IS OFF")
 						//genTimer( actor, state )
 					}
