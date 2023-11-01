@@ -24,19 +24,25 @@ class Coldstorageservice ( name: String, scope: CoroutineScope, isconfined: Bool
 				val TicketTimeout = 20000
 				val TicketFormat = "yyyyMMddHHmmss"; // yyyy.MM.dd.HH.mm.ss
 				
-				var ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
+				val ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
 				
 				var CurrentWeight = 0.0f
 				var ReservedWeight = 0.0f
 				var RejectedRequests = 0
+		
+				fun checkExpired() {
+					for (ticket in ticketManager.tickets.values) {
+						if (!ticket.isValid && !ticket.isExpired && !ticket.isApproved) {
+							ReservedWeight -= ticket.weight
+							ticket.hasExpired()
+							val id = ticket.id
+							println("Ticket $id scaduto, rimuovo peso")
+						}
+					}	
+				}
 				return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						 
-									ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
-									CurrentWeight = 0.0f 
-									ReservedWeight = 0.0f
-									RejectedRequests = 0
 						CoapObserverSupport(myself, "localhost","11802","ctx_coldstorage","transporttrolley")
 						CommUtils.outgreen("$name | init")
 						//genTimer( actor, state )
@@ -49,13 +55,7 @@ class Coldstorageservice ( name: String, scope: CoroutineScope, isconfined: Bool
 				state("idle") { //this:State
 					action { //it:State
 						 
-									for (ticket in ticketManager.tickets.values) {
-										if (!ticket.isValid && !ticket.isExpired && !ticket.isApproved) {
-											ReservedWeight -= ticket.weight
-											ticket.hasExpired()
-											println("Ticket $ticket scaduto, rimuovo peso")
-										}
-									}	
+									checkExpired()
 						CommUtils.outgreen("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight")
 						updateResourceRep( "'weight(cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom)'"  
 						)
@@ -82,7 +82,8 @@ class Coldstorageservice ( name: String, scope: CoroutineScope, isconfined: Bool
 								answer("storerequest", "storerejected", "storerejected(tooheavy)"   )  
 								}
 								else
-								 {if(  ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom)  
+								 { checkExpired()  
+								 if(  ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom)  
 								  ){ RejectedRequests++  
 								 updateResourceRep( "'rejected($RejectedRequests)'"  
 								 )
@@ -113,7 +114,7 @@ class Coldstorageservice ( name: String, scope: CoroutineScope, isconfined: Bool
 												val Received = payloadArg(0).toString()
 												val TICKET = ticketManager.getTicket(Received)
 								if(  (TICKET != null)  
-								 ){if(  (TICKET.isValid && !TICKET.isExpired)  
+								 ){if(  (TICKET.isValid)  
 								 ){if( (!TICKET.isApproved()) 
 								 ){if(  (ticketManager.isWaiting)  
 								 ){CommUtils.outgreen("$name | Rejected ticket [ $Received ] - service full. Waiting for [ ${ticketManager.waiting} ] to be handled")
@@ -140,7 +141,9 @@ class Coldstorageservice ( name: String, scope: CoroutineScope, isconfined: Bool
 								}
 								else
 								 {
-								 						ReservedWeight -= TICKET.weight
+								 						if (!TICKET.isExpired) {
+								 							ReservedWeight -= TICKET.weight	
+								 						}
 								 						ticketManager.remove(TICKET)
 								 CommUtils.outgreen("$name | Rejected ticket [ $Received ] - timedout")
 								 answer("insertticket", "ticketrejected", "ticketrejected(timedout)"   )  

@@ -51,6 +51,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope, isconfined: Boolea
 				}	 
 				state("idle") { //this:State
 					action { //it:State
+						updateResourceRep( "azione(HOME)"  
+						)
 						CommUtils.outmagenta("$name | idle")
 						//genTimer( actor, state )
 					}
@@ -153,9 +155,12 @@ class Transporttrolley ( name: String, scope: CoroutineScope, isconfined: Boolea
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
+				 	 		stateTimer = TimerActor("timer_chargeDeposited", 
+				 	 					  scope, context!!, "local_tout_transporttrolley_chargeDeposited", 3000.toLong() )
 					}	 	 
-					 transition(edgeName="t015",targetState="moveToIndoor",cond=whenRequest("gotoindoor"))
-					transition(edgeName="t016",targetState="moveToHome",cond=whenDispatch("gohome"))
+					 transition(edgeName="t015",targetState="moveToHome",cond=whenTimeout("local_tout_transporttrolley_chargeDeposited"))   
+					transition(edgeName="t016",targetState="moveToIndoor",cond=whenRequest("gotoindoor"))
+					transition(edgeName="t017",targetState="moveToHome",cond=whenDispatch("gohome"))
 				}	 
 				state("moveToHome") { //this:State
 					action { //it:State
@@ -171,9 +176,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t017",targetState="requestDuringHome",cond=whenRequest("gotoindoor"))
-					transition(edgeName="t018",targetState="trolleyathome",cond=whenReply("moverobotdone"))
-					transition(edgeName="t019",targetState="sonarobstacle",cond=whenEvent("alarm"))
+					 transition(edgeName="t018",targetState="requestDuringHome",cond=whenRequest("gotoindoor"))
+					transition(edgeName="t019",targetState="trolleyathome",cond=whenReply("moverobotdone"))
+					transition(edgeName="t020",targetState="sonarobstacle",cond=whenEvent("alarm"))
 				}	 
 				state("trolleyathome") { //this:State
 					action { //it:State
@@ -205,18 +210,16 @@ class Transporttrolley ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t020",targetState="requestDuringAlarm",cond=whenRequest("gotoindoor"))
-					transition(edgeName="t021",targetState="idle",cond=whenEventGuarded("resume",{ stato == "inHome"  
+					 transition(edgeName="t021",targetState="requestDuringAlarm",cond=whenRequest("gotoindoor"))
+					transition(edgeName="t022",targetState="idle",cond=whenEventGuarded("resume",{ stato == "inHome"  
 					}))
-					transition(edgeName="t022",targetState="moveToIndoor",cond=whenEventGuarded("resume",{ stato == "toIndoor"  
+					transition(edgeName="t023",targetState="moveToIndoor",cond=whenEventGuarded("resume",{ stato == "toIndoor"  
 					}))
-					transition(edgeName="t023",targetState="loadTheCharge",cond=whenEventGuarded("resume",{ stato == "inIndoor"  
+					transition(edgeName="t024",targetState="loadTheCharge",cond=whenEventGuarded("resume",{ stato == "inIndoor"  
 					}))
-					transition(edgeName="t024",targetState="moveToColdroom",cond=whenEventGuarded("resume",{ stato == "toColdroom"  
+					transition(edgeName="t025",targetState="moveToColdroom",cond=whenEventGuarded("resume",{ stato == "toColdroom"  
 					}))
-					transition(edgeName="t025",targetState="storeTheCharge",cond=whenEventGuarded("resume",{ stato == "inColdroom"  
-					}))
-					transition(edgeName="t026",targetState="chargeDeposited",cond=whenEventGuarded("resume",{ stato == "deposited"  
+					transition(edgeName="t026",targetState="storeTheCharge",cond=whenEventGuarded("resume",{ stato == "inColdroom"  
 					}))
 					transition(edgeName="t027",targetState="moveToHome",cond=whenEventGuarded("resume",{ stato == "toHome"  
 					}))

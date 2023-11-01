@@ -80,7 +80,7 @@ CodedQActor ledMQTTSender  	context ctx_coldstorage className "kt.ledMQTTSender"
 //sonar
 QActor alarmdevice context ctx_coldstorage {
 	
-	[# var MINT = 5000L #]
+	[# var MINT = 6000L #]
 	
 	State init initial {		
 		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("sonarreceiver") #]
@@ -153,7 +153,7 @@ QActor warningdevice context ctx_coldstorage {
 	Goto work
 }
 
-QActor transporttrolley context ctx_coldstorage { // ctx_trolley {
+QActor transporttrolley context ctx_coldstorage { 
 	[# 
 		var stato: String = ""
 	   	var pending: Boolean = false   	
@@ -175,7 +175,9 @@ QActor transporttrolley context ctx_coldstorage { // ctx_trolley {
 	Goto idle
 	
 	State idle{
+		updateResource [# "azione(HOME)" #]		
 		println("$name | idle") color magenta
+		
 	}
 	Transition t0 whenRequest 	gotoindoor 	-> moveToIndoor
 				  whenEvent 	alarm 		-> sonarobstacle
@@ -232,9 +234,10 @@ QActor transporttrolley context ctx_coldstorage { // ctx_trolley {
 		println("$name | terminato deposito. Aspetto istruzioni") color magenta		
 		updateResource [# "deposited" #]
 	}
-	Transition t0 whenRequest 	gotoindoor  -> moveToIndoor
+	Transition t0 whenTime 3000				-> moveToHome
+				  whenRequest 	gotoindoor  -> moveToIndoor
 				  whenMsg 		gohome 		-> moveToHome
-	
+				  
 	State moveToHome{
 		[# stato = "toHome" #]
 		updateResource [# "azione(MOVING)" #]
@@ -266,7 +269,6 @@ QActor transporttrolley context ctx_coldstorage { // ctx_trolley {
 				  whenEvent resume and [# stato == "inIndoor" #] 	-> loadTheCharge
 				  whenEvent resume and [# stato == "toColdroom" #] 	-> moveToColdroom
 				  whenEvent resume and [# stato == "inColdroom" #] 	-> storeTheCharge
-				  whenEvent resume and [# stato == "deposited" #] 	-> chargeDeposited
 				  whenEvent resume and [# stato == "toHome" #] 		-> moveToHome
 	
 	State requestDuringAlarm {
@@ -301,20 +303,25 @@ QActor coldstorageservice context ctx_coldstorage {
 		val TicketTimeout = 20000
 		val TicketFormat = "yyyyMMddHHmmss"; // yyyy.MM.dd.HH.mm.ss
 		
-		var ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
+		val ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
 		
 		var CurrentWeight = 0.0f
 		var ReservedWeight = 0.0f
 		var RejectedRequests = 0
+
+		fun checkExpired() {
+			for (ticket in ticketManager.tickets.values) {
+				if (!ticket.isValid && !ticket.isExpired && !ticket.isApproved) {
+					ReservedWeight -= ticket.weight
+					ticket.hasExpired()
+					val id = ticket.id
+					println("Ticket $id scaduto, rimuovo peso")
+				}
+			}	
+		}
 	#]
 	
 	State s0 initial {
-		[# 
-			ticketManager = coldstorageservice.TicketManager(TicketTimeout, TicketFormat);
-			CurrentWeight = 0.0f 
-			ReservedWeight = 0.0f
-			RejectedRequests = 0
-		#]
 		observeResource transporttrolley
 		println("$name | init") color green
 	}
@@ -322,13 +329,7 @@ QActor coldstorageservice context ctx_coldstorage {
 	
 	State idle {
 		[# 
-			for (ticket in ticketManager.tickets.values) {
-				if (!ticket.isValid && !ticket.isExpired && !ticket.isApproved) {
-					ReservedWeight -= ticket.weight
-					ticket.hasExpired()
-					println("Ticket $ticket scaduto, rimuovo peso")
-				}
-			}	
+			checkExpired()
 		#]
 		println("$name | Idle. Current: $CurrentWeight, Reserved: $ReservedWeight") color green
 		updateResource [# "'weight(cur,$CurrentWeight,res,$ReservedWeight,max,$MaxWeightcoldroom)'" #]
@@ -349,6 +350,7 @@ QActor coldstorageservice context ctx_coldstorage {
 				updateResource [# "'rejected($RejectedRequests)'" #]				
 				replyTo storerequest with storerejected: storerejected(tooheavy)
 			} else {
+				[# checkExpired() #]
 				if [# ((CurrentWeight + ReservedWeight + FW) > MaxWeightcoldroom) #] {
 					[# RejectedRequests++ #]
 					updateResource [# "'rejected($RejectedRequests)'" #]
@@ -376,7 +378,7 @@ QActor coldstorageservice context ctx_coldstorage {
 			
 			if [# (TICKET != null) #] // ticket esiste
 			{
-				if [# (TICKET.isValid && !TICKET.isExpired) #] // ticket non è scaduto
+				if [# (TICKET.isValid) #] // ticket non è scaduto
 				{	
 					if [#(!TICKET.isApproved())#] { // ticket non ancora approvato
 						if [# (ticketManager.isWaiting) #] { // c'è già un ticket in attesa
@@ -401,7 +403,9 @@ QActor coldstorageservice context ctx_coldstorage {
 					}
 				} else { // ticket scaduto
 					[#
-						ReservedWeight -= TICKET.weight
+						if (!TICKET.isExpired) {
+							ReservedWeight -= TICKET.weight	
+						}
 						ticketManager.remove(TICKET)
 					#]
 					println("$name | Rejected ticket [ $Received ] - timedout") color green

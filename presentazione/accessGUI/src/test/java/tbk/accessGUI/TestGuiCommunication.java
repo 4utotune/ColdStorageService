@@ -44,6 +44,13 @@ public class TestGuiCommunication {
 
     @Test
     @Order(3)
+    public void sendTicketTooHeavy() {
+        IApplMessage store_response = handler.storerequest("60");
+        Assertions.assertTrue(store_response.isReply() && store_response.msgContent().contains("storerejected(tooheavy)"));
+    }
+
+    @Test
+    @Order(4)
     public void twoTickets() throws InterruptedException {
         CountDownLatch lock = new CountDownLatch(1);
 
@@ -95,7 +102,7 @@ public class TestGuiCommunication {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     public void sendStoreAndTicketIntime() {
         outgreen("Sending store request");
         IApplMessage response = handler.storerequest("10");

@@ -18,7 +18,7 @@ class Alarmdevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
-		 var MINT = 5000L  
+		 var MINT = 6000L  
 				return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
